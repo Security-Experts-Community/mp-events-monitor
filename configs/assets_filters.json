@@ -1211,7 +1211,8 @@
             "compactunique(host.endpoints<ipendpoint>.address) as Host_addresses) | filter(Listen_addresses) as G, G.host.@id = asset_id) ",
             "| select(@host, asset_id, host.@audittime, dur_audit, Sc.host.@ScanningInfo.Status, Vendor, Name, Version, ConfFile, mode, G.Listen_addresses, G.Listen_ports, G.Host_addresses, routes, Cl.clients, Log.logging)"
         ],
-        "default_politics_blacklist": "^(u os |s openvpn)"
+        "default_politics_blacklist": "^(u os)",
+        "mandatory_policies": "s openvpn"
     },
     "KSC_by_ports": {
         "comment": [

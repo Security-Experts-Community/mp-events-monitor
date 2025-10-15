@@ -32,6 +32,7 @@ class AssetWorker:
         pdql: Union[str, list[str]]
         default_politics_whitelist: Union[str, list[str], None]
         default_politics_blacklist: Union[str, list[str], None]
+        mandatory_policies: Union[str, list[str], None]
         comment: Union[str, list[str], None]
         group: Union[str, UUID, list[UUID], list[str]]
         specific_politics: dict[str, list[dict[str, str | list[str]]]] | None
@@ -39,6 +40,7 @@ class AssetWorker:
         pdql: Any
         default_politics_whitelist: Any
         default_politics_blacklist: Any
+        mandatory_policies: Any
         comment: Any
         group: Any
         specific_politics: Any
@@ -67,8 +69,7 @@ class AssetWorker:
     то он выведет это в лог, а также в ексельке это значение будет оставаться красным
     """
 
-    def __init__(self, settings, auth, logger, policies, filter_name, filter_settings: dict):
-        #TODO проврека что ктот из default_politics_whitelist ИЛИ default_politics_blacklist
+    def __init__(self, settings, auth, logger: logging.Logger, policies, filter_name, filter_settings: dict):
         self.settings = settings
         self.auth = auth
         self.logger = logger
@@ -77,6 +78,19 @@ class AssetWorker:
         self.pdql = filter_settings["PDQL"]
         self.default_politics_whitelist = filter_settings.get("default_politics_whitelist")
         self.default_politics_blacklist = filter_settings.get("default_politics_blacklist")
+        self.mandatory_policies = filter_settings.get("mandatory_policies")
+        if self.mandatory_policies:
+            if not self.default_politics_blacklist:
+                self.default_politics_blacklist = []
+            elif type(self.default_politics_blacklist) is str:
+                self.default_politics_blacklist = [self.default_politics_blacklist]
+            if type(self.mandatory_policies) is str:
+                self.default_politics_blacklist.append(self.mandatory_policies)
+                self.mandatory_policies = [self.mandatory_policies]
+            elif type(self.mandatory_policies) is list:
+                self.default_politics_blacklist.extend(self.mandatory_policies)
+            else:
+                logger.error(f'self.mandatory_policies {self.mandatory_policies} is not string or list. Skip.')
         self.comment = filter_settings.get("comment")
         self.group = filter_settings["group"]
         self.specific_politics = filter_settings.get("specific_politics")
@@ -99,7 +113,7 @@ class AssetWorker:
         counter = self.settings.max_uuids_in_siem_query
         if num_assets > 0:
             ev = EventsWorker(self.settings, self.logger, self.policies, self.auth, self.default_politics_blacklist,
-                              self.default_politics_whitelist, self.specific_politics, True)
+                              self.default_politics_whitelist, self.specific_politics, self.mandatory_policies, True)
             print("Now take events by policies")
             if num_assets < counter:
                 if not old_python:
@@ -347,7 +361,6 @@ class AssetWorker:
             else:
                 prep_dict = {i: None for i in fields}
                 return {}, all_search_to_no_asset(all_search_values, prep_dict, [])
-
 
 def switch_and_clear_filter(static_filter, key_field, main_field, dm_fields, dyn_filter, main_values):
     static_filter = static_filter.replace('["+' + key_field + '"]', "['" + key_field + "']")

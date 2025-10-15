@@ -28,13 +28,13 @@ class EventsWorker:
     policies: EventPolicies
     auth: MPXAuthenticator
 
-    def __init__(self, settings, logger, policies, auth, pol_blacklist, pol_whitelist = None, pol_spec = None, assets: bool = False):
+    def __init__(self, settings, logger, policies, auth, pol_blacklist = None, pol_whitelist = None, pol_spec = None, mand_pols = None, assets: bool = False):
         self.settings = settings
         self.logger = logger
         self.policies = policies
         self.semaphore = asyncio.Semaphore(self.settings.max_threads_for_siem_api)
         self.auth = auth
-        self.policies.filter_policies(pol_blacklist, pol_whitelist, pol_spec)
+        self.policies.filter_policies(pol_blacklist, pol_whitelist, pol_spec, mand_pols)
         if assets:
             audit_pol = {
                 'name': 'Audit Events Hack', 'number': 0,
@@ -180,7 +180,7 @@ class EventsWorker:
             asset_dict = excel_file.create_asset_dict(self.policies.rebuilt_policies, self.policies.small_policies, asset_dict)
         with (out_path / "!asset_dict.json").open('w', encoding='utf-8') as out_assets:
             json.dump(asset_dict, out_assets, indent=4, ensure_ascii=False)
-        excel_file.work_with_asset_dict(self.policies.small_policies, asset_dict, no_assets)
+        excel_file.work_with_asset_dict(self.policies.small_policies, asset_dict, no_assets, self.policies.mandatory_policies)
         closed = False
         for try_number in range(self.settings.reconnect_times):
             try:

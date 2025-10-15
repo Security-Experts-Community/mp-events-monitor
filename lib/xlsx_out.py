@@ -259,7 +259,7 @@ class MonitorXlsxWriter:
                 asset_dict[host].update({"audit_info": policies[-1]["host_ids"][host]["event_src.host"]})
         return asset_dict
 
-    def work_with_asset_dict(self, small_policies, asset_dict, no_assets):
+    def work_with_asset_dict(self, small_policies, asset_dict, no_assets, mandatory_policies=None):
         col_sizer = []
         index_row = self.worksheets_line_number["FULL"]
         index_row_no_extra = self.worksheets_line_number["simple"]
@@ -369,7 +369,7 @@ class MonitorXlsxWriter:
             full_simple_attrs.append(part_policies)
             full_policies = ", ".join(full_policies)
             part_policies = ", ".join(part_policies)
-            simple_status, empty_policies_list = _status_master(full_simple_attrs, list(small_policies.keys()))
+            simple_status, empty_policies_list = _status_master(full_simple_attrs, list(small_policies.keys()), mandatory_policies)
             empty_policies = ", ".join(empty_policies_list)
             self.worksheets["simple"].write_row(index_row_no_extra, 8, [full_policies, part_policies, empty_policies],
                                                 self.formats.white_wrapped)
@@ -504,7 +504,7 @@ def _asset_info_to_list(asset_info, col_sizer):
     return attrs_list, col_sizer, index_col, extra_info, simple_attrs
 
 
-def _status_master(full_simple_attrs, small_attrs):
+def _status_master(full_simple_attrs, small_attrs, mandatory_policies = None):
     simple_pol_st_os = False
     simple_audit_st = False
     empty_policies = []
@@ -541,6 +541,18 @@ def _status_master(full_simple_attrs, small_attrs):
                     if pol.find(" os ") == 1:
                         simple_pol_st_os = True
                         break
+        if mandatory_policies:
+            for mandatory in mandatory_policies:
+                if mandatory not in full_simple_attrs[7]:
+                    empty = True
+                    for not_all_with_msgid in full_simple_attrs[8]:
+                        if not_all_with_msgid.find(mandatory) != -1:
+                            empty = False
+                    if empty:
+                        simple_pol_st_os = False
+                        empty_policies.append(mandatory)
+
+
         if full_simple_attrs[8]:
             simple_pol_st_os = False
     else:

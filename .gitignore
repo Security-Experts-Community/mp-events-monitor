@@ -1,0 +1,15 @@
+# base
+.*
+!.gitignore
+!.gitattributes
+*~
+*.pyc
+*.log
+build
+dist
+*.spec
+
+# pycharm
+*.idea
+
+/out/*
