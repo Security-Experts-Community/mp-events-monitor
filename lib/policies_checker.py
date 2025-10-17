@@ -162,6 +162,8 @@ class EventPolicies:
             pol_blacklist = []
         if type(pol_whitelist) is str:
             pol_whitelist = [pol_whitelist]
+        elif not pol_whitelist:
+            pol_whitelist = []
         elif type(pol_whitelist) is not list:
             self.logger.error(
                 "problem in addition_self.filtered_policies one of default_politics_whitelist is not a list. Clear "

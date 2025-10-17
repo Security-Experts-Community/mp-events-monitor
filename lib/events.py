@@ -105,8 +105,7 @@ class EventsWorker:
                 break
             index += 1
         filter_file_name = file_name[:-5] + ".txt"
-        with (out_dir / filter_file_name).open('w', encoding='utf-8') as out_file:
-            out_file.write(event_filter)
+        file_path = (out_dir / filter_file_name)
         data = {
             "filter": event_filter,
             "timeFrom": time_from
@@ -115,6 +114,10 @@ class EventsWorker:
             param = {"groupId": group_id}
         else:
             param = {"groupIds": group_id}
+        with file_path.open('w', encoding='utf-8') as out_file:
+            temp_data_with_params = {"data": data, "params": param}
+            json.dump(temp_data_with_params, out_file, ensure_ascii=False, indent=4)
+            temp_data_with_params = {}
         try_number = 0
         all_ok = False
         response = {}
@@ -132,19 +135,20 @@ class EventsWorker:
                                     all_ok = True
                                     break
                                 else:
-                                    self.logger.warning(f'Errors in take_events response for {data} in try number {try_number}: {response}')
+                                    self.logger.warning(f'Errors in take_events response for {file_path} in try number {try_number}: {response}. Next try after 5 seconds')
+                                    await asyncio.sleep(5)
                             elif response_temp.status >= 500:
-                                self.logger.warning(f"Response code: {response_temp.status}. Try number: {try_number}. Next try after 5 seconds")
+                                self.logger.warning(f"Response code: {response_temp.status} for {file_path}. Try number: {try_number}. Next try after 5 seconds")
                                 await asyncio.sleep(5)
                             elif response_temp.status == 400:
                                 response = await response_temp.json()
                                 self.logger.error(f"Response code: {response_temp.status}. Response message: {response["message"]}.")
-                                self.logger.error(f"Most likely there is an error in the request: {event_filter}")
+                                self.logger.error(f"Most likely there is an error in the request: {file_path}")
                                 self.logger.error(f"Full response: {json.dumps(response, indent=4)}")
                                 break
                             else:
                                 response = await response_temp.json()
-                                self.logger.error(f"Unspecified response code: {response_temp.status}. Event filter: {event_filter}. Break.")
+                                self.logger.error(f"Unspecified response code: {response_temp.status}. Event filter: {file_path}. Break.")
                                 self.logger.error(f"Full response: {json.dumps(response, indent=4)}")
                                 break
                 except requests.exceptions.RequestException as Err:
