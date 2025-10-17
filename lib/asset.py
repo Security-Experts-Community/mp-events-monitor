@@ -145,7 +145,7 @@ class AssetWorker:
                 ev.make_readable_out(out_folder, asset_fields, asset_dict, no_assets, need_up_file, self.comment)
         elif no_assets:
             ev = EventsWorker(self.settings, self.logger, self.policies, self.auth, self.default_politics_blacklist,
-                              self.default_politics_whitelist, self.specific_politics, True)
+                              self.default_politics_whitelist, self.specific_politics, self.mandatory_policies, True)
             ev.policies.rebuilt_policies = []
             ev.policies.small_policies = {}
             ev.make_readable_out(out_folder, asset_fields, asset_dict, no_assets, need_up_file, self.comment)
