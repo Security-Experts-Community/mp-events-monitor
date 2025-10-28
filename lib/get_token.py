@@ -1,12 +1,11 @@
 import logging
-from multiprocessing.context import AuthenticationError
-
 import requests
 import time
 import re
 import urllib3
-from requests import Request
+
 from .settings_checker import Settings
+
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -22,21 +21,21 @@ class MPXAuthenticator:
         if settings.personal_token:
             self.logger.info(f"Use personal_token for host: {settings.mpx_host}")
             if not self._check_mc_token(settings):
-                raise AuthenticationError("Проверьте personal_token, адрес сервера, помолитесь Омниссии")
+                raise ConnectionError("Проверьте personal_token, адрес сервера, помолитесь Омниссии")
             else:
                 self.logger.info("Successfully authenticated")
                 return True
         elif settings.mpx_secret:
             self.logger.info(f"Use creds and client secret  for host: {settings.mpx_host}")
             if not self._get_token(settings):
-                raise AuthenticationError("Проверьте правильность ввода адреса сервера, логина, пароля и ClientSecret")
+                raise ConnectionError("Проверьте правильность ввода адреса сервера, логина, пароля и ClientSecret")
             else:
                 self.logger.info("Successfully authenticated")
                 return True
         else:
             self.logger.info(f"Use creds for host: {settings.mpx_host}")
             if not self._get_token_ui(settings):
-                raise AuthenticationError("Проверьте правильность ввода адреса сервера, логина, пароля")
+                raise ConnectionError("Проверьте правильность ввода адреса сервера, логина, пароля")
             else:
                 self.logger.info("Successfully authenticated")
                 return True

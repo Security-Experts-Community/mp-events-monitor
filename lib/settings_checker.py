@@ -71,8 +71,13 @@ class Settings(BaseSettings, **base_params):
                           "недостающих, day-1 - оставить вчерашнее, day-2 - оставить позавчерашние, not_clear - "
                           "не чистить отчеты, создать недостающие.")
     mode: Literal[
-        "Assets_filters", "ALL_events", "ALL_assets", "Dynamic_Groups_events", "Dynamic_Groups_assets", "Asset_IDs"
+        "Assets_filters", "ALL_events", "ALL_assets", "Dynamic_Groups_events",
+        "Dynamic_Groups_assets", "Asset_IDs", "Only_KB"
     ] = Field(default="Assets_filters", description="Режим работы скрипта (см. раздел \"Режимы работы\")")
+    kb_check_mode: bool = Field(default=True, validation_alias=AliasChoices('k', 'kb_check', 'kb_check_mode'),
+                                description="Добавление информации из knowledgebase, будут анализироваться ПАКи, "
+                                            "их включенность и возможность работы для данного состояния источников. "
+                                            "Для токена необходимо добавить разрешений на работу с KB")
     pdql_assets: str = Field(default="select(@Host, Host.@id as asset_id, Host.@audittime) | LIMIT(0)",
                              description="PDQL-запрос для режимов с активами (кроме Assets_filters)",
                              validation_alias=AliasChoices('pdql_assets', 'pdql'))
@@ -95,7 +100,7 @@ class Settings(BaseSettings, **base_params):
     )
     mpx_host: str = Field(description="FQDN MaxPatrol", validation_alias=AliasChoices('mpx_host', 'host'))
     personal_token: Optional[SecretStr] = Field(
-        default=None, validation_alias=AliasChoices('personal_token', 'mc_token'),
+        default=None, validation_alias=AliasChoices('personal_token', 'mc_token', 'mc'),
         description="Личный токен для аутентификации в API. Лучший вариант для использования скрипта. "
                     "Инструкция по получению: 1. Слева в переключении между продуктами нажмите \"Management and Configuration\" "
                     "ИЛИ справа нажмите на значок профиля, а далее \"Профиль\"; 2. Слева внизу нажмите на значок "
@@ -158,9 +163,9 @@ class Settings(BaseSettings, **base_params):
                     if create_find:
                         create_find = create_find.group(0)
                         create_date = datetime.strptime(create_find, "%Y-%m-%d").date()
-                        if create_date < min_date:
+                        if create_date < min_date or excel_report.name.find("table_report") != -1:
                             excel_report.unlink()
-                logger.info("Remove all folders which have no excel report")
+                logger.info("Remove all folders and text files which have no excel report")
                 for folder in self.out_folder.iterdir():
                     if folder.is_dir():
                         have_report = False
@@ -169,6 +174,8 @@ class Settings(BaseSettings, **base_params):
                         if not have_report:
                             if not folder_prepare(folder, 5, logger, False):
                                 exit(1)
+                    elif folder.is_file() and not folder.name.endswith('.xlsx'):
+                        folder.unlink()
         else:
             if not folder_prepare(self.out_folder, self.reconnect_times, logger):
                 exit(1)
