@@ -1,0 +1,349 @@
+{
+    "categories": [{
+            "id": "system",
+            "name": "Базовый пакет"
+        }, {
+            "id": "active_directory_attacks",
+            "name": "Active Directory"
+        }, {
+            "id": "bruteforce",
+            "name": "Атаки методом перебора"
+        }, {
+            "id": "sap_attack_detection",
+            "name": "SAP NetWeaver AS ABAP"
+        }, {
+            "id": "mitre_attck_execution",
+            "name": "ATT&CK: «Выполнение»"
+        }, {
+            "id": "mitre_attck_lateral_movement",
+            "name": "ATT&CK: «Перемещение внутри периметра»"
+        }, {
+            "id": "oracle_database",
+            "name": "Oracle Database"
+        }, {
+            "id": "mitre_attck_persistence",
+            "name": "ATT&CK: «Закрепление»"
+        }, {
+            "id": "sap_suspicious_user_activity",
+            "name": "SAP NetWeaver AS ABAP. Подозрительная активность пользователей"
+        }, {
+            "id": "mitre_attck_cred_access",
+            "name": "ATT&CK: «Получение учетных данных»"
+        }, {
+            "id": "mitre_attck_discovery",
+            "name": "ATT&CK: «Изучение»"
+        }, {
+            "id": "hacking_tools",
+            "name": "Атаки с помощью специализированного ПО"
+        }, {
+            "id": "mssql_database",
+            "name": "Microsoft SQL Server"
+        }, {
+            "id": "remote_work",
+            "name": "Безопасность удаленной работы"
+        }, {
+            "id": "mitre_attck_command_and_control",
+            "name": "ATT&CK: «Организация управления»"
+        }, {
+            "id": "mitre_attck_privilege_escalation",
+            "name": "ATT&CK: «Повышение привилегий»"
+        }, {
+            "id": "network_devices_abnormal_activity",
+            "name": "Сетевые устройства. Подозрительная сетевая активность"
+        }, {
+            "id": "mitre_attck_collection",
+            "name": "ATT&CK: «Сбор данных»"
+        }, {
+            "id": "mitre_attck_impact",
+            "name": "ATT&CK: «Деструктивное воздействие»"
+        }, {
+            "id": "postgresql_database",
+            "name": "PostgreSQL"
+        }, {
+            "id": "vsphere_suspicious_user_activity",
+            "name": "VMware vSphere. Подозрительная активность пользователей"
+        }, {
+            "id": "mongo_database",
+            "name": "MongoDB"
+        }, {
+            "id": "sap_java_suspicious_user_activity",
+            "name": "SAP NetWeaver AS Java. Подозрительная активность пользователей"
+        }, {
+            "id": "solaris_suspicious_network_activity",
+            "name": "Oracle Solaris. Подозрительная сетевая активность"
+        }, {
+            "id": "network_devices_compromise",
+            "name": "Сетевые устройства. Индикаторы компрометации"
+        }, {
+            "id": "mysql_database",
+            "name": "Oracle MySQL"
+        }, {
+            "id": "pt_application_firewall",
+            "name": "PT Application Firewall"
+        }, {
+            "id": "enterprise_1c_and_bitrix",
+            "name": "«1C:Предприятие» 8.3 и «Битрикс24»"
+        }, {
+            "id": "siemens_simatic",
+            "name": "Siemens Simatic S7"
+        }, {
+            "id": "pt_nad",
+            "name": "PT Network Attack Discovery"
+        }, {
+            "id": "adastra_trace_mode",
+            "name": "SCADA Trace Mode"
+        }, {
+            "id": "antimalware",
+            "name": "Вредоносное ПО и нежелательные рассылки"
+        }, {
+            "id": "wonderware",
+            "name": "System Platform. Подозрительная активность"
+        }, {
+            "id": "yandex_cloud",
+            "name": "Yandex Cloud. Подозрительная активность"
+        }, {
+            "id": "auto_whitelisting",
+            "name": "Автоматическое заполнение списков исключений"
+        }, {
+            "id": "process_chains_and_logons",
+            "name": "Расследование запуска процессов и исследование сессий"
+        }, {
+            "id": "yokogawa",
+            "name": "Yokogawa CENTUM VP и Yokogawa ProSafe-RS"
+        }, {
+            "id": "masterscada",
+            "name": "MasterSCADA и MasterOPC"
+        }, {
+            "id": "clickhouse",
+            "name": "ClickHouse"
+        }, {
+            "id": "unix_mitre_attck_cred_access",
+            "name": "Unix-системы. ATT&CK: «Получение учетных данных»"
+        }, {
+            "id": "unix_mitre_attck_defense_evasion",
+            "name": "Unix-системы. ATT&CK: «Предотвращение обнаружения»"
+        }, {
+            "id": "unix_mitre_attck_collection",
+            "name": "Unix-системы. ATT&CK: «Сбор данных»"
+        }, {
+            "id": "unix_mitre_attck_discovery",
+            "name": "Unix-системы. ATT&CK: «Исследование»"
+        }, {
+            "id": "unix_mitre_attck_command_and_control",
+            "name": "Unix-системы. ATT&CK: «Организация управления»"
+        }, {
+            "id": "unix_mitre_attck_execution",
+            "name": "Unix-системы. ATT&CK: «Выполнение»"
+        }, {
+            "id": "unix_mitre_attck_initial_access",
+            "name": "Unix-системы. ATT&CK: «Первоначальный доступ»"
+        }, {
+            "id": "unix_mitre_attck_lateral_movement",
+            "name": "Unix-системы. ATT&CK: «Перемещение внутри периметра»"
+        }, {
+            "id": "unix_mitre_attck_persistence",
+            "name": "Unix-системы. ATT&CK: «Закрепление»"
+        }, {
+            "id": "unix_mitre_attck_privilege_escalation",
+            "name": "Unix-системы. ATT&CK: «Повышение привилегий»"
+        }, {
+            "id": "supply_chain",
+            "name": "Аномалии в цепочках поставок"
+        }, {
+            "id": "profiling",
+            "name": "Профилирование доступа к критически важным системам"
+        }, {
+            "id": "vulnerabilities",
+            "name": "Эксплуатация уязвимостей"
+        }, {
+            "id": "kaspersky",
+            "name": "Продукты «Лаборатория Касперского». Выявление вредоносной активности"
+        }, {
+            "id": "security_code_secret_net_lsp",
+            "name": "Secret Net LSP"
+        }, {
+            "id": "microsoft_mecm",
+            "name": "Microsoft Endpoint Configuration Manager"
+        }, {
+            "id": "freeipa",
+            "name": "ALD Pro (FreeIPA). Подозрительная активность"
+        }, {
+            "id": "redis",
+            "name": "Redis. Подозрительная активность"
+        }, {
+            "id": "web_servers_abnormal_activity",
+            "name": "Аномальная активность веб-серверов"
+        }, {
+            "id": "drweb",
+            "name": "Dr.Web Enterprise Security Suite. Подозрительная активность"
+        }, {
+            "id": "hashicorp",
+            "name": "HashiCorp Vault"
+        }, {
+            "id": "zabbix",
+            "name": "Zabbix"
+        }, {
+            "id": "it_bastion",
+            "name": "Продукты компании «АйТи Бастион». Подозрительная активность"
+        }, {
+            "id": "bind",
+            "name": "BIND. Подозрительные DNS-запросы"
+        }, {
+            "id": "microsoft_sharepoint",
+            "name": "Microsoft SharePoint Server. Подозрительная активность"
+        }, {
+            "id": "apache_cassandra_database",
+            "name": "Apache Cassandra. Подозрительная активность"
+        }, {
+            "id": "dnsmasq",
+            "name": "Подозрительная активность в сетях с dnsmasq"
+        }, {
+            "id": "astraregul",
+            "name": "AstraRegul. Подозрительная активность"
+        }, {
+            "id": "automiq",
+            "name": "Alpha.Platform. Выявление атак на АСУ ТП"
+        }, {
+            "id": "acronis",
+            "name": "Acronis Backup. Мониторинг операций"
+        }, {
+            "id": "grafana_labs",
+            "name": "Grafana. Подозрительна активность"
+        }, {
+            "id": "vk_cloud",
+            "name": "VK Cloud. Подозрительная активность"
+        }, {
+            "id": "uem_safemobile",
+            "name": "UEM SafeMobile. Подозрительная активность"
+        }, {
+            "id": "saltstack",
+            "name": "SaltStack. Подозрительная активность"
+        }, {
+            "id": "eltex",
+            "name": "Eltex"
+        }, {
+            "id": "mitre_attck_defense_evasion",
+            "name": "ATT&CK: «Предотвращение обнаружения»"
+        }, {
+            "id": "mitre_attck_initial_access",
+            "name": "ATT&CK: «Первоначальный доступ»"
+        }, {
+            "id": "vmware_aria",
+            "name": "VMware Aria. Подозрительная активность"
+        }, {
+            "id": "arista_eos",
+            "name": "Arista EOS. Подозрительная активность"
+        }, {
+            "id": "infowatch_tm",
+            "name": "InfoWatch Traffic Monitor. Подозрительная активность"
+        }, {
+            "id": "redkit_scada",
+            "name": "Redkit SCADA. Подозрительная активность"
+        }, {
+            "id": "pt_isim",
+            "name": "PT Industrial Security Incident Manager"
+        }, {
+            "id": "microsoft_exchange",
+            "name": "Microsoft Exchange Server"
+        }, {
+            "id": "yandex_360",
+            "name": "Яндекс 360. Подозрительная активность"
+        }, {
+            "id": "citrix_ns_adc",
+            "name": "Citrix NetScaler (ADC). Подозрительная активность"
+        }, {
+            "id": "passwork",
+            "name": "«Пассворк». Подозрительная активность"
+        }, {
+            "id": "vipnet_tias",
+            "name": "ViPNet TIAS. Подозрительная активность"
+        }, {
+            "id": "kontinent",
+            "name": "АПКШ «Континент 4». Подозрительная активность"
+        }, {
+            "id": "postfix",
+            "name": "Postfix. Подозрительная активность"
+        }, {
+            "id": "proxmox",
+            "name": "Proxmox VE. Подозрительная активность"
+        }, {
+            "id": "teleport",
+            "name": "Teleport. Подозрительная активность"
+        }, {
+            "id": "active_directory_certificate_services_attacks",
+            "name": "Active Directory Certificate Services"
+        }, {
+            "id": "samba_active_directory_attacks",
+            "name": "Samba DC directory service"
+        }, {
+            "id": "mitre_attck_exfiltration",
+            "name": "ATT&CK: «Эксфильтрация данных»"
+        }, {
+            "id": "elasticsearch",
+            "name": "Elasticsearch. Подозрительная активность"
+        }, {
+            "id": "zvirt",
+            "name": "zVirt. Подозрительная активность"
+        }, {
+            "id": "bad",
+            "name": "Behavioral Anomaly Detection"
+        }, {
+            "id": "netflow",
+            "name": "Протоколы NetFlow и IPFIX. Подозрительная сетевая активность"
+        }, {
+            "id": "microsoft_hyperv",
+            "name": "Microsoft Hyper-V. Подозрительная активность"
+        }, {
+            "id": "indeed_pam",
+            "name": "Indeed Privileged Access Manager. Подозрительная активность"
+        }, {
+            "id": "capabilities_account_manipulation",
+            "name": "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора"
+        }, {
+            "id": "capabilities_data_access",
+            "name": "Универсальные правила. Доступ к критически важным данным"
+        }, {
+            "id": "capabilities_defense_evasion",
+            "name": "Универсальные правила. Отключение и обход защитных механизмов"
+        }, {
+            "id": "capabilities_impact",
+            "name": "Универсальные правила. Тактика «Деструктивное воздействие»"
+        }, {
+            "id": "capabilities_logon",
+            "name": "Универсальные правила. Подозрительные входы в ПО"
+        }, {
+            "id": "capabilities_suspicious_activity",
+            "name": "Универсальные правила. Запросы к подозрительным или вредоносным ресурсам"
+        }, {
+            "id": "pt_ngfw",
+            "name": "PT Next Generation Firewall"
+        }, {
+            "id": "bitbucket",
+            "name": "Atlassian Bitbucket Data Center. Подозрительная активность"
+        }, {
+            "id": "vk_workmail",
+            "name": "VK WorkMail. Подозрительная активность"
+        }, {
+            "id": "honeywell_experion_pks",
+            "name": "Honeywell Experion PKS. Подозрительная активность"
+        }, {
+            "id": "confluence",
+            "name": "Atlassian Confluence. Подозрительная активность"
+        }, {
+            "id": "pt_cs",
+            "name": "PT Container Security"
+        }, {
+            "id": "unix_mitre_attck_impact",
+            "name": "Unix-системы. ATT&CK: «Деструктивное воздействие»"
+        }, {
+            "id": "amazon_aws",
+            "name": "Amazon Web Services. Подозрительная активность"
+        }, {
+            "id": "wallarm",
+            "name": "Wallarm («Вебмониторэкс»)"
+        }, {
+            "id": "microsoft_365",
+            "name": "Microsoft 365. Подозрительная активность"
+        }
+    ]
+}

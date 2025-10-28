@@ -3,7 +3,7 @@ from pathlib import Path
 import json
 import re
 import logging
-from typing import Union
+from typing import Union, List, Dict
 import sys
 old_python = False
 if sys.version.find('3.7.') == 0:
@@ -17,7 +17,7 @@ class EventPolicies:
         small_policies: Any
         mandatory_policies: Any
     else:
-        policies_by_file: dict[str, list[dict[str, Union[str, list[str]]]]]
+        policies_by_file: Dict[str, Dict[str, List[Dict[str, Union[str, List[str]]] | str]]]
         filtered_policies: dict[str, list[dict[str, str | list[str]]]]
         rebuilt_policies: list[dict[str, str | int | dict[str, dict[str, Union[str, int]]]]]
         small_policies: dict[str, dict[str, str | list[Union[str,int]]]]
@@ -36,6 +36,47 @@ class EventPolicies:
             self.logger.error(f'Policies file {self.policies_path} is not JSON: {Err}')
             exit(1)
 
+    def unit_policy_query_check(self, all_good, policy_filter, policy):
+        if type(policy_filter) is not dict:
+            self.logger.error(f"Policy `{policy}` queries filter `{policy_filter}` is not a dictionary")
+            all_good = False
+        else:
+            list_fields = []
+            for taxonomy_field in policy_filter.keys():
+                if type(taxonomy_field) is not str:
+                    self.logger.error(f"Policy `{policy}` queries filter `{policy_filter}` taxonomy field "
+                                      f"`{taxonomy_field}` is not a string")
+                    all_good = False
+                elif re.sub("[a-zA-Z0-9_.]", "", taxonomy_field) != "":
+                    bad_symbols = re.sub("[a-zA-Z0-9_.]", "", taxonomy_field)
+                    self.logger.error(f"Policy `{policy}` queries filter `{policy_filter}` taxonomy field "
+                                      f"`{taxonomy_field}` have unexpected symbols "
+                                      f"`{bad_symbols}`")
+                    all_good = False
+                if type(policy_filter[taxonomy_field]) is list:
+                    list_fields.append(taxonomy_field)
+                    for list_field in policy_filter[taxonomy_field]:
+                        if type(list_field) not in [str, int]:
+                            self.logger.error(
+                                f"Policy `{policy}` queries filter `{policy_filter}` have taxonomy field "
+                                f"`{taxonomy_field}` and it is list but `{list_field}` is not a"
+                                f" string or int."
+                            )
+                            all_good = False
+                if (policy_filter[taxonomy_field]
+                        and type(policy_filter[taxonomy_field]) not in [str, int, bool, list]):
+                    self.logger.error(f"Policy `{policy}` queries filter `{policy_filter}` by taxonomy field "
+                                      f"`{taxonomy_field}` search value in unexpected datatype. "
+                                      f"Expecting datatypes [str, int, bool, None, list]")
+                    all_good = False
+            if len(list_fields) > 1:
+                self.logger.error(f"Policy `{policy}` queries filter `{policy_filter}` have two or more "
+                                  f"list_fields {list_fields}. Maximum list field is 1. "
+                                  f"Matrix multiplication does not make sense in the case of filtering."
+                                  f" Rewrite filter.")
+                all_good = False
+        return all_good
+
     def check_policies(self):
         all_good = True
 
@@ -43,49 +84,30 @@ class EventPolicies:
             self.logger.error("Policies file is empty")
             exit(1)
         for policy in self.policies_by_file.keys():
-            if type(self.policies_by_file[policy]) is not list:
-                self.logger.error(f"Policy `{policy}` is not a list")
+            if type(self.policies_by_file[policy]) is not dict:
+                self.logger.error(f"Policy `{policy}` is not a dict")
                 all_good = False
             else:
-                for policy_filter in self.policies_by_file[policy]:
-                    if type(policy_filter) is not dict:
-                        self.logger.error(f"Policy `{policy}` filter `{policy_filter}` is not a dictionary")
+                if ("queries" not in self.policies_by_file[policy].keys() or
+                        "KB_packs" not in self.policies_by_file[policy].keys()):
+                    self.logger.error(f"Policy `{policy}` have no keys `queries` or `KB_packs`")
+                    all_good = False
+                else:
+                    if type(self.policies_by_file[policy]["queries"]) is not list:
+                        self.logger.error(f"Policy `{policy}` queries is not a list")
                         all_good = False
                     else:
-                        list_fields = []
-                        for taxonomy_field in policy_filter.keys():
-                            if type(taxonomy_field) is not str:
-                                self.logger.error(f"Policy `{policy}` filter `{policy_filter}` taxonomy field "
-                                                  f"`{taxonomy_field}` is not a string")
-                                all_good = False
-                            elif re.sub("[a-zA-Z0-9_.]", "", taxonomy_field) != "":
-                                bad_symbols = re.sub("[a-zA-Z0-9_.]", "", taxonomy_field)
-                                self.logger.error(f"Policy `{policy}` filter `{policy_filter}` taxonomy field "
-                                                  f"`{taxonomy_field}` have unexpected symbols "
-                                                  f"`{bad_symbols}`")
-                                all_good = False
-                            if type(policy_filter[taxonomy_field]) is list:
-                                list_fields.append(taxonomy_field)
-                                for list_field in policy_filter[taxonomy_field]:
-                                    if type(list_field) not in [str, int]:
-                                        self.logger.error(
-                                            f"Policy `{policy}` filter `{policy_filter}` have taxonomy field "
-                                            f"`{taxonomy_field}` and it is list but `{list_field}` is not a"
-                                            f" string or int."
-                                        )
-                                        all_good = False
-                            if (policy_filter[taxonomy_field]
-                                    and type(policy_filter[taxonomy_field]) not in [str, int, bool, list]):
-                                self.logger.error(f"Policy `{policy}` filter `{policy_filter}` by taxonomy field "
-                                                  f"`{taxonomy_field}` search value in unexpected datatype. "
-                                                  f"Expecting datatypes [str, int, bool, None, list]")
-                                all_good = False
-                        if len(list_fields) > 1:
-                            self.logger.error(f"Policy `{policy}` filter `{policy_filter}` have two or more "
-                                              f"list_fields {list_fields}. Maximum list field is 1. "
-                                              f"Matrix multiplication does not make sense in the case of filtering."
-                                              f" Rewrite filter.")
+                        for policy_filter in self.policies_by_file[policy]["queries"]:
+                            all_good = self.unit_policy_query_check(all_good, policy_filter, policy)
+                        if type(self.policies_by_file[policy]["KB_packs"]) is not list:
+                            self.logger.error(f"Policy `{policy}` KB_packs is not a list")
                             all_good = False
+                        else:
+                            if self.policies_by_file[policy]["KB_packs"]:
+                                for kb_pack in self.policies_by_file[policy]["KB_packs"]:
+                                    if type(kb_pack) is not str:
+                                        self.logger.error(f"Policy `{policy}` KB_pack {kb_pack} is not a string")
+                                        all_good = False
         if all_good:
             self.logger.info("All policies is good")
         else:
@@ -114,7 +136,9 @@ class EventPolicies:
                     if policy not in self.small_policies.keys():
                         self.small_policies.update({policy: {"count": 0, "filters": [], "full_filters": [],
                                                              "list_field": [list_field],
-                                                             "small_keys": []}})
+                                                             "small_keys": [],
+                                                             "KB_packs": self.policies_by_file[policy]["KB_packs"]}})
+
                     else:
                         if "list_field" not in self.small_policies[policy].keys():
                             self.small_policies[policy].update({"list_field": [list_field], "small_keys": []})
@@ -143,7 +167,8 @@ class EventPolicies:
                     if policy not in self.small_policies.keys():
                         self.small_policies.update({policy: {"count": 1, "filters": [event_filter],
                                                              "full_filters": [full_filter],
-                                                             "small_keys": [str(index)]}})
+                                                             "small_keys": [str(index)],
+                                                             "KB_packs": self.policies_by_file[policy]["KB_packs"]}})
                     else:
                         self.small_policies[policy]["count"] += 1
                         self.small_policies[policy]["filters"].append(event_filter)
@@ -180,7 +205,7 @@ class EventPolicies:
                                     if re.search(reg_white, policy):
                                         not_in_whitelist = False
                             if not_in_whitelist:
-                                self.filtered_policies.update({policy: self.policies_by_file[policy]})
+                                self.filtered_policies.update({policy: self.policies_by_file[policy]["queries"]})
                             if mand_pols:
                                 for mand_pol in mand_pols:
                                     if re.search(mand_pol, policy):
@@ -192,10 +217,9 @@ class EventPolicies:
                         if re.search(reg_white, policy):
                             not_in_whitelist = False
                     if not_in_whitelist:
-                        self.filtered_policies.update({policy: self.policies_by_file[policy]})
+                        self.filtered_policies.update({policy: self.policies_by_file[policy]["queries"]})
                 else:
-                    self.filtered_policies.update({policy: self.policies_by_file[policy]})
-
+                    self.filtered_policies.update({policy: self.policies_by_file[policy]["queries"]})
         if pol_spec:
             for add_pol in pol_spec.keys():
                 self.filtered_policies.update({add_pol: pol_spec[add_pol]})
