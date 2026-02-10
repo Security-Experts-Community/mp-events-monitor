@@ -151,7 +151,6 @@ class AssetWorker:
             ev.make_readable_out(out_folder, asset_fields, asset_dict, no_assets, need_up_file, self.comment)
 
     def work(self, out_folder):
-
         response, fields, asset_id_field, all_search_values = self.create_pdql_token(out_folder)
         if self.all_search_values:
             all_search_values = self.all_search_values

@@ -31,11 +31,20 @@ class MonitorXlsxWriter:
     formats: MainFormats = MainFormats()
     if old_python:
         worksheets_line_number: Any
+        worksheets_line_starter: Any
+        kb_view: Any
+        kb_struct: Any
     else:
         worksheets_line_number: dict[str, int]
+        worksheets_line_starter: dict[str, int]
+        kb_view: dict[str, dict[str, int]]
+        kb_struct: dict[str, list[dict[str, str | dict[str, str | bool]]]]
     workbook_path: Path
     delta_hours: int
     len_attrs_simple: int
+    start_col_second: int
+    main_out_path: Path
+
 
     def __init__(
             self,
@@ -45,12 +54,28 @@ class MonitorXlsxWriter:
             need_up_file: bool
     ):
         """Активация класса"""
+        self.main_out_path = main_out_path
         self._set_workbook_path(main_out_path, mpx, need_up_file)
         self.workbook = xlsxwriter.Workbook(self.workbook_path)
         self.worksheets = {"simple": self.workbook.add_worksheet("simple"), "FULL": self.workbook.add_worksheet("FULL")}
         self._add_formats()
         self.delta_hours = delta_hours
         self.worksheets_line_number = {"simple": 0, "FULL": 0}
+        self.start_col_second = 7
+        self.kb_view = {}
+
+        self.kb_struct = {}
+        try:
+            kb_struct_path = (self.main_out_path.parent / "KB_struct_uninstalled.json")
+            if kb_struct_path.exists():
+                with kb_struct_path.open('r', encoding='utf-8') as kb_struct_file:
+                    self.kb_struct = json.load(kb_struct_file)
+        except Exception as Err:
+            print(Err)
+            pass
+
+
+        self.worksheets_line_starter = {}
 
     def _set_workbook_path(self, main_out_path: Path, mpx: str, need_up_file: bool):
         current_time = datetime.now().strftime("%Y-%m-%d")
@@ -161,26 +186,87 @@ class MonitorXlsxWriter:
             self.worksheets[policy_name].write(self.worksheets_line_number[policy_name], num_col+1, index_ef+1, self.formats.yellow)
         self.worksheets_line_number[policy_name] += 2
         self.worksheets[policy_name].write_row(self.worksheets_line_number[policy_name], 0, list_attrs, self.formats.cyan)
+        self.worksheets_line_starter[policy_name] = self.worksheets_line_number[policy_name]
         self.worksheets[policy_name].autofilter(self.worksheets_line_number[policy_name], 0, self.worksheets_line_number[policy_name], num_col - 1)
         self.worksheets[policy_name].set_column(0, 0, 40)
         self.worksheets[policy_name].set_column(1, 1, 35)
-        self.worksheets[policy_name].write_row(self.worksheets_line_number[policy_name], 10,
+        self.worksheets[policy_name].write_row(self.worksheets_line_number[policy_name], self.start_col_second,
                                                ["event_src.asset", "event_src.host"],
                                                self.formats.cyan)
-        self.worksheets[policy_name].write_row(self.worksheets_line_number[policy_name], 12,
+        self.worksheets[policy_name].write_row(self.worksheets_line_number[policy_name], self.start_col_second + 2,
                                                [str(_ + 1) for _ in range(len(policy["filters"]))],
                                                self.formats.yellow)
         if len(policy["filters"]) > 1:
-            self.worksheets[policy_name].merge_range(self.worksheets_line_number[policy_name] - 1, 12,
-                                                     self.worksheets_line_number[policy_name] -1, 11 + len(policy["filters"]),
+            self.worksheets[policy_name].merge_range(self.worksheets_line_number[policy_name] - 1, self.start_col_second + 2,
+                                                     self.worksheets_line_number[policy_name] -1, self.start_col_second + 1 + len(policy["filters"]),
                                                      "№ фильтра", self.formats.yellow)
         else:
-            self.worksheets[policy_name].write(self.worksheets_line_number[policy_name] - 1, 12, "№ фильтра", self.formats.yellow)
+            self.worksheets[policy_name].write(self.worksheets_line_number[policy_name] - 1, self.start_col_second + 2, "№ фильтра", self.formats.yellow)
         self.worksheets[policy_name].autofilter(self.worksheets_line_number[policy_name], 0,
-                                                self.worksheets_line_number[policy_name], 11 + len(policy["filters"]))
-        self.worksheets[policy_name].set_column(10, 10, 40)
-        self.worksheets[policy_name].set_column(11, 11, 35)
-
+                                                self.worksheets_line_number[policy_name], self.start_col_second + 1 + len(policy["filters"]))
+        self.worksheets[policy_name].set_column(self.start_col_second, self.start_col_second, 40)
+        self.worksheets[policy_name].set_column(self.start_col_second + 1, self.start_col_second + 1, 35)
+        self.kb_view.update({policy_name: {"col": self.start_col_second + 3 + len(policy["filters"]), "row": 1}})
+        self.worksheets[policy_name].write(self.kb_view[policy_name]["row"], self.kb_view[policy_name]["col"], "Связанные пакеты экспертизы", self.formats.cyan)
+        self.worksheets[policy_name].set_column(self.kb_view[policy_name]["col"], self.kb_view[policy_name]["col"], 80)
+        self.worksheets[policy_name].set_column(self.kb_view[policy_name]["col"] + 1,
+                                                self.kb_view[policy_name]["col"] + 1, 80)
+        self.kb_view[policy_name]["row"] += 1
+        if self.kb_struct:
+            for kb_pack in policy["KB_packs"]:
+                if kb_pack in self.kb_struct.keys():
+                    if not self.kb_struct[kb_pack]:
+                        self.worksheets[policy_name].write(
+                            self.kb_view[policy_name]["row"], self.kb_view[policy_name]["col"], kb_pack,
+                            self.formats.green
+                        )
+                        self.kb_view[policy_name]["row"] += 1
+                    else:
+                        self.worksheets[policy_name].write_column(
+                            self.kb_view[policy_name]["row"], self.kb_view[policy_name]["col"] + 1,
+                            self.kb_struct[kb_pack],
+                            self.formats.red
+                        )
+                        len_packs = len(self.kb_struct[kb_pack]) - 1
+                        if len_packs > 0:
+                            self.worksheets[policy_name].merge_range(
+                                self.kb_view[policy_name]["row"], self.kb_view[policy_name]["col"],
+                                self.kb_view[policy_name]["row"] + len_packs,
+                                self.kb_view[policy_name]["col"],
+                                kb_pack, self.formats.red
+                            )
+                        else:
+                            self.worksheets[policy_name].write(
+                                self.kb_view[policy_name]["row"], self.kb_view[policy_name]["col"],
+                                kb_pack, self.formats.red
+                            )
+                        self.kb_view[policy_name]["row"] += len_packs + 1
+                else:
+                    self.worksheets[policy_name].write(
+                        self.kb_view[policy_name]["row"], self.kb_view[policy_name]["col"], kb_pack,
+                        self.formats.white
+                    )
+                    self.kb_view[policy_name]["row"] += 1
+                    # all_pack_activate_status = 0
+                    # for rule in self.kb_struct[kb_pack]:
+                    #     if rule["GeneralDeploymentStatus"] == "Installed":
+                    #         all_pack_activate_status += 1
+                    # if all_pack_activate_status == len(self.kb_struct[kb_pack]):
+                    #     temp_color = self.formats.green
+                    # elif all_pack_activate_status > 0:
+                    #     temp_color = self.formats.yellow
+                    # else:
+                    #     temp_color = self.formats.red
+                    # self.worksheets[policy_name].write(
+                    #     self.kb_view[policy_name]["row"], self.kb_view[policy_name]["col"], kb_pack, temp_color
+                    # )
+                    # self.kb_view[policy_name]["row"] += 1
+        else:
+            self.worksheets[policy_name].write_column(
+                self.kb_view[policy_name]["row"], self.kb_view[policy_name]["col"], policy["KB_packs"],
+                self.formats.white
+            )
+            self.kb_view[policy_name]["row"] += len(policy["KB_packs"])
 
     def create_asset_dict(self, policies, small_policies, asset_dict):
         index = 0
@@ -336,7 +422,7 @@ class MonitorXlsxWriter:
                     pol_out_list.extend([asset_dict[asset]["policies"][policy]["satisfaction"], int(
                         asset_dict[asset]["policies"][policy]["sum_count"])])
                     self.worksheets[policy].write_row(
-                        self.worksheets_line_number[policy], 10, [asset, e_host_info], self.formats.white)
+                        self.worksheets_line_number[policy], self.start_col_second, [asset, e_host_info], self.formats.white)
                     empty_fields = []
                     for index_small_key, small_key in enumerate(small_policies[policy]["small_keys"]):
                         full_info = asset_dict[asset]["policies"][policy].get("full_info")
@@ -350,7 +436,7 @@ class MonitorXlsxWriter:
                             color = self.formats.green
                         self.worksheets[policy].write(
                             self.worksheets_line_number[policy],
-                            12 + index_small_key, small_key, color
+                            self.start_col_second + 2 + index_small_key, small_key, color
                         )
                     if asset_dict[asset]["policies"][policy]["satisfaction"] == "YES":
                         full_policies.append(policy)
@@ -420,6 +506,10 @@ class MonitorXlsxWriter:
         for row in range(3):
             self.worksheets["simple"].write_formula(row + 9, 2, f'=B{str(row + 10)}/$B$7', self.formats.percents)
             self.worksheets["simple"].write_formula(row + 9, 3, f'=B{str(row + 10)}/$B$6', self.formats.percents)
+
+        for policy in self.worksheets_line_starter.keys():
+            if self.worksheets_line_starter[policy] == self.worksheets_line_number[policy]:
+                self.worksheets[policy].hide()
 
 
 if __name__ == "__main__":

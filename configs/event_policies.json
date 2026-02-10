@@ -1,526 +1,1119 @@
 {
-    "w os Win Ess common": [
-        {
-            "event_src.subsys": "Security",
-            "msgid": [
-                "4624",
-                "4625",
-                "4697",
-                "5145"
-            ]
-        },
-        {
-            "event_src.subsys": "system",
-            "msgid": [
-                "7045"
-            ]
-        }
-    ],
-    "w os Win Ess posh": [
-        {
-            "event_src.subsys": "Microsoft-Windows-PowerShell/Operational",
-            "msgid": [
-                "4103",
-                "4104"
-            ]
-        }
-    ],
-    "w os Win Ess task": [
-        {
-            "event_src.subsys": "microsoft-windows-taskscheduler/operational",
-            "msgid": "129"
-        }
-    ],
-    "w os Win Ess 4688 cmd": [
-        {
-            "event_src.subsys": "Security",
-            "msgid": "4688",
-            "object.process.cmdline": true
-        }
-    ],
-    "w os Win sysmon": [
-        {
-            "event_src.title": "sysmon",
-            "msgid": [
-                "1",
-                "3",
-                "12",
-                "13"
-            ]
-        }
-    ],
-    "w os Win Optional": [
-        {
-            "event_src.title": "windows",
-            "msgid": [
-                "4732",
-                "4733",
-                "4798",
-                "4799",
-                "5140",
-                "5156",
-                "5378",
-                "5379",
-                "6416",
-                "7031",
-                "20503",
-                "1074",
-                "4672",
-                "4673",
-                "4698",
-                "4699",
-                "4702",
-                "4723",
-                "4724",
-                "4726",
-                "4728"
-            ]
-        },
-        {
-            "event_src.title": "windows",
-            "msgid": "2",
-            "event_src.subsys": "application"
-        }
-    ],
-    "w os Win Advanced": [
-        {
-            "event_src.title": "windows",
-            "msgid": [
-                "4656",
-                "4663"
-            ]
-        }
-    ],
-    "u os astra": [
-        {
-            "event_src.title": "astra_linux"
-        }
-    ],
-    "u os auditd": [
-        {
-            "event_src.title": "unix_like",
-            "event_src.subsys": "auditd",
-            "msgid": [
-                "execve",
-                "LOGIN"
-            ]
-        },
-        {
-            "event_src.title": "unix_like",
-            "event_src.subsys": null
-        }
-    ],
-    "u os old": [
-        {
-            "event_src.title": "unix_like",
-            "event_src.subsys": null,
-            "id": [
-                "PT_UNIX_like_auditd_syslog_user_login",
-                "PT_UNIX_like_auditd_syslog_user_cmd_syscall",
-                "PT_UNIX_like_auditd_fake_for_show_no_auditd"
-            ]
-        }
-    ],
-    "n os 3com": [
-        {
-            "event_src.title": "3com"
-        }
-    ],
-    "n os cisco fw": [
-        {
-            "event_src.vendor": "cisco",
-            "event_src.title": [
-                "asa",
-                "fwsm",
-                "pix"
-            ]
-        }
-    ],
-    "n os cisco": [
-        {
-            "event_src.vendor": "cisco",
-            "event_src.title": [
-                "ios",
-                "ios_xe",
-                "ios_xr",
-                "ise"
-            ]
-        }
-    ],
-    "n os fortigate": [
-        {
-            "event_src.title": "fortigate"
-        }
-    ],
-    "n os watchguard": [
-        {
-            "event_src.subsys": [
-                "admd",
-                "dhcpd",
-                "sessiond",
-                "wgagent"
-            ],
-            "event_src.title": "fireware_xtmv"
-        }
-    ],
-    "n os fortimail": [
-        {
-            "event_src.title": "fortimail"
-        }
-    ],
-    "n os checkpoint": [
-        {
-            "event_src.title": "gaia"
-        }
-    ],
-    "n os jun": [
-        {
-            "event_src.title": "junos"
-        }
-    ],
-    "n os pan": [
-        {
-            "event_src.title": "pan_os"
-        }
-    ],
-    "n os stonesoft ngfw": [
-        {
-            "event_src.title": "stonesoft_ngfw"
-        }
-    ],
-    "n os huawei": [
-        {
-            "event_src.title": "vrp"
-        }
-    ],
-    "p ptaf": [
-        {
-            "event_src.title": "application_firewall"
-        }
-    ],
-    "p fortiweb": [
-        {
-            "event_src.title": "fortiweb"
-        }
-    ],
-    "p siteprotector": [
-        {
-            "event_src.title": "siteprotector"
-        }
-    ],
-    "p apache": [
-        {
-            "event_src.title": "apache"
-        }
-    ],
-    "p nginx": [
-        {
-            "event_src.title": "nginx"
-        }
-    ],
-    "p lighttpd": [
-        {
-            "event_src.title": "lighttpd"
-        }
-    ],
-    "p haproxy": [
-        {
-            "event_src.title": "haproxy"
-        }
-    ],
-    "s 1c": [
-        {
-            "event_src.title": "1c_enterprise"
-        }
-    ],
-    "s bitrix24": [
-        {
-            "event_src.title": "bitrix24"
-        }
-    ],
-    "s VMware vCenter": [
-        {
-            "event_src.title": "vsphere",
-            "event_src.subsys": "vpxd"
-        },
-        {
-            "event_src.title": "vsphere",
-            "event_src.subsys": null
-        }
-    ],
-    "s VMware ESXi": [
-        {
-            "event_src.title": "esxi",
-            "action": "login",
-            "status": "success"
-        }
-    ],
-    "s VMware Horizon": [
-        {
-            "event_src.title": "horizon"
-        }
-    ],
-    "sw AD DC": [
-        {
-            "event_src.subsys": "Security",
-            "msgid": [
-                "4931",
-                "4769"
-            ]
-        },
-        {
-            "event_src.subsys": "active_directory",
-            "msgid": [
-                "4928",
-                "4929",
-                "5136",
-                "5137"
-            ]
-        },
-        {
-            "event_src.subsys": "directory service",
-            "msgid": [
-                "1644",
-                "2946"
-            ]
-        }
-    ],
-    "sw AD CS": [
-        {
-            "event_src.subsys": "certification_authority",
-            "msgid": [
-                "4871",
-                "4872",
-                "4887",
-                "4888",
-                "4889",
-                "4898"
-            ]
-        }
-    ],
-    "sw AD WS": [
-        {
-            "event_src.subsys": "active directory web services",
-            "msgid": [
-                "1",
-                "5"
-            ]
-        }
-    ],
-    "sw AD FS": [
-        {
-            "event_src.subsys": "ad fs",
-            "msgid": [
-                "1200",
-                "1201"
-            ]
-        }
-    ],
-    "sw AD DNS": [
-        {
-            "event_src.subsys": "",
-            "msgid": [
-                "6001",
-                "6525"
-            ]
-        }
-    ],
-    "sw AD mecm": [
-        {
-            "event_src.title": "mecm"
-        }
-    ],
-    "sw AD exchange": [
-        {
-            "event_src.title": "exchange",
-            "event_src.subsys": [
-                "application",
-                "msexchange management",
-                "anti-spam"
-            ]
-        }
-    ],
-    "sw sharepoint": [
-        {
-            "event_src.title": "sharepoint"
-        }
-    ],
-    "sw nps": [
-        {
-            "event_src.title": "nps"
-        }
-    ],
-    "sw mssql": [
-        {
-            "event_src.title": "sql_server"
-        }
-    ],
-    "sw rds": [
-        {
-            "event_src.title": "windows",
-            "event_src.subsys": [
-                "microsoft-windows-terminalservices-remoteconnectionmanager/operational",
-                "microsoft-windows-terminalservices-localsessionmanager/operational"
-            ]
-        }
-    ],
-    "sw rdg": [
-        {
-            "event_src.title": "windows",
-            "event_src.subsys": [
-                "microsoft-windows-terminalservices-gateway/operational"
-            ]
-        }
-    ],
-    "sw iis": [
-        {
-            "event_src.title": "internet_information_services"
-        }
-    ],
-    "sa symantec": [
-        {
-            "event_src.vendor": "symantec",
-            "event_src.title": "endpoint_protection_manager"
-        }
-    ],
-    "sa kes": [
-        {
-            "event_src.subsys": "kaspersky endpoint security",
-            "event_src.title": "endpoint_security"
-        }
-    ],
-    "sa PT EDR": [
-        {
-            "event_src.title": "xdr",
-            "msgid": [
-                "rule_engine",
-                "yara_scanner"
-            ]
-        }
-    ],
-    "sa eset": [
-        {
-            "event_src.title": "eset_security_management_center"
-        }
-    ],
-    "sa drweb": [
-        {
-            "event_src.subsys": "control center",
-            "event_src.title": "security_suite"
-        }
-    ],
-    "sa vipnet ids hs": [
-        {
-            "event_src.title": "vipnet_ids_hs"
-        }
-    ],
-    "sa infowatch personal-monitor": [
-        {
-            "event_src.title": "personal_monitor"
-        }
-    ],
-    "s netiq": [
-        {
-            "event_src.vendor": "netiq",
-            "event_src.title": "advanced_authentication",
-            "msgid": [
-                "101",
-                "102",
-                "105"
-            ]
-        }
-    ],
-    "s netapp": [
-        {
-            "event_src.vendor": "netapp",
-            "event_src.title": "aff"
-        }
-    ],
-    "s arti": [
-        {
-            "event_src.title": "artifactory"
-        }
-    ],
-    "s vsp aria": [
-        {
-            "event_src.title": "aria_operations_for_logs"
-        }
-    ],
-    "s es-prom bastion": [
-        {
-            "event_src.title": "bastion"
-        }
-    ],
-    "s clickhouse": [
-        {
-            "event_src.title": "clickhouse"
-        }
-    ],
-    "s cyberark": [
-        {
-            "event_src.title": "enterprise_password_vault"
-        }
-    ],
-    "s ksc": [
-        {
-            "event_src.title": "security_center"
-        }
-    ],
-    "s gitlab": [
-        {
-            "event_src.title": "gitlab",
-            "event_src.subsys": "security"
-        }
-    ],
-    "s katap": [
-        {
-            "event_src.title": "kaspersky_anti_targeted_attack_platform"
-        }
-    ],
-    "s ksmg": [
-        {
-            "event_src.title": "kaspersky_anti_targeted_attack_platform"
-        }
-    ],
-    "s kontinent": [
-        {
-            "event_src.title": "kontinent"
-        }
-    ],
-    "s yandex_cloud": [
-        {
-            "event_src.title": "yandex_cloud"
-        }
-    ],
-    "s netbackup": [
-        {
-            "event_src.title": "netbackup"
-        }
-    ],
-    "s passwork": [
-        {
-            "event_src.title": "passwork"
-        }
-    ],
-    "s teamcity": [
-        {
-            "event_src.title": "teamcity"
-        }
-    ],
-    "s openvpn": [
-        {
-            "event_src.title": "openvpn",
-            "event_src.subsys": "vpn-gateway"
-        }
-    ],
-    "s mysql": [
-        {
-            "event_src.title": "mysql"
-        }
-    ],
-    "s postgresql": [
-        {
-            "event_src.title": "postgresql"
-        }
-    ]
+    "w os Win Ess common": {
+        "queries": [
+            {
+                "event_src.subsys": "Security",
+                "msgid": [
+                    "4624",
+                    "4625",
+                    "4697",
+                    "5145"
+                ]
+            },
+            {
+                "event_src.subsys": "system",
+                "msgid": [
+                    "7045"
+                ]
+            }
+        ],
+        "KB_packs": [
+            "Unix-системы. ATT&CK: «Перемещение внутри периметра»",
+            "Active Directory Certificate Services",
+            "ATT&CK: «Первоначальный доступ»",
+            "ATT&CK: «Сбор данных»",
+            "Атаки при помощи специализированного ПО",
+            "ATT&CK: «Изучение»",
+            "ATT&CK: «Повышение привилегий»",
+            "ATT&CK: «Организация управления»",
+            "Универсальные правила. Подозрительные входы в ПО",
+            "Active Directory",
+            "ATT&CK: «Выполнение»",
+            "Microsoft Exchange Server",
+            "ATT&CK: «Перемещение внутри периметра»",
+            "Универсальные правила. Запросы к подозрительным или вредоносным ресурсам",
+            "ATT&CK: «Предотвращение обнаружения»",
+            "Эксплуатация уязвимостей",
+            "ATT&CK: «Получение учетных данных»",
+            "ATT&CK: «Закрепление»"
+        ]
+    },
+    "w os Win Ess posh": {
+        "queries": [
+            {
+                "event_src.subsys": "Microsoft-Windows-PowerShell/Operational",
+                "msgid": [
+                    "4103",
+                    "4104"
+                ]
+            }
+        ],
+        "KB_packs": [
+            "ATT&CK: «Перемещение внутри периметра»",
+            "ATT&CK: «Деструктивное воздействие»",
+            "ATT&CK: «Получение учетных данных»",
+            "Microsoft Endpoint Configuration Manager",
+            "Атаки при помощи специализированного ПО",
+            "ATT&CK: «Эксфильтрация данных»",
+            "ATT&CK: «Предотвращение обнаружения»",
+            "Active Directory",
+            "ATT&CK: «Сбор данных»",
+            "ATT&CK: «Выполнение»",
+            "ATT&CK: «Закрепление»",
+            "ATT&CK: «Изучение»",
+            "Microsoft Hyper-V. Подозрительная активность"
+        ]
+    },
+    "w os Win Ess task": {
+        "queries": [
+            {
+                "event_src.subsys": "microsoft-windows-taskscheduler/operational",
+                "msgid": "129"
+            }
+        ],
+        "KB_packs": [
+            "ATT&CK: «Выполнение»"
+        ]
+    },
+    "w os Win Ess 4688 cmd": {
+        "queries": [
+            {
+                "event_src.subsys": "Security",
+                "msgid": "4688",
+                "object.process.cmdline": true
+            }
+        ],
+        "KB_packs": [
+            "Расследование запуска процессов и исследование сессий",
+            "Active Directory Certificate Services",
+            "ATT&CK: «Первоначальный доступ»",
+            "ATT&CK: «Сбор данных»",
+            "Атаки при помощи специализированного ПО",
+            "ATT&CK: «Изучение»",
+            "ATT&CK: «Деструктивное воздействие»",
+            "ATT&CK: «Повышение привилегий»",
+            "Вредоносное ПО и нежелательные рассылки",
+            "ATT&CK: «Эксфильтрация данных»",
+            "ATT&CK: «Организация управления»",
+            "Active Directory",
+            "ATT&CK: «Выполнение»",
+            "Microsoft Exchange Server",
+            "ATT&CK: «Перемещение внутри периметра»",
+            "ATT&CK: «Предотвращение обнаружения»",
+            "Эксплуатация уязвимостей",
+            "PostgreSQL",
+            "ATT&CK: «Получение учетных данных»",
+            "Аномальная активность веб-серверов",
+            "ATT&CK: «Закрепление»"
+        ]
+    },
+    "w os Win sysmon": {
+        "queries": [
+            {
+                "event_src.title": "sysmon",
+                "msgid": [
+                    "1",
+                    "3",
+                    "12",
+                    "13"
+                ]
+            }
+        ],
+        "KB_packs": [
+            "Расследование запуска процессов и исследование сессий",
+            "Active Directory Certificate Services",
+            "ATT&CK: «Первоначальный доступ»",
+            "ATT&CK: «Сбор данных»",
+            "Атаки при помощи специализированного ПО",
+            "ATT&CK: «Изучение»",
+            "ATT&CK: «Деструктивное воздействие»",
+            "ATT&CK: «Повышение привилегий»",
+            "PT Network Attack Discovery",
+            "Вредоносное ПО и нежелательные рассылки",
+            "ATT&CK: «Эксфильтрация данных»",
+            "Сетевые устройства. Подозрительная сетевая активность",
+            "ATT&CK: «Организация управления»",
+            "Служба каталогов Samba DC",
+            "Active Directory",
+            "ATT&CK: «Выполнение»",
+            "Microsoft Exchange Server",
+            "ATT&CK: «Перемещение внутри периметра»",
+            "ATT&CK: «Предотвращение обнаружения»",
+            "Эксплуатация уязвимостей",
+            "PostgreSQL",
+            "ATT&CK: «Получение учетных данных»",
+            "Microsoft Endpoint Configuration Manager",
+            "PT Next Generation Firewall",
+            "Аномальная активность веб-серверов",
+            "ATT&CK: «Закрепление»"
+        ]
+    },
+    "w os Win Optional": {
+        "queries": [
+            {
+                "event_src.title": "windows",
+                "msgid": [
+                    "4732",
+                    "4733",
+                    "4798",
+                    "4799",
+                    "5140",
+                    "5156",
+                    "5378",
+                    "5379",
+                    "6416",
+                    "7031",
+                    "20503",
+                    "1074",
+                    "4672",
+                    "4673",
+                    "4698",
+                    "4699",
+                    "4702",
+                    "4723",
+                    "4724",
+                    "4726",
+                    "4728"
+                ]
+            },
+            {
+                "event_src.title": "windows",
+                "msgid": "2",
+                "event_src.subsys": "application"
+            }
+        ],
+        "KB_packs": [
+            "Active Directory Certificate Services",
+            "ATT&CK: «Первоначальный доступ»",
+            "ATT&CK: «Сбор данных»",
+            "Атаки при помощи специализированного ПО",
+            "ATT&CK: «Изучение»",
+            "ATT&CK: «Деструктивное воздействие»",
+            "Универсальные правила. Тактика «Деструктивное воздействие»",
+            "ATT&CK: «Повышение привилегий»",
+            "PT Network Attack Discovery",
+            "ATT&CK: «Эксфильтрация данных»",
+            "ATT&CK: «Организация управления»",
+            "Active Directory",
+            "ATT&CK: «Выполнение»",
+            "ATT&CK: «Перемещение внутри периметра»",
+            "ATT&CK: «Предотвращение обнаружения»",
+            "ATT&CK: «Получение учетных данных»",
+            "Microsoft Endpoint Configuration Manager",
+            "PT Next Generation Firewall",
+            "ATT&CK: «Закрепление»"
+        ]
+    },
+    "w os Win Advanced": {
+        "queries": [
+            {
+                "event_src.title": "windows",
+                "msgid": [
+                    "4656",
+                    "4663"
+                ]
+            }
+        ],
+        "KB_packs": [
+            "ATT&CK: «Первоначальный доступ»",
+            "Атаки при помощи специализированного ПО",
+            "ATT&CK: «Изучение»",
+            "ATT&CK: «Эксфильтрация данных»",
+            "ATT&CK: «Организация управления»",
+            "ATT&CK: «Выполнение»",
+            "ATT&CK: «Перемещение внутри периметра»",
+            "ATT&CK: «Предотвращение обнаружения»",
+            "Эксплуатация уязвимостей",
+            "PostgreSQL",
+            "ATT&CK: «Получение учетных данных»",
+            "ATT&CK: «Закрепление»"
+        ]
+    },
+    "u os auditd": {
+        "queries": [
+            {
+                "event_src.title": "unix_like",
+                "event_src.subsys": "auditd",
+                "msgid": [
+                    "execve",
+                    "LOGIN"
+                ]
+            },
+            {
+                "event_src.title": "unix_like",
+                "event_src.subsys": null
+            }
+        ],
+        "KB_packs": [
+            "Unix-системы. ATT&CK: «Перемещение внутри периметра»",
+            "Unix-системы. ATT&CK: «Получение учетных данных»",
+            "Unix-системы. ATT&CK: «Закрепление»",
+            "Unix-системы. ATT&CK: «Исследование»",
+            "Oracle MySQL",
+            "Unix-системы. ATT&CK: «Предотвращение обнаружения»",
+            "Атаки при помощи специализированного ПО",
+            "ATT&CK: «Изучение»",
+            "ATT&CK: «Деструктивное воздействие»",
+            "Unix-системы. ATT&CK: «Выполнение»",
+            "Универсальные правила. Тактика «Деструктивное воздействие»",
+            "Unix-системы. ATT&CK: «Первоначальный доступ»",
+            "PT Network Attack Discovery",
+            "Вредоносное ПО и нежелательные рассылки",
+            "Служба каталогов Samba DC",
+            "ATT&CK: «Организация управления»",
+            "Сетевые устройства. Подозрительная сетевая активность",
+            "Универсальные правила. Подозрительные входы в ПО",
+            "Unix-системы. ATT&CK: «Деструктивное воздействие»",
+            "Unix-системы. ATT&CK: «Организация управления»",
+            "Elasticsearch. Подозрительная активность",
+            "ATT&CK: «Предотвращение обнаружения»",
+            "Эксплуатация уязвимостей",
+            "ALD Pro (FreeIPA). Подозрительная активность",
+            "PostgreSQL",
+            "PT Container Security",
+            "SaltStack. Подозрительная активность",
+            "Аномалии в цепочках поставок",
+            "PT Next Generation Firewall",
+            "Аномальная активность веб-серверов",
+            "Unix-системы. ATT&CK: «Сбор данных»",
+            "Unix-системы. ATT&CK: «Повышение привилегий»"
+        ]
+    },
+    "u os old": {
+        "queries": [
+            {
+                "event_src.title": "unix_like",
+                "event_src.subsys": null,
+                "id": [
+                    "PT_UNIX_like_auditd_syslog_user_login",
+                    "PT_UNIX_like_auditd_syslog_user_cmd_syscall",
+                    "PT_UNIX_like_auditd_fake_for_show_no_auditd"
+                ]
+            }
+        ],
+        "KB_packs": []
+    },
+    "n os 3com": {
+        "queries": [
+            {
+                "event_src.title": "3com"
+            }
+        ],
+        "KB_packs": [
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
+            "Универсальные правила. Подозрительные входы в ПО"
+        ]
+    },
+    "n os cisco fw": {
+        "queries": [
+            {
+                "event_src.vendor": "cisco",
+                "event_src.title": [
+                    "asa",
+                    "fwsm",
+                    "pix"
+                ]
+            }
+        ],
+        "KB_packs": [
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
+            "Универсальные правила. Запросы к подозрительным или вредоносным ресурсам",
+            "Сетевые устройства. Индикаторы компрометации",
+            "Универсальные правила. Подозрительные входы в ПО",
+            "ATT&CK: «Изучение»"
+        ]
+    },
+    "n os cisco": {
+        "queries": [
+            {
+                "event_src.vendor": "cisco",
+                "event_src.title": [
+                    "ios",
+                    "ios_xe",
+                    "ios_xr",
+                    "ise"
+                ]
+            }
+        ],
+        "KB_packs": [
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
+            "Сетевые устройства. Подозрительная сетевая активность",
+            "Сетевые устройства. Индикаторы компрометации",
+            "Эксплуатация уязвимостей",
+            "Универсальные правила. Подозрительные входы в ПО",
+            "ATT&CK: «Изучение»"
+        ]
+    },
+    "n os fortigate": {
+        "queries": [
+            {
+                "event_src.title": "fortigate"
+            }
+        ],
+        "KB_packs": [
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
+            "Универсальные правила. Запросы к подозрительным или вредоносным ресурсам",
+            "Вредоносное ПО и нежелательные рассылки",
+            "Сетевые устройства. Подозрительная сетевая активность",
+            "Универсальные правила. Подозрительные входы в ПО",
+            "Универсальные правила. Отключение и обход защитных механизмов",
+            "ATT&CK: «Изучение»"
+        ]
+    },
+    "n os watchguard": {
+        "queries": [
+            {
+                "event_src.subsys": [
+                    "admd",
+                    "dhcpd",
+                    "sessiond",
+                    "wgagent"
+                ],
+                "event_src.title": "fireware_xtmv"
+            }
+        ],
+        "KB_packs": [
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
+            "Сетевые устройства. Индикаторы компрометации",
+            "Универсальные правила. Подозрительные входы в ПО"
+        ]
+    },
+    "n os fortimail": {
+        "queries": [
+            {
+                "event_src.title": "fortimail"
+            }
+        ],
+        "KB_packs": [
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
+            "Вредоносное ПО и нежелательные рассылки",
+            "Универсальные правила. Подозрительные входы в ПО"
+        ]
+    },
+    "n os checkpoint": {
+        "queries": [
+            {
+                "event_src.title": "gaia"
+            }
+        ],
+        "KB_packs": [
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
+            "Универсальные правила. Запросы к подозрительным или вредоносным ресурсам",
+            "Вредоносное ПО и нежелательные рассылки",
+            "Сетевые устройства. Подозрительная сетевая активность",
+            "Сетевые устройства. Индикаторы компрометации",
+            "Эксплуатация уязвимостей",
+            "Универсальные правила. Подозрительные входы в ПО",
+            "ATT&CK: «Изучение»"
+        ]
+    },
+    "n os jun": {
+        "queries": [
+            {
+                "event_src.title": "junos"
+            }
+        ],
+        "KB_packs": [
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
+            "Универсальные правила. Запросы к подозрительным или вредоносным ресурсам",
+            "Универсальные правила. Подозрительные входы в ПО",
+            "ATT&CK: «Изучение»"
+        ]
+    },
+    "n os pan": {
+        "queries": [
+            {
+                "event_src.title": "pan_os"
+            }
+        ],
+        "KB_packs": [
+            "Универсальные правила. Тактика «Деструктивное воздействие»",
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
+            "Универсальные правила. Запросы к подозрительным или вредоносным ресурсам",
+            "Вредоносное ПО и нежелательные рассылки",
+            "Сетевые устройства. Подозрительная сетевая активность",
+            "Эксплуатация уязвимостей",
+            "Универсальные правила. Подозрительные входы в ПО",
+            "Универсальные правила. Отключение и обход защитных механизмов",
+            "ATT&CK: «Изучение»"
+        ]
+    },
+    "n os stonesoft ngfw": {
+        "queries": [
+            {
+                "event_src.title": "stonesoft_ngfw"
+            }
+        ],
+        "KB_packs": [
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
+            "Универсальные правила. Запросы к подозрительным или вредоносным ресурсам",
+            "Сетевые устройства. Подозрительная сетевая активность",
+            "Универсальные правила. Подозрительные входы в ПО",
+            "ATT&CK: «Изучение»"
+        ]
+    },
+    "n os huawei": {
+        "queries": [
+            {
+                "event_src.title": "vrp"
+            }
+        ],
+        "KB_packs": [
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
+            "Универсальные правила. Подозрительные входы в ПО"
+        ]
+    },
+    "p ptaf": {
+        "queries": [
+            {
+                "event_src.title": "application_firewall"
+            }
+        ],
+        "KB_packs": [
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
+            "PT Application Firewall",
+            "Универсальные правила. Подозрительные входы в ПО",
+            "Универсальные правила. Отключение и обход защитных механизмов"
+        ]
+    },
+    "p fortiweb": {
+        "queries": [
+            {
+                "event_src.title": "fortiweb"
+            }
+        ],
+        "KB_packs": [
+            "Универсальные правила. Запросы к подозрительным или вредоносным ресурсам",
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
+            "Универсальные правила. Подозрительные входы в ПО"
+        ]
+    },
+    "p siteprotector": {
+        "queries": [
+            {
+                "event_src.title": "siteprotector"
+            }
+        ],
+        "KB_packs": []
+    },
+    "p apache": {
+        "queries": [
+            {
+                "event_src.title": "apache"
+            }
+        ],
+        "KB_packs": [
+            "Эксплуатация уязвимостей",
+            "Аномальная активность веб-серверов"
+        ]
+    },
+    "p nginx": {
+        "queries": [
+            {
+                "event_src.title": "nginx"
+            }
+        ],
+        "KB_packs": [
+            "Эксплуатация уязвимостей",
+            "Аномальная активность веб-серверов"
+        ]
+    },
+    "p lighttpd": {
+        "queries": [
+            {
+                "event_src.title": "lighttpd"
+            }
+        ],
+        "KB_packs": [
+            "Эксплуатация уязвимостей",
+            "Аномальная активность веб-серверов"
+        ]
+    },
+    "p haproxy": {
+        "queries": [
+            {
+                "event_src.title": "haproxy"
+            }
+        ],
+        "KB_packs": [
+            "Эксплуатация уязвимостей",
+            "Универсальные правила. Тактика «Деструктивное воздействие»"
+        ]
+    },
+    "s 1c": {
+        "queries": [
+            {
+                "event_src.title": "1c_enterprise"
+            }
+        ],
+        "KB_packs": [
+            "«1C:Предприятие» 8.3 и «Битрикс24»",
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
+            "Профилирование доступа к критически важным системам"
+        ]
+    },
+    "s bitrix24": {
+        "queries": [
+            {
+                "event_src.title": "bitrix24"
+            }
+        ],
+        "KB_packs": [
+            "«1C:Предприятие» 8.3 и «Битрикс24»",
+            "Универсальные правила. Подозрительные входы в ПО"
+        ]
+    },
+    "s VMware vCenter": {
+        "queries": [
+            {
+                "event_src.title": "vsphere",
+                "event_src.subsys": "vpxd"
+            },
+            {
+                "event_src.title": "vsphere",
+                "event_src.subsys": null
+            }
+        ],
+        "KB_packs": [
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
+            "VMware vSphere. Подозрительная активность пользователей",
+            "Универсальные правила. Подозрительные входы в ПО"
+        ]
+    },
+    "s VMware ESXi": {
+        "queries": [
+            {
+                "event_src.title": "esxi",
+                "action": "login",
+                "status": "success"
+            }
+        ],
+        "KB_packs": [
+            "Универсальные правила. Подозрительные входы в ПО"
+        ]
+    },
+    "s VMware Horizon": {
+        "queries": [
+            {
+                "event_src.title": "horizon"
+            }
+        ],
+        "KB_packs": [
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора"
+        ]
+    },
+    "sw AD DC": {
+        "queries": [
+            {
+                "event_src.subsys": "Security",
+                "msgid": [
+                    "4931",
+                    "4769"
+                ]
+            },
+            {
+                "event_src.subsys": "active_directory",
+                "msgid": [
+                    "4928",
+                    "4929",
+                    "5136",
+                    "5137"
+                ]
+            },
+            {
+                "event_src.subsys": "directory service",
+                "msgid": [
+                    "1644",
+                    "2946"
+                ]
+            }
+        ],
+        "KB_packs": [
+            "ATT&CK: «Получение учетных данных»",
+            "Microsoft Endpoint Configuration Manager",
+            "Атаки при помощи специализированного ПО",
+            "Эксплуатация уязвимостей",
+            "Active Directory Certificate Services",
+            "Active Directory",
+            "ATT&CK: «Выполнение»",
+            "ATT&CK: «Изучение»"
+        ]
+    },
+    "sw AD CS": {
+        "queries": [
+            {
+                "event_src.subsys": "certification_authority",
+                "msgid": [
+                    "4871",
+                    "4872",
+                    "4887",
+                    "4888",
+                    "4889",
+                    "4898"
+                ]
+            }
+        ],
+        "KB_packs": []
+    },
+    "sw AD WS": {
+        "queries": [
+            {
+                "event_src.subsys": "active directory web services",
+                "msgid": [
+                    "1",
+                    "5"
+                ]
+            }
+        ],
+        "KB_packs": []
+    },
+    "sw AD FS": {
+        "queries": [
+            {
+                "event_src.subsys": "ad fs",
+                "msgid": [
+                    "1200",
+                    "1201"
+                ]
+            }
+        ],
+        "KB_packs": [
+            "Атаки методом перебора"
+        ]
+    },
+    "sw AD DNS": {
+        "queries": [
+            {
+                "event_src.subsys": "",
+                "msgid": [
+                    "6001",
+                    "6525"
+                ]
+            }
+        ],
+        "KB_packs": []
+    },
+    "sw AD mecm": {
+        "queries": [
+            {
+                "event_src.title": "mecm"
+            }
+        ],
+        "KB_packs": [
+            "Microsoft Endpoint Configuration Manager"
+        ]
+    },
+    "sw AD exchange": {
+        "queries": [
+            {
+                "event_src.title": "exchange",
+                "event_src.subsys": [
+                    "application",
+                    "msexchange management",
+                    "anti-spam"
+                ]
+            }
+        ],
+        "KB_packs": [
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
+            "Вредоносное ПО и нежелательные рассылки",
+            "Microsoft Exchange Server"
+        ]
+    },
+    "sw sharepoint": {
+        "queries": [
+            {
+                "event_src.title": "sharepoint"
+            }
+        ],
+        "KB_packs": [
+            "Эксплуатация уязвимостей",
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
+            "Microsoft SharePoint Server. Подозрительная активность"
+        ]
+    },
+    "sw nps": {
+        "queries": [
+            {
+                "event_src.title": "nps"
+            }
+        ],
+        "KB_packs": [
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
+            "Универсальные правила. Подозрительные входы в ПО"
+        ]
+    },
+    "sw mssql": {
+        "queries": [
+            {
+                "event_src.title": "sql_server"
+            }
+        ],
+        "KB_packs": [
+            "ATT&CK: «Перемещение внутри периметра»",
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
+            "ATT&CK: «Получение учетных данных»",
+            "Microsoft SQL Server",
+            "Универсальные правила. Подозрительные входы в ПО"
+        ]
+    },
+    "sw rds": {
+        "queries": [
+            {
+                "event_src.title": "windows",
+                "event_src.subsys": [
+                    "microsoft-windows-terminalservices-remoteconnectionmanager/operational",
+                    "microsoft-windows-terminalservices-localsessionmanager/operational"
+                ]
+            }
+        ],
+        "KB_packs": [
+            "ATT&CK: «Организация управления»",
+            "ATT&CK: «Сбор данных»"
+        ]
+    },
+    "sw rdg": {
+        "queries": [
+            {
+                "event_src.title": "windows",
+                "event_src.subsys": [
+                    "microsoft-windows-terminalservices-gateway/operational"
+                ]
+            }
+        ],
+        "KB_packs": [
+            "Безопасность удаленной работы"
+        ]
+    },
+    "sw iis": {
+        "queries": [
+            {
+                "event_src.title": "internet_information_services"
+            }
+        ],
+        "KB_packs": [
+            "PT Application Firewall",
+            "Эксплуатация уязвимостей",
+            "ATT&CK: «Изучение»",
+            "ATT&CK: «Первоначальный доступ»",
+            "Аномальная активность веб-серверов",
+            "ATT&CK: «Выполнение»",
+            "Атаки при помощи специализированного ПО",
+            "Microsoft Exchange Server"
+        ]
+    },
+    "sa symantec": {
+        "queries": [
+            {
+                "event_src.vendor": "symantec",
+                "event_src.title": "endpoint_protection_manager"
+            }
+        ],
+        "KB_packs": [
+            "Универсальные правила. Тактика «Деструктивное воздействие»",
+            "Вредоносное ПО и нежелательные рассылки"
+        ]
+    },
+    "sa kes": {
+        "queries": [
+            {
+                "event_src.subsys": "kaspersky endpoint security",
+                "event_src.title": "endpoint_security"
+            }
+        ],
+        "KB_packs": [
+            "Универсальные правила. Запросы к подозрительным или вредоносным ресурсам",
+            "Вредоносное ПО и нежелательные рассылки",
+            "Универсальные правила. Отключение и обход защитных механизмов",
+            "Продукты «Лаборатория Касперского». Выявление вредоносной активности"
+        ]
+    },
+    "sa PT EDR": {
+        "queries": [
+            {
+                "event_src.title": "xdr",
+                "msgid": [
+                    "rule_engine",
+                    "yara_scanner"
+                ]
+            }
+        ],
+        "KB_packs": []
+    },
+    "sa eset": {
+        "queries": [
+            {
+                "event_src.title": "eset_security_management_center"
+            }
+        ],
+        "KB_packs": [
+            "Универсальные правила. Запросы к подозрительным или вредоносным ресурсам",
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
+            "Вредоносное ПО и нежелательные рассылки"
+        ]
+    },
+    "sa drweb": {
+        "queries": [
+            {
+                "event_src.subsys": "control center",
+                "event_src.title": "security_suite"
+            }
+        ],
+        "KB_packs": [
+            "Dr.Web Enterprise Security Suite. Подозрительная активность",
+            "Универсальные правила. Подозрительные входы в ПО",
+            "Универсальные правила. Отключение и обход защитных механизмов"
+        ]
+    },
+    "sa vipnet ids hs": {
+        "queries": [
+            {
+                "event_src.title": "vipnet_ids_hs"
+            }
+        ],
+        "KB_packs": [
+            "Универсальные правила. Запросы к подозрительным или вредоносным ресурсам",
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
+            "Атаки методом перебора"
+        ]
+    },
+    "sa infowatch personal-monitor": {
+        "queries": [
+            {
+                "event_src.title": "personal_monitor"
+            }
+        ],
+        "KB_packs": [
+            "Универсальные правила. Запросы к подозрительным или вредоносным ресурсам",
+            "ATT&CK: «Предотвращение обнаружения»",
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора"
+        ]
+    },
+    "s netiq": {
+        "queries": [
+            {
+                "event_src.vendor": "netiq",
+                "event_src.title": "advanced_authentication",
+                "msgid": [
+                    "101",
+                    "102",
+                    "105"
+                ]
+            }
+        ],
+        "KB_packs": [
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
+            "Универсальные правила. Подозрительные входы в ПО"
+        ]
+    },
+    "s netapp": {
+        "queries": [
+            {
+                "event_src.vendor": "netapp",
+                "event_src.title": "aff"
+            }
+        ],
+        "KB_packs": [
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора"
+        ]
+    },
+    "s arti": {
+        "queries": [
+            {
+                "event_src.title": "artifactory"
+            }
+        ],
+        "KB_packs": [
+            "Аномалии в цепочках поставок",
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
+            "Универсальные правила. Подозрительные входы в ПО"
+        ]
+    },
+    "s vsp aria": {
+        "queries": [
+            {
+                "event_src.title": "aria_operations_for_logs"
+            }
+        ],
+        "KB_packs": [
+            "VMware Aria. Подозрительная активность"
+        ]
+    },
+    "s es-prom bastion": {
+        "queries": [
+            {
+                "event_src.title": "bastion"
+            }
+        ],
+        "KB_packs": [
+            "ATT&CK: «Предотвращение обнаружения»"
+        ]
+    },
+    "s clickhouse": {
+        "queries": [
+            {
+                "event_src.title": "clickhouse"
+            }
+        ],
+        "KB_packs": [
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
+            "Универсальные правила. Запросы к подозрительным или вредоносным ресурсам",
+            "ClickHouse"
+        ]
+    },
+    "s cyberark": {
+        "queries": [
+            {
+                "event_src.title": "enterprise_password_vault"
+            }
+        ],
+        "KB_packs": [
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
+            "Универсальные правила. Подозрительные входы в ПО",
+            "Универсальные правила. Отключение и обход защитных механизмов"
+        ]
+    },
+    "s ksc": {
+        "queries": [
+            {
+                "event_src.title": "security_center"
+            }
+        ],
+        "KB_packs": [
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
+            "Универсальные правила. Запросы к подозрительным или вредоносным ресурсам",
+            "Вредоносное ПО и нежелательные рассылки",
+            "Универсальные правила. Подозрительные входы в ПО",
+            "Универсальные правила. Отключение и обход защитных механизмов",
+            "Продукты «Лаборатория Касперского». Выявление вредоносной активности"
+        ]
+    },
+    "s gitlab": {
+        "queries": [
+            {
+                "event_src.title": "gitlab",
+                "event_src.subsys": "security"
+            }
+        ],
+        "KB_packs": []
+    },
+    "s katap": {
+        "queries": [
+            {
+                "event_src.title": "kaspersky_anti_targeted_attack_platform"
+            }
+        ],
+        "KB_packs": [
+            "Универсальные правила. Запросы к подозрительным или вредоносным ресурсам",
+            "Вредоносное ПО и нежелательные рассылки"
+        ]
+    },
+    "s ksmg": {
+        "queries": [
+            {
+                "event_src.title": "kaspersky_anti_targeted_attack_platform"
+            }
+        ],
+        "KB_packs": [
+            "Универсальные правила. Запросы к подозрительным или вредоносным ресурсам",
+            "Вредоносное ПО и нежелательные рассылки"
+        ]
+    },
+    "s kontinent": {
+        "queries": [
+            {
+                "event_src.title": "kontinent"
+            }
+        ],
+        "KB_packs": [
+            "АПКШ «Континент 4». Подозрительная активность",
+            "Универсальные правила. Тактика «Деструктивное воздействие»",
+            "Универсальные правила. Запросы к подозрительным или вредоносным ресурсам",
+            "Сетевые устройства. Подозрительная сетевая активность",
+            "Универсальные правила. Подозрительные входы в ПО",
+            "Универсальные правила. Отключение и обход защитных механизмов",
+            "ATT&CK: «Изучение»"
+        ]
+    },
+    "s yandex_cloud": {
+        "queries": [
+            {
+                "event_src.title": "yandex_cloud"
+            }
+        ],
+        "KB_packs": [
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
+            "Yandex Cloud. Подозрительная активность"
+        ]
+    },
+    "s netbackup": {
+        "queries": [
+            {
+                "event_src.title": "netbackup"
+            }
+        ],
+        "KB_packs": [
+            "ATT&CK: «Предотвращение обнаружения»",
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора"
+        ]
+    },
+    "s passwork": {
+        "queries": [
+            {
+                "event_src.title": "passwork"
+            }
+        ],
+        "KB_packs": [
+            "ATT&CK: «Получение учетных данных»",
+            "Универсальные правила. Подозрительные входы в ПО",
+            "«Пассворк». Подозрительная активность"
+        ]
+    },
+    "s teamcity": {
+        "queries": [
+            {
+                "event_src.title": "teamcity"
+            }
+        ],
+        "KB_packs": [
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
+            "Эксплуатация уязвимостей",
+            "Универсальные правила. Подозрительные входы в ПО",
+            "Аномалии в цепочках поставок"
+        ]
+    },
+    "s openvpn": {
+        "queries": [
+            {
+                "event_src.title": "openvpn",
+                "event_src.subsys": "vpn-gateway"
+            }
+        ],
+        "KB_packs": [
+            "Универсальные правила. Подозрительные входы в ПО"
+        ]
+    },
+    "s mysql": {
+        "queries": [
+            {
+                "event_src.title": "mysql"
+            }
+        ],
+        "KB_packs": [
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
+            "Oracle MySQL",
+            "Универсальные правила. Доступ к критически важным данным"
+        ]
+    },
+    "s postgresql": {
+        "queries": [
+            {
+                "event_src.title": "postgresql"
+            }
+        ],
+        "KB_packs": [
+            "PostgreSQL",
+            "Универсальные правила. Подозрительные входы в ПО"
+        ]
+    }
 }

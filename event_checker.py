@@ -12,6 +12,7 @@ from lib.get_token import MPXAuthenticator
 from pydantic_core import ValidationError
 from lib.policies_checker import EventPolicies
 from lib.asset import AssetWorker
+from lib.kb_checker import KB_Checker
 
 import sys
 old_python = False
@@ -173,9 +174,12 @@ class MaxPatrolEventsMonitor():
             aw = AssetWorker(self.settings, self.auth, self.logger, self.policies, assets_filter, assets_filters[assets_filter])
             aw.assets_take_info(out_folder, True, all_search_values)
 
+
 if __name__ == "__main__":
     mem = MaxPatrolEventsMonitor()
-
+    if mem.settings.kb_check_mode:
+        kb_check_a = KB_Checker(mem.settings, mem.logger, mem.auth)
+        kb_check_a.work()
     if mem.settings.mode == "ALL_events":
         mem.all_events_worker()
     elif mem.settings.mode == "Asset_IDs":
@@ -186,3 +190,5 @@ if __name__ == "__main__":
         mem.dynamic_modes()
     elif mem.settings.mode == "Assets_filters":
         mem.asset_filters()
+    # elif mem.settings.mode == "Only_KB":
+    #     mem.kb_check()

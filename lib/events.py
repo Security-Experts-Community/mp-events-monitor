@@ -106,6 +106,7 @@ class EventsWorker:
             index += 1
         filter_file_name = file_name[:-5] + ".txt"
         file_path = (out_dir / filter_file_name)
+        modified_delta = 0
         data = {
             "filter": event_filter,
             "timeFrom": time_from
@@ -117,7 +118,7 @@ class EventsWorker:
         with file_path.open('w', encoding='utf-8') as out_file:
             temp_data_with_params = {"data": data, "params": param}
             json.dump(temp_data_with_params, out_file, ensure_ascii=False, indent=4)
-            temp_data_with_params = {}
+            del temp_data_with_params
         try_number = 0
         all_ok = False
         response = {}
@@ -135,10 +136,26 @@ class EventsWorker:
                                     all_ok = True
                                     break
                                 else:
-                                    self.logger.warning(f'Errors in take_events response for {file_path} in try number {try_number}: {response}. Next try after 5 seconds')
+                                    if not modified_delta:
+                                        modified_delta = self.settings.time_delta_hours // 2
+                                    else:
+                                        modified_delta = modified_delta // 2
+                                    data["timeFrom"] = int(time.time()) - modified_delta * 60 * 60
+                                    self.logger.warning(
+                                        f'Errors in take_events response for {file_path} in try number {try_number}: '
+                                        f'{response}. The delta time for this query has been halved to {modified_delta}'
+                                        f'. Next try after 5 seconds')
                                     await asyncio.sleep(5)
                             elif response_temp.status >= 500:
-                                self.logger.warning(f"Response code: {response_temp.status} for {file_path}. Try number: {try_number}. Next try after 5 seconds")
+                                if not modified_delta:
+                                    modified_delta = self.settings.time_delta_hours // 2
+                                else:
+                                    modified_delta = modified_delta // 2
+                                data["timeFrom"] = int(time.time()) - modified_delta * 60 * 60
+                                self.logger.warning(
+                                    f"Response code: {response_temp.status} for {file_path}. Try number: {try_number} "
+                                    f"of {self.settings.reconnect_times} The delta time for this query has been halved "
+                                    f"to {modified_delta}. Next try after 5 seconds")
                                 await asyncio.sleep(5)
                             elif response_temp.status == 400:
                                 response = await response_temp.json()

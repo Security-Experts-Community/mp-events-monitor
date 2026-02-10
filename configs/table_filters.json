@@ -1,0 +1,122 @@
+{
+  "active_directory_certificate_services_attacks": [
+    "CRL_Publication_Time"
+  ],
+  "auto_whitelisting": [
+    "Common_whitelist_auto_thresholds"
+  ],
+  "bad": [
+    "BAD_Significant_Rules"
+  ],
+  "bitbucket": [
+    "Bitbucket_Group_Permission_Registry",
+    "Bitbucket_Important_Branches_Registry",
+    "Bitbucket_Robots_Whitelist",
+    "Bitbucket_Subnets_Whitelist",
+    "Bitbucket_User_Permission_Registry"
+  ],
+  "capabilities_data_access": [
+    "Sensitive_DB_Tables"
+  ],
+  "elasticsearch": [
+    "Elasticsearch_critical_role",
+    "Elasticsearch_critical_user"
+  ],
+  "freeipa": [
+    "FreeIPA_Privileged_Accounts"
+  ],
+  "hashicorp": [
+    "Hashicorp_Vault_Important_Engines",
+    "Hashicorp_Vault_Important_Secrets"
+  ],
+  "indeed_pam": [
+    "Significant_Applications",
+    "Significant_PAM_Groups",
+    "Significant_Resources"
+  ],
+  "microsoft_exchange": [
+    "Exchange_Critical_Distribution_Groups"
+  ],
+  "microsoft_hyperv": [
+    "Significant_VMs"
+  ],
+  "microsoft_sharepoint": [
+    "Sharepoint_Critical_Features"
+  ],
+  "mitre_attck_initial_access": [
+    "External_Link_WhiteList",
+    "HoneyAccounts",
+    "Server_Scan_Usernames"
+  ],
+  "process_chains_and_logons": [
+    "Critical_Linux_Hosts_For_Process_Chains",
+    "Disable_Process_Chain"
+  ],
+  "profiling": [
+    "Critical_Files_List",
+    "Risk_User_Logon_Correlation_Profile_Manual"
+  ],
+  "proxmox": [
+    "ProxMox_Critical_VM_Container"
+  ],
+  "remote_work": [
+    "Mail_Domains",
+    "VPN_Networks"
+  ],
+  "sap_java_suspicious_user_activity": [
+    "SAP_JAVA_Admin_Groups"
+  ],
+  "security_code_secret_net_lsp": [
+    "Secretnet_Lsp_User_Elevate_Allowed"
+  ],
+  "supply_chain": [
+    "SupplyChain_Artifactory_Repositories_Registry",
+    "SupplyChain_Artifactory_Subnets_Whitelist",
+    "SupplyChain_Gitlab_Subnets_Whitelist",
+    "SupplyChain_Important_Branches_Registry",
+    "SupplyChain_Private_Vendor_Libraries",
+    "SupplyChain_Robots_Whitelist",
+    "SupplyChain_TeamCity_Important_Groups"
+  ],
+  "system": [
+    "Applications_Critical_Data_Values",
+    "Applications_Critical_VMs",
+    "Common_IP_Subnet_Whitelist",
+    "Common_blacklist_value",
+    "Common_whitelist_for_labeling",
+    "Common_whitelist_for_labeling_regex",
+    "Common_whitelist_regex",
+    "Common_whitelist_value",
+    "Correlation_Types_To_Override",
+    "Critical_Hosts_Manual",
+    "Dismissed_Users",
+    "IOCs_Value",
+    "List_Servers",
+    "Sensitive_Users",
+    "Significant_Networks",
+    "Specific_Local_Networks",
+    "UNIX_Hosts"
+  ],
+  "teleport": [
+    "Teleport_Critical_Roles"
+  ],
+  "vk_cloud": [
+    "VK_Cloud_Important_Objects"
+  ],
+  "vmware_aria": [
+    "AOFL_Critical_Permissions",
+    "Aria_Operations_Critical_Resources"
+  ],
+  "vsphere_suspicious_user_activity": [
+    "VSphere_Critical_VMs_Custom",
+    "VSphere_Protective_VMs_Custom"
+  ],
+  "yandex_cloud": [
+    "Yandex_Cloud_Cluster_Admin_Roles",
+    "Yandex_Cloud_Privileged_Accounts",
+    "Yandex_Cloud_Service_Accounts_With_Secret_Access"
+  ],
+  "zabbix": [
+    "Zabbix_Critical_Groups"
+  ]
+}
