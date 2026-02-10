@@ -1,1119 +1,3792 @@
 {
     "w os Win Ess common": {
-        "queries": [
-            {
-                "event_src.subsys": "Security",
-                "msgid": [
-                    "4624",
-                    "4625",
-                    "4697",
-                    "5145"
-                ]
-            },
-            {
-                "event_src.subsys": "system",
-                "msgid": [
-                    "7045"
-                ]
-            }
-        ],
-        "KB_packs": [
-            "Unix-системы. ATT&CK: «Перемещение внутри периметра»",
-            "Active Directory Certificate Services",
-            "ATT&CK: «Первоначальный доступ»",
-            "ATT&CK: «Сбор данных»",
-            "Атаки при помощи специализированного ПО",
-            "ATT&CK: «Изучение»",
-            "ATT&CK: «Повышение привилегий»",
-            "ATT&CK: «Организация управления»",
-            "Универсальные правила. Подозрительные входы в ПО",
-            "Active Directory",
-            "ATT&CK: «Выполнение»",
-            "Microsoft Exchange Server",
-            "ATT&CK: «Перемещение внутри периметра»",
-            "Универсальные правила. Запросы к подозрительным или вредоносным ресурсам",
-            "ATT&CK: «Предотвращение обнаружения»",
-            "Эксплуатация уязвимостей",
-            "ATT&CK: «Получение учетных данных»",
-            "ATT&CK: «Закрепление»"
-        ]
+        "event_src.subsys = \"security\" and msgid = \"4624\"": {
+            "Active Directory": [
+                "Kerberos_Silver_Ticket",
+                "RemoteKrbRelay_Usage",
+                "Subrule_MSA_LDAP_Query",
+                "KrbRelay_Usage",
+                "DCShadow_Attack",
+                "DCSync_Attack",
+                "KDS_Root_Key_Access",
+                "MSA_Password_Access"
+            ],
+            "Active Directory Certificate Services": [
+                "Subrule_Hostname_Mismatch",
+                "ADCS_Certify_Coerce",
+                "Cert_Compromise_Via_NTLM_Relay"
+            ],
+            "Атаки методом перебора": [
+                "Windows_Machine_Account_Password_Spraying",
+                "Windows_Password_Spraying",
+                "Windows_SSH_FTP_Brute",
+                "Windows_Password_Brute",
+                "IIS_Web_Application_Password_Spraying",
+                "IIS_Web_Application_Password_Brute",
+                "Windows_SSH_FTP_Spraying",
+                "Probing_Auth_On_Various_Hosts",
+                "Possible_Pre2k_Machine_Account_Pasword_Guessing"
+            ],
+            "Универсальные правила. Запросы к подозрительным или вредоносным ресурсам": [
+                "CAP_Activity_From_Known_Malicious_Hostname"
+            ],
+            "Универсальные правила. Подозрительные входы в ПО": [
+                "CAP_Default_Account_Logon"
+            ],
+            "Атаки с помощью специализированного ПО": [
+                "Cobalt_Strike_RunAs_Escalate",
+                "Cobalt_Strike_SpawnAs",
+                "Cobalt_Strike_Make_Token"
+            ],
+            "Microsoft Exchange Server": [
+                "Exchange_ProxyNotShell"
+            ],
+            "ATT&CK: «Сбор данных»": [
+                "Access_PST_File_In_Share"
+            ],
+            "ATT&CK: «Организация управления»": [
+                "Microsoft_Devtunnel_Usage"
+            ],
+            "ATT&CK: «Получение учетных данных»": [
+                "Subrule_NTLM_Logon",
+                "Netlogon_Auth",
+                "MalSecLogon_LSASS_Dump",
+                "Kekeo_Credentials_Relay_Via_NTLM"
+            ],
+            "ATT&CK: «Предотвращение обнаружения»": [
+                "Changing_Restricted_Admin_Settings",
+                "MalSecLogon_PPID_Spoofing"
+            ],
+            "ATT&CK: «Изучение»": [
+                "NullSession_System_Discovery",
+                "NetView_Recon",
+                "Dump_Bitlocker_Keys_From_AD",
+                "Multiple_Groups_Enum"
+            ],
+            "ATT&CK: «Выполнение»": [
+                "Subrule_Suspicious_RPC_Server",
+                "Suspicious_RPC_Server"
+            ],
+            "ATT&CK: «Первоначальный доступ»": [
+                "HoneyAccount_Auth_Success",
+                "Service_Logon_From_VPN_Network",
+                "Logon_Via_Vuln_Scanner_Account"
+            ],
+            "ATT&CK: «Перемещение внутри периметра»": [
+                "Remoting_Windows_Shell",
+                "LiquidSnake_WMI_EventFilter",
+                "Input_Remote_PowerShell_Via_WinRM",
+                "Evil_WinRM_Activity",
+                "DCOMUploadExec",
+                "Powershell_Remoting",
+                "Multiple_RDP_From_One_User_Or_Host",
+                "Subrule_Windows_Remote_Logon_With_Explicit_Credentials",
+                "Impacket_Like_Execution",
+                "Remote_Creation_Suspicious_File",
+                "Remoting_WMI",
+                "Remoting_WinExec",
+                "Scheduled_Task_Was_Created_Or_Updated_Via_Schtasks",
+                "NTLM_Relay_Auth",
+                "Pass_The_Hash",
+                "Subrule_Session_Changed",
+                "KRB_Relay_Auth_MITM6",
+                "Subrule_Remoting_SSH",
+                "Subrule_Windows_Logon",
+                "Remote_Admin_Share_Access",
+                "SVCCTL_Connection",
+                "Lateral_Movement_Via_WinRM",
+                "Remote_Execution_Via_Custom_Impacket",
+                "Subrule_Task_Created_Via_Atsvc",
+                "Remoting_SSH",
+                "Remote_Code_Execution_Via_AtSvc"
+            ],
+            "ATT&CK: «Закрепление»": [
+                "Remote_Creation_Of_Computer_Account_By_Local_User"
+            ],
+            "ATT&CK: «Повышение привилегий»": [
+                "RunAs_System_Or_External_Tools",
+                "PrintNotify_Potato",
+                "JuicyPotato_PrivEsc",
+                "RunAs_Subrule_Login"
+            ],
+            "Профилирование доступа к критически важным системам": [
+                "Subrule_Windows_Host_Abnormal_Access",
+                "SecurityAdmin_Abnormal_Access",
+                "Antivirus_Server_Abnormal_Access",
+                "App_1C_Server_Abnormal_Access",
+                "App_1C_User_PC_Abnormal_Access",
+                "Critical_Server_Abnormal_Access",
+                "Developer_PC_Abnormal_Access",
+                "Domain_Controller_Abnormal_Access",
+                "Release_Build_Agent_Abnormal_Access",
+                "Top_Managers_Abnormal_Access",
+                "Update_Server_Abnormal_Access",
+                "VCS_Server_Abnormal_Access"
+            ],
+            "Безопасность удаленной работы": [
+                "RDP_Login_From_Internet",
+                "VPN_User_Abnormal_Access",
+                "RDP_Tunneling"
+            ],
+            "Unix-системы. ATT&CK: «Перемещение внутри периметра»": [
+                "Unix_SSH_Agent_Hijacking"
+            ],
+            "Эксплуатация уязвимостей": [
+                "MS17_010_SMB_Privellege_Escalation",
+                "MS17_010_SMB_Code_Execution"
+            ]
+        },
+        "event_src.subsys = \"security\" and msgid = \"4625\"": {
+            "Active Directory": [
+                "Failed_Access_With_Unknown_User"
+            ],
+            "Атаки методом перебора": [
+                "Reason_Account_Blocked",
+                "Windows_Machine_Account_Password_Spraying",
+                "Windows_Password_Spraying",
+                "Windows_Password_Brute",
+                "Windows_SSH_FTP_Brute",
+                "IIS_Web_Application_Password_Spraying",
+                "IIS_Web_Application_Password_Brute",
+                "Windows_SSH_FTP_Spraying",
+                "Probing_Auth_On_Various_Hosts"
+            ],
+            "Универсальные правила. Запросы к подозрительным или вредоносным ресурсам": [
+                "CAP_Activity_From_Known_Malicious_Hostname"
+            ],
+            "Атаки с помощью специализированного ПО": [
+                "Cobalt_Strike_RunAs_Escalate",
+                "Cobalt_Strike_SpawnAs"
+            ],
+            "ATT&CK: «Перемещение внутри периметра»": [
+                "Subrule_Windows_Logon"
+            ],
+            "ATT&CK: «Повышение привилегий»": [
+                "RunAs_Subrule_Login",
+                "Subrule_Not_Self_Relay"
+            ],
+            "Безопасность удаленной работы": [
+                "RDP_Login_From_Internet"
+            ]
+        },
+        "event_src.subsys = \"security\" and msgid = \"4697\"": {
+            "Атаки с помощью специализированного ПО": [
+                "Suspicious_BYOVKD_Driver_Loaded",
+                "Rootkit_R77_Usage",
+                "Subrule_Cobalt_Strike_Service_Creation",
+                "Cobalt_Strike_Elevate",
+                "Cobalt_Strike_Psexec_Jump"
+            ],
+            "ATT&CK: «Организация управления»": [
+                "Wintun_Network_Driver_Usage"
+            ],
+            "ATT&CK: «Предотвращение обнаружения»": [
+                "Blackout_AV_Disabling"
+            ],
+            "ATT&CK: «Выполнение»": [
+                "Windows_Service_Installed",
+                "Execute_PSEXEC",
+                "Hidden_Service_Create"
+            ],
+            "ATT&CK: «Перемещение внутри периметра»": [
+                "Remoting_Impacket_PsExec"
+            ],
+            "ATT&CK: «Повышение привилегий»": [
+                "Named_Pipe_Impersonation_PrivEsc"
+            ]
+        },
+        "event_src.subsys = \"security\" and msgid = \"5145\"": {
+            "Active Directory": [
+                "Untrusted_Terminal_Server_Activity",
+                "RemoteKrbRelay_Usage",
+                "GPO_Manipulation"
+            ],
+            "Active Directory Certificate Services": [
+                "CA_Cert_Export"
+            ],
+            "Атаки с помощью специализированного ПО": [
+                "Go_Secdump_Activity",
+                "Subrule_SharpHound_Access_To_Wkssvc_Srvsvc",
+                "Subrule_PVE_Find_AD_User_Usage",
+                "Impacket_Secretsdump",
+                "Cobalt_Strike_Service_Move",
+                "Windows_Hacktool_Copied_To_Share",
+                "NimExec_Activity",
+                "SharpHound_Sysvol_Access",
+                "Subrule_Cobalt_Strike_Service_Creation",
+                "Subrule_SharpHound_LoggedOn",
+                "Subrule_Sharphound_Server_Side",
+                "Subrule_SharpHound_Access_To_Samr_Srvsvc",
+                "Cobalt_Strike_Payload_Delivery_Check",
+                "SharpHound_Session",
+                "PVE_Find_AD_User_Usage",
+                "Cobalt_Strike_Elevate",
+                "Cobalt_Strike_Psexec_Jump",
+                "SharpHound_LoggedOn",
+                "Sharphound_Server_Side",
+                "SharpHound_Groups_Collection"
+            ],
+            "Microsoft Exchange Server": [
+                "Exchange_ActiveSync_Discovery_SMB"
+            ],
+            "ATT&CK: «Сбор данных»": [
+                "Access_Into_Sensitive_Files_Via_Network_Share",
+                "Access_PST_File_In_Share",
+                "Suspicious_Access_To_Users_Folder",
+                "RDP_Shadow_Session"
+            ],
+            "ATT&CK: «Организация управления»": [
+                "Dameware_MRC_Remote_Connect",
+                "Dameware_Install"
+            ],
+            "ATT&CK: «Получение учетных данных»": [
+                "Subrule_Shares_For_DragonCastle",
+                "Subrule_Access_To_Protected_Storage_Share",
+                "Remote_Password_Dump",
+                "Access_To_Files_Containing_Passwords",
+                "Remote_Copy_Credential_Dump_Artifact",
+                "Subrule_NTLM_Logon",
+                "SCF_Or_URL_File_Created",
+                "Subrule_Remote_Credential_Theft_By_Masky",
+                "Credential_Access_To_Passwords_Storage",
+                "Netlogon_Auth",
+                "SCF_Or_URL_Forced_Authentication",
+                "Subrule_Coerce_Auth",
+                "DragonCastle_LSASS_Dump",
+                "Access_To_User_Secrets_Via_DPAPI",
+                "Kekeo_Credentials_Relay_Via_NTLM",
+                "Remote_Credential_Theft_By_Masky",
+                "Coerce_Auth"
+            ],
+            "ATT&CK: «Предотвращение обнаружения»": [
+                "Remote_EventLog_Crashing",
+                "Suspicious_File_Creation_In_Sysvol"
+            ],
+            "ATT&CK: «Изучение»": [
+                "NullSession_System_Discovery",
+                "Multiple_SrvSvc_Share_Access",
+                "Shares_Discovery",
+                "Subrule_LocalGroupListMembers",
+                "Multiple_Shares_Enum_On_Single_Host",
+                "Account_Or_Group_Discovery_Via_SAM_R",
+                "Windows_Mass_Recon",
+                "LocalGroupListMembers_From_Remote_Host"
+            ],
+            "ATT&CK: «Выполнение»": [
+                "Execute_File_From_Sysvol_Share",
+                "Subrule_Suspicious_RPC_Server",
+                "Suspicious_RPC_Server"
+            ],
+            "ATT&CK: «Перемещение внутри периметра»": [
+                "Remote_SSP_Dump",
+                "Auth_Coerce_With_WebClient_Abuse",
+                "Remote_Code_Execution_Via_AtSvc",
+                "Remote_Creation_Suspicious_File",
+                "Remoting_SysInternals_PsExec",
+                "SharpLateral_DCOM",
+                "Remote_Admin_Share_Access",
+                "SVCCTL_Connection",
+                "Remoting_Impacket_PsExec",
+                "Remote_Execution_Via_Custom_Impacket"
+            ],
+            "ATT&CK: «Повышение привилегий»": [
+                "Subrule_Action_After_Pipe_Connected",
+                "Named_Pipe_Impersonation_PrivEsc",
+                "GodPotato_PrivEsc",
+                "Subrule_RasMan_Pipe"
+            ],
+            "Профилирование доступа к критически важным системам": [
+                "Critical_File_Access",
+                "Subrule_Windows_Host_Abnormal_Access",
+                "Antivirus_Server_Abnormal_Access",
+                "App_1C_Server_Abnormal_Access",
+                "App_1C_User_PC_Abnormal_Access",
+                "Critical_Server_Abnormal_Access",
+                "Developer_PC_Abnormal_Access",
+                "Domain_Controller_Abnormal_Access",
+                "Release_Build_Agent_Abnormal_Access",
+                "Top_Managers_Abnormal_Access",
+                "Update_Server_Abnormal_Access",
+                "VCS_Server_Abnormal_Access"
+            ],
+            "Эксплуатация уязвимостей": [
+                "MS17_010_SMB_Privellege_Escalation",
+                "Certified_Priv_Esc_CVE_2022_26923",
+                "Symlink_Via_SpoolDirectory",
+                "MS17_010_SMB_Code_Execution",
+                "PrintSpooler_PrivEsc"
+            ]
+        },
+        "event_src.subsys = \"system\" and msgid = \"7045\"": {
+            "Атаки с помощью специализированного ПО": [
+                "Suspicious_BYOVKD_Driver_Loaded",
+                "Rootkit_R77_Usage",
+                "Subrule_Cobalt_Strike_Service_Creation",
+                "Sliver_PsExec",
+                "Impacket_SMBEXEC",
+                "Metasploit_Payload",
+                "Cobalt_Strike_Elevate",
+                "Cobalt_Strike_Psexec_Jump"
+            ],
+            "ATT&CK: «Организация управления»": [
+                "Wintun_Network_Driver_Usage"
+            ],
+            "ATT&CK: «Получение учетных данных»": [
+                "Masky_Tool_Usage"
+            ],
+            "ATT&CK: «Предотвращение обнаружения»": [
+                "Blackout_AV_Disabling"
+            ],
+            "ATT&CK: «Выполнение»": [
+                "Windows_Service_Installed",
+                "Execute_PSEXEC",
+                "Hidden_Service_Create"
+            ],
+            "ATT&CK: «Перемещение внутри периметра»": [
+                "Remoting_Impacket_PsExec"
+            ],
+            "ATT&CK: «Повышение привилегий»": [
+                "Named_Pipe_Impersonation_PrivEsc"
+            ],
+            "Безопасность удаленной работы": [
+                "TeamViewer_Activity",
+                "Remote_Administration_Tools_Usage"
+            ]
+        }
     },
     "w os Win Ess posh": {
-        "queries": [
-            {
-                "event_src.subsys": "Microsoft-Windows-PowerShell/Operational",
-                "msgid": [
-                    "4103",
-                    "4104"
-                ]
-            }
-        ],
-        "KB_packs": [
-            "ATT&CK: «Перемещение внутри периметра»",
-            "ATT&CK: «Деструктивное воздействие»",
-            "ATT&CK: «Получение учетных данных»",
-            "Microsoft Endpoint Configuration Manager",
-            "Атаки при помощи специализированного ПО",
-            "ATT&CK: «Эксфильтрация данных»",
-            "ATT&CK: «Предотвращение обнаружения»",
-            "Active Directory",
-            "ATT&CK: «Сбор данных»",
-            "ATT&CK: «Выполнение»",
-            "ATT&CK: «Закрепление»",
-            "ATT&CK: «Изучение»",
-            "Microsoft Hyper-V. Подозрительная активность"
-        ]
+        "event_src.subsys = \"microsoft-windows-powershell/operational\" and object = \"command\" and msgid = \"4103\"": {
+            "Active Directory": [
+                "Kerberos_Ticket_Dump"
+            ],
+            "Атаки с помощью специализированного ПО": [
+                "Empire_Stager",
+                "AdPEAS_Usage",
+                "Rubeus_Usage",
+                "DSInternals_Usage",
+                "ShadowHound_Usage",
+                "SharPersist_Usage",
+                "Cobalt_Strike_Powershell_Stager",
+                "SharpKatz_Usage",
+                "SharpWMI_Usage",
+                "PsMapExec_First_Usage",
+                "NetCat_Usage",
+                "SharpSploit_Usage",
+                "Rubeus_Non_Cmdline_Usage"
+            ],
+            "Microsoft Hyper-V. Подозрительная активность": [
+                "HyperV_VM_Enumeration"
+            ],
+            "Microsoft Endpoint Configuration Manager": [
+                "MECM_Discovery_Via_WMI"
+            ],
+            "ATT&CK: «Сбор данных»": [
+                "Data_Compression",
+                "Clipboard_Access",
+                "Shadow_Screen_Save",
+                "Copying_Files"
+            ],
+            "ATT&CK: «Получение учетных данных»": [
+                "Credential_Dump_In_Local_Registry",
+                "Access_System_Credential_Files_Via_Cmdline",
+                "Search_Stored_Credentials",
+                "LAPS_Passwords_Access",
+                "Esentutil_Copy_File"
+            ],
+            "ATT&CK: «Предотвращение обнаружения»": [
+                "Disable_UAC_Remote_Restrictions",
+                "BitsJob_Download_And_Run"
+            ],
+            "ATT&CK: «Изучение»": [
+                "File_Directory_Discovery",
+                "Delegated_Accounts_Recon",
+                "Query_Registry",
+                "LAPS_Enumeration",
+                "Process_Discovery",
+                "System_Network_Connections_Discovery",
+                "WindowsTitle_Discovery",
+                "Permission_Groups_Discovery",
+                "System_Network_Configuration_Discovery",
+                "Password_Policy_Discovery",
+                "SPN_LDAP_Requests",
+                "System_Information_Discovery",
+                "Software_Discovery",
+                "Security_State_Discovery",
+                "System_Service_Discovery",
+                "Enumerating_Delegated_Credentials",
+                "Account_Discovery",
+                "Network_Share_Discovery",
+                "Windows_Mass_Recon"
+            ],
+            "ATT&CK: «Выполнение»": [
+                "Dangerous_Command_Usage",
+                "Fuegoshell_Remote_Shell",
+                "PowerShdll_Usage",
+                "Execute_Encoded_Powershell",
+                "Suspicious_Wmic_Command",
+                "Reverse_Shell_Via_Powershell",
+                "Execute_Malicious_Command",
+                "Subrule_PowerShell_CLM_Bypass_4103",
+                "Schtasks_Commandline",
+                "Run_Malicious_Msbuild_Project",
+                "NimPlant_Powershell_Activity",
+                "WinAPI_Access_From_Powershell",
+                "Execute_Malicious_Powershell_Cmdlet",
+                "Payload_Injection_Into_EventLog"
+            ],
+            "ATT&CK: «Деструктивное воздействие»": [
+                "Shadow_Copies_Deletion_With_Builtin_Tools"
+            ],
+            "ATT&CK: «Перемещение внутри периметра»": [
+                "Output_Remote_PowerShell_Via_WinRM",
+                "Evil_WinRM_Activity",
+                "Input_Remote_PowerShell_Via_WinRM",
+                "Lateral_Movement_Via_WinRM"
+            ],
+            "ATT&CK: «Закрепление»": [
+                "Add_User_To_Group",
+                "Browser_Extension_Install",
+                "WMI_Subscription_Creation"
+            ],
+            "Безопасность удаленной работы": [
+                "Windows_Firewall_Enable_Local_RDP"
+            ]
+        },
+        "event_src.subsys = \"microsoft-windows-powershell/operational\" and object = \"command\" and msgid = \"4104\"": {
+            "Active Directory": [
+                "Kerberos_Ticket_Dump"
+            ],
+            "Атаки с помощью специализированного ПО": [
+                "Powermad_Usage",
+                "Sliver_Shell_Usage",
+                "Rubeus_Usage",
+                "ShadowHound_Usage",
+                "Covenant_Launcher_Start",
+                "Cobalt_Strike_Powershell_Stager",
+                "SharPersist_Usage",
+                "Metasploit_Payload",
+                "SharpKatz_Usage",
+                "SharpWMI_Usage",
+                "SilentTrinity_Stager",
+                "NetCat_Usage",
+                "SharpSploit_Usage",
+                "Mimikatz_Command",
+                "Rubeus_Non_Cmdline_Usage"
+            ],
+            "Microsoft Endpoint Configuration Manager": [
+                "MECM_SharpSCCM",
+                "MECM_Discovery_Via_WMI",
+                "MECM_NTLM_Relay_Via_SharpSCCM"
+            ],
+            "ATT&CK: «Сбор данных»": [
+                "Shadow_Screen_Save",
+                "Data_Compression",
+                "Clipboard_Access",
+                "Copying_Files",
+                "Clipboard_Access_Powershell"
+            ],
+            "ATT&CK: «Получение учетных данных»": [
+                "Credential_Dump_In_Local_Registry",
+                "Access_System_Credential_Files_Via_Cmdline",
+                "Search_Stored_Credentials",
+                "LAPS_Passwords_Access",
+                "Veeam_Credential_Recovery_Script",
+                "Esentutil_Copy_File"
+            ],
+            "ATT&CK: «Предотвращение обнаружения»": [
+                "Obfuscated_Powershell",
+                "Firewall_Modify",
+                "Explicit_Recycle_Bin_Directory_Usage",
+                "Powershell_Execution_From_Image",
+                "Suspicious_XSLT_XML_PowerShell_Execution",
+                "Windows_Defender_Disable",
+                "File_And_Directory_Permissions_Modification",
+                "Disable_UAC_Remote_Restrictions",
+                "AMSI_Bypass_Via_Powershell"
+            ],
+            "ATT&CK: «Изучение»": [
+                "File_Directory_Discovery",
+                "WindowsTitle_Discovery",
+                "Password_Policy_Discovery",
+                "SPN_LDAP_Requests",
+                "System_Information_Discovery",
+                "System_Network_Connections_Discovery",
+                "Process_Discovery",
+                "Query_Registry",
+                "Permission_Groups_Discovery",
+                "AppLocker_Policies_Discovery",
+                "Domain_Controllers_Discovery",
+                "Network_Share_Discovery",
+                "System_Network_Configuration_Discovery",
+                "Software_Discovery",
+                "Security_State_Discovery",
+                "System_Service_Discovery",
+                "Account_Discovery",
+                "Delegated_Accounts_Recon",
+                "Domain_Trust_Discovery",
+                "LAPS_Enumeration",
+                "Enumerating_Delegated_Credentials",
+                "Windows_Mass_Recon"
+            ],
+            "ATT&CK: «Выполнение»": [
+                "Dangerous_Command_Usage",
+                "Subrule_PowerShell_CLM_Bypass_4104",
+                "WinAPI_Access_From_Powershell",
+                "Execute_Encoded_Powershell",
+                "Remote_Registry_Enable",
+                "SCT_Scripts_Hidden_Execution",
+                "Suspicious_Wmic_Command",
+                "Dump_Bitlocker_Keys_From_Host",
+                "Execute_Malicious_Command",
+                "Reverse_Shell_Via_Powershell",
+                "Powershell_Library_Loaded_Into_Process",
+                "Run_Malicious_Msbuild_Project",
+                "Schtasks_Commandline",
+                "Fuegoshell_Oneliners_Execution",
+                "Execute_Malicious_Powershell_Cmdlet",
+                "Payload_Injection_Into_EventLog",
+                "PowerShdll_Usage",
+                "Fuegoshell_Remote_Shell"
+            ],
+            "ATT&CK: «Эксфильтрация данных»": [
+                "Exfiltration_Over_Alternative_Protocol_Detection"
+            ],
+            "ATT&CK: «Деструктивное воздействие»": [
+                "Shadow_Copies_Deletion_With_Builtin_Tools"
+            ],
+            "ATT&CK: «Перемещение внутри периметра»": [
+                "Output_Remote_PowerShell_Via_WinRM",
+                "Remote_SSP_Dump",
+                "Client_Side_Execution_Via_DCOM",
+                "Lateral_Movement_Via_WinRM",
+                "DCOM_Excel_Abuse"
+            ],
+            "ATT&CK: «Закрепление»": [
+                "WMI_Subscription_Creation",
+                "Service_Created_Or_Modified",
+                "Add_New_User_In_Commandline",
+                "IIS_Module_Filter_Installation",
+                "Add_User_To_Group"
+            ],
+            "Безопасность удаленной работы": [
+                "Windows_Firewall_Enable_Local_RDP"
+            ]
+        }
     },
     "w os Win Ess task": {
-        "queries": [
-            {
-                "event_src.subsys": "microsoft-windows-taskscheduler/operational",
-                "msgid": "129"
-            }
-        ],
-        "KB_packs": [
-            "ATT&CK: «Выполнение»"
-        ]
+        "event_src.subsys = \"microsoft-windows-taskscheduler/operational\" and msgid = \"129\"": {
+            "ATT&CK: «Выполнение»": [
+                "Scheduled_Task_Execution"
+            ]
+        }
     },
     "w os Win Ess 4688 cmd": {
-        "queries": [
-            {
-                "event_src.subsys": "Security",
-                "msgid": "4688",
-                "object.process.cmdline": true
-            }
-        ],
-        "KB_packs": [
-            "Расследование запуска процессов и исследование сессий",
-            "Active Directory Certificate Services",
-            "ATT&CK: «Первоначальный доступ»",
-            "ATT&CK: «Сбор данных»",
-            "Атаки при помощи специализированного ПО",
-            "ATT&CK: «Изучение»",
-            "ATT&CK: «Деструктивное воздействие»",
-            "ATT&CK: «Повышение привилегий»",
-            "Вредоносное ПО и нежелательные рассылки",
-            "ATT&CK: «Эксфильтрация данных»",
-            "ATT&CK: «Организация управления»",
-            "Active Directory",
-            "ATT&CK: «Выполнение»",
-            "Microsoft Exchange Server",
-            "ATT&CK: «Перемещение внутри периметра»",
-            "ATT&CK: «Предотвращение обнаружения»",
-            "Эксплуатация уязвимостей",
-            "PostgreSQL",
-            "ATT&CK: «Получение учетных данных»",
-            "Аномальная активность веб-серверов",
-            "ATT&CK: «Закрепление»"
-        ]
+        "event_src.subsys = \"security\" and msgid = \"4688\" and object.process.cmdline": {
+            "Active Directory": [
+                "Kerberos_Ticket_Dump"
+            ],
+            "Active Directory Certificate Services": [
+                "CA_Cert_Export"
+            ],
+            "Вредоносное ПО и нежелательные рассылки": [
+                "MP_EDR_Detected_Malicious_Object",
+                "Malicious_File_Is_Run"
+            ],
+            "Атаки с помощью специализированного ПО": [
+                "WMEye_Execution",
+                "PhantomCore_Tools_Usage",
+                "Cobalt_Strike_Stager",
+                "Rubeus_Usage",
+                "SharPersist_Usage",
+                "SharpKatz_Usage",
+                "Havoc_Powerpick",
+                "SharpMapExec_Usage",
+                "Windows_Hacktool_Usage",
+                "USB_Rubber_Ducky",
+                "Mimikatz_Command",
+                "Rootkit_R77_Usage",
+                "NimExec_Activity",
+                "Covenant_Launcher_Start",
+                "Cobalt_Strike_HiddenDesktop",
+                "SharpToken_Usage",
+                "Sharphound_Client_Side",
+                "Subrule_Cobalt_Strike_RunDLL32",
+                "Subrule_MSTSC_SharpRDPThief_Usage",
+                "Cobalt_Strike_RunAs_Escalate",
+                "Rubeus_Non_Cmdline_Usage",
+                "Cobalt_Strike_Elevate",
+                "Cobalt_Strike_SpawnAs",
+                "SharpRDPThief_Usage"
+            ],
+            "Microsoft Exchange Server": [
+                "Exchange_ProxyNotShell"
+            ],
+            "ATT&CK: «Сбор данных»": [
+                "Copying_Files",
+                "Documents_Access_Via_Console",
+                "RDP_Shadow_Session"
+            ],
+            "ATT&CK: «Организация управления»": [
+                "Download_File_Through_Windows_Defender",
+                "Subrule_SlothfulMedia_Execute_Request",
+                "Proxy_Tools_Usage",
+                "Download_File_Through_Curl",
+                "Subrule_Suspicious_Connection_System_Process",
+                "SlothfulMedia_Trojan",
+                "Possible_Network_Local_Tunnel",
+                "Suspicious_Connection_System_Process"
+            ],
+            "ATT&CK: «Получение учетных данных»": [
+                "Subrule_LOLBins_LSASS_Dump",
+                "Credential_Dump_In_Local_Registry",
+                "Access_System_Credential_Files_Via_Cmdline",
+                "Search_Stored_Credentials",
+                "MalSecLogon_LSASS_Dump",
+                "Comsvcs_Minidump_Usage",
+                "PuntoSwitcher_Diary_Open",
+                "LetMeowIn_LSASS_Dump",
+                "Esentutil_Copy_File",
+                "Physmem2profit_LSASS_Dump",
+                "LSASS_PSSCapture_Snapshot",
+                "MultiDump_LSASS_Dump",
+                "Subrule_LetMeowIn_LSASS_Dump"
+            ],
+            "ATT&CK: «Предотвращение обнаружения»": [
+                "Double_File_Extension_Masquerading",
+                "ParentPid_Spoofing",
+                "InstallUtil_AWL_Bypass",
+                "Proccess_Tampering",
+                "MSBuild_AWL_Bypass",
+                "Attribute_Changer_Usage",
+                "MalSecLogon_PPID_Spoofing",
+                "Microsoft_Teams_AWL_Bypass",
+                "MSHTA_AWL_Bypass",
+                "Msiexec_AWL_Bypass",
+                "Devinit_AWL_Bypass",
+                "PowerShell_CLM_Bypass",
+                "Regsvr32_AWL_Bypass",
+                "BitsJob_Download_And_Run",
+                "Self_Delete_Object",
+                "XSL_Script_WMIC_Execution",
+                "Remote_EventLog_Crashing",
+                "Subrule_Possible_Process_From_Mounted_Disk",
+                "Suspicious_Execution_Via_Setup16",
+                "DLL_Side_Loading",
+                "Rundll32_Suspicious_System_DLL_Usage",
+                "Rundll32_AWL_Bypass",
+                "DirtyVanity_Process_Injection",
+                "Browser_LOLBin",
+                "Abnormal_Directory_For_Process",
+                "EventLog_File_Substitute",
+                "Office_Security_Params_Changed",
+                "Wlrmdr_LOLBin",
+                "Blackout_AV_Disabling",
+                "File_And_Directory_Permissions_Modification",
+                "WDAC_Bypass_Via_Dbgsrv",
+                "Suspicious_Execution_Via_Regsvr32",
+                "Process_From_Mounted_Disk",
+                "ControlPanel_AWL_Bypass"
+            ],
+            "ATT&CK: «Изучение»": [
+                "WiFi_Networks_Configuration_Discovery",
+                "File_Directory_Discovery",
+                "Domain_Trust_Discovery",
+                "Query_Registry",
+                "Process_Discovery",
+                "WindowsTitle_Discovery",
+                "Dnszone_Export",
+                "Permission_Groups_Discovery",
+                "System_Network_Configuration_Discovery",
+                "Password_Policy_Discovery",
+                "System_Information_Discovery",
+                "Software_Discovery",
+                "Security_State_Discovery",
+                "Domain_Controllers_Discovery",
+                "Net_Tool_Usage",
+                "System_Service_Discovery",
+                "Account_Discovery",
+                "Network_Share_Discovery",
+                "Windows_Mass_Recon"
+            ],
+            "ATT&CK: «Выполнение»": [
+                "Office_File_With_Macros",
+                "Suspicious_Process_Execution_Sequence",
+                "Suspicious_ShortHanded_Process_Started",
+                "Suspicious_Child_From_Messenger_Process",
+                "Suspicious_Child_From_Webserver_Process",
+                "Subrule_Script_Files_Execution",
+                "Execute_Via_Wmiprvse",
+                "Execute_Encoded_Powershell",
+                "Execute_Malicious_Command",
+                "Execute_PSEXEC",
+                "Malicious_Office_Document",
+                "Code_Execution_Via_JDK_Tools",
+                "Execute_Suspicious_Command_Via_Cmd",
+                "Scheduled_Task_Execution",
+                "Tttracer_LOLBin",
+                "Windows_Path_Traversal",
+                "DotNetToJScript_Usage",
+                "Recon_Via_Webserver_Process",
+                "Suspicious_Directory_For_Process",
+                "Run_Whoami_As_System",
+                "Execute_File_From_Sysvol_Share",
+                "Script_Files_Execution"
+            ],
+            "ATT&CK: «Эксфильтрация данных»": [
+                "Web_Service_Interaction_Via_LOLBins"
+            ],
+            "ATT&CK: «Деструктивное воздействие»": [
+                "Hosts_File_Modify",
+                "Shutdown_Tool_Usage"
+            ],
+            "ATT&CK: «Первоначальный доступ»": [
+                "Potential_Rogue_RDP_Attack",
+                "Suspicious_File_Creation_From_Messenger_Or_Mail",
+                "Subrule_Binary_Start_From_Archive",
+                "Suspicious_Living_Off_Trusted_Sites_Usage",
+                "External_Link_Clicked",
+                "Start_Process_From_MOTW_Archive"
+            ],
+            "ATT&CK: «Перемещение внутри периметра»": [
+                "Remoting_Windows_Shell",
+                "Client_Side_Execution_Via_DCOM",
+                "Subrule_Remoting_SSH",
+                "Impacket_Like_Execution",
+                "RDP_Session_Hijacking",
+                "SharpLateral_DCOM",
+                "Remoting_WMI",
+                "Remoting_WinExec",
+                "RDP_Shared_Mountpoint_Usage",
+                "Creation_Suspicious_File",
+                "Downloading_Remote_File_Via_Lolbas",
+                "DCOM_Excel_Abuse",
+                "Remoting_SSH",
+                "Remote_Execution_Via_Custom_Impacket",
+                "Remote_Creation_Suspicious_File"
+            ],
+            "ATT&CK: «Закрепление»": [
+                "Registry_Winlogon_Helper",
+                "Time_Providers_Persistence",
+                "Outlook_Malicious_Actions",
+                "Default_File_Association_Modify",
+                "Add_New_User_In_Commandline",
+                "IIS_Module_Filter_Installation",
+                "Service_Created_Or_Modified",
+                "Persistence_Netsh_DLL",
+                "AppCert_DLLs_Persist",
+                "Browser_Extension_Install",
+                "WMI_Subscription_Execution",
+                "Add_User_To_Group",
+                "Abusing_Windows_Telemetry_Persist"
+            ],
+            "ATT&CK: «Повышение привилегий»": [
+                "UAC_Bypass_Via_Registry_Hijacking",
+                "RunAs_Context_Menu_Subrule_Execute",
+                "Subrule_Full_Elevation_Token_Steal",
+                "Subrule_Elevated_Process_Run",
+                "AutoElevate_UAC_Bypass",
+                "RPC_Abuse_UAC_Bypass",
+                "Subrule_AutoElevate_Process_Parent_Run",
+                "Token_Manipulation",
+                "RunAs_System_Or_External_Tools",
+                "Subrule_Action_After_Pipe_Connected",
+                "PrivEsc_Via_StorSvc",
+                "Byeintegrity_UAC_Bypass",
+                "Spoolsv_Priv_Escalation",
+                "DiskCleanup_UAC_Bypass",
+                "S4UTomato_PrivEsc",
+                "Subrule_AutoElevate_Process_Run",
+                "Subrule_Pwned_Pipe",
+                "Unquoted_Service_Path_Abuse"
+            ],
+            "Расследование запуска процессов и исследование сессий": [
+                "Suspicious_Webserver_Process_Chain",
+                "Suspicious_Kaspersky_Agent_Process_Chain",
+                "Suspicious_SCCM_Agent_Process_Chain",
+                "Suspicious_Messenger_Process_Chain"
+            ],
+            "PostgreSQL": [
+                "Subrule_PostgreSQL_Create_Process",
+                "PostgreSQL_Code_Execution"
+            ],
+            "Безопасность удаленной работы": [
+                "Remote_Administration_Tools_Usage",
+                "LOLRMM_Tools_Usage"
+            ],
+            "Эксплуатация уязвимостей": [
+                "Subrule_CVE_2025_24813_Tomcat_RCE",
+                "Possible_CVE_2019_1388",
+                "CVE_2025_59287_WSUS_RCE",
+                "CVE_2021_41379_Exploitation",
+                "CVE_2024_32002_RCE_Via_Git_Clone",
+                "Subrule_CVE_2025_0411_7Zip_MotW_Bypass",
+                "CVE_2025_6218_WinRAR_Directory_Traversal",
+                "Possible_CVE_2020_1350",
+                "MS17_010_SMB_Code_Execution",
+                "Subrule_CVE_2025_24071_NTLM_Hash_Leak",
+                "Possible_CVE_2021_1647",
+                "PrivEsc_Via_UAC_Elevated_Data",
+                "CVE_2024_26229_CSC_Service_PrivEsc",
+                "LPE_7zip_CVE_2022_29072",
+                "Uptime_Kuma_RCE_Via_Fake_Chrome",
+                "CVE_2025_33053_Internet_Shortcut_Files_RCE",
+                "CVE_2025_24813_Tomcat_RCE",
+                "CVE_2025_0411_7Zip_MotW_Bypass",
+                "CVE_2025_24071_NTLM_Hash_Leak"
+            ],
+            "Аномальная активность веб-серверов": [
+                "Web_Automation_Tool"
+            ]
+        }
     },
     "w os Win sysmon": {
-        "queries": [
-            {
-                "event_src.title": "sysmon",
-                "msgid": [
-                    "1",
-                    "3",
-                    "12",
-                    "13"
-                ]
-            }
-        ],
-        "KB_packs": [
-            "Расследование запуска процессов и исследование сессий",
-            "Active Directory Certificate Services",
-            "ATT&CK: «Первоначальный доступ»",
-            "ATT&CK: «Сбор данных»",
-            "Атаки при помощи специализированного ПО",
-            "ATT&CK: «Изучение»",
-            "ATT&CK: «Деструктивное воздействие»",
-            "ATT&CK: «Повышение привилегий»",
-            "PT Network Attack Discovery",
-            "Вредоносное ПО и нежелательные рассылки",
-            "ATT&CK: «Эксфильтрация данных»",
-            "Сетевые устройства. Подозрительная сетевая активность",
-            "ATT&CK: «Организация управления»",
-            "Служба каталогов Samba DC",
-            "Active Directory",
-            "ATT&CK: «Выполнение»",
-            "Microsoft Exchange Server",
-            "ATT&CK: «Перемещение внутри периметра»",
-            "ATT&CK: «Предотвращение обнаружения»",
-            "Эксплуатация уязвимостей",
-            "PostgreSQL",
-            "ATT&CK: «Получение учетных данных»",
-            "Microsoft Endpoint Configuration Manager",
-            "PT Next Generation Firewall",
-            "Аномальная активность веб-серверов",
-            "ATT&CK: «Закрепление»"
-        ]
+        "event_src.title = \"sysmon\" and msgid = \"1\"": {
+            "Active Directory": [
+                "Kerberos_Ticket_Dump"
+            ],
+            "Вредоносное ПО и нежелательные рассылки": [
+                "MP_EDR_Detected_Malicious_Object"
+            ],
+            "Атаки с помощью специализированного ПО": [
+                "WMEye_Execution",
+                "XRed_Backdoor_Usage",
+                "Cobalt_Strike_Stager",
+                "Rubeus_Usage",
+                "SharPersist_Usage",
+                "SharpKatz_Usage",
+                "Havoc_Powerpick",
+                "Metasploit_Payload",
+                "SharpMapExec_Usage",
+                "PPLBlade_Cmdline",
+                "Sliver_Shell_Usage",
+                "Empire_Stager",
+                "Windows_Hacktool_Usage",
+                "USB_Rubber_Ducky",
+                "SharpWMI_Usage",
+                "SharpSploit_Usage",
+                "Mimikatz_Command",
+                "Rootkit_R77_Usage",
+                "Havoc_Powershell_Command_Execution",
+                "NimExec_Activity",
+                "Subrule_WannaMine_Usage",
+                "Subrule_MSTSC_SharpRDPThief_Usage",
+                "VNT_Usage",
+                "Covenant_Launcher_Start",
+                "Cobalt_Strike_HiddenDesktop",
+                "Sliver_GetSystem",
+                "SharpToken_Usage",
+                "Cobalt_Strike_Child_Process",
+                "Sharphound_Client_Side",
+                "Subrule_Cobalt_Strike_RunDLL32",
+                "SOAPHound_Usage",
+                "NetCat_Usage",
+                "Cobalt_Strike_RunAs_Escalate",
+                "Rubeus_Non_Cmdline_Usage",
+                "WannaMine_Usage",
+                "SharpRDPThief_Usage",
+                "Cobalt_Strike_Elevate",
+                "Cobalt_Strike_SpawnAs"
+            ],
+            "Microsoft Exchange Server": [
+                "Exchange_ProxyNotShell"
+            ],
+            "Microsoft Endpoint Configuration Manager": [
+                "MECM_SharpSCCM",
+                "MECM_Discovery_Via_WMI",
+                "MECM_NTLM_Relay_Via_SharpSCCM"
+            ],
+            "ATT&CK: «Сбор данных»": [
+                "Shadow_Screen_Save",
+                "Data_Compression",
+                "Clipboard_Access",
+                "Copying_Files",
+                "Documents_Access_Via_Console",
+                "Export_Certs",
+                "RDP_Shadow_Session"
+            ],
+            "ATT&CK: «Организация управления»": [
+                "Windows_Desktopimgdownldr_Ingress_Tool_Transfer",
+                "Subrule_SlothfulMedia_Execute_Request",
+                "Proxy_Tools_Usage",
+                "Subrule_DoublePulsar_Process_Access",
+                "Remote_File_Download_Via_Certutil",
+                "Ligolo_Reverse_Tunneling",
+                "Download_File_Through_Curl",
+                "Microsoft_Devtunnel_Usage",
+                "Subrule_Suspicious_Connection_System_Process",
+                "SlothfulMedia_Trojan",
+                "Possible_Network_Local_Tunnel",
+                "DoublePulsar_Activity",
+                "Suspicious_Connection_System_Process"
+            ],
+            "ATT&CK: «Получение учетных данных»": [
+                "ProcDump_Usage",
+                "PPLdump_Usage",
+                "Credential_Dump_In_Local_Registry",
+                "Access_System_Credential_Files_Via_Cmdline",
+                "Subrule_LOLBins_LSASS_Dump",
+                "MultiDump_Registry_Dump",
+                "Comsvcs_Minidump_Usage",
+                "MalSecLogon_LSASS_Dump",
+                "PPLFault_Process_Dump",
+                "Symbolic_Link_To_Shadow_Copy_Created",
+                "LAPS_Passwords_Access",
+                "Subrule_PPLmedic_WerFaultSecure",
+                "LSASS_Shtinkering_Dump",
+                "Masky_Tool_Usage",
+                "IIS_Credential_Dumping",
+                "Physmem2profit_LSASS_Dump",
+                "AvDump_LSASS_Dump",
+                "Dangerous_Theme",
+                "MultiDump_LSASS_Dump",
+                "Subrule_PPLmedic_DllLoad",
+                "PPLmedic_Process_Dump"
+            ],
+            "ATT&CK: «Предотвращение обнаружения»": [
+                "Double_File_Extension_Masquerading",
+                "Alternate_Data_Stream",
+                "ParentPid_Spoofing",
+                "InstallUtil_AWL_Bypass",
+                "Firewall_Modify",
+                "Proccess_Tampering",
+                "MSBuild_AWL_Bypass",
+                "Attribute_Changer_Usage",
+                "Malicious_CHM_File",
+                "Cmstp_AWL_Bypass",
+                "Explicit_Recycle_Bin_Directory_Usage",
+                "MalSecLogon_PPID_Spoofing",
+                "ControlPanel_AWL_Bypass",
+                "Mavinject_AWL_Bypass",
+                "Pcalua_AWL_Bypass",
+                "Csc_AWL_Bypass",
+                "Msiexec_AWL_Bypass",
+                "Devinit_AWL_Bypass",
+                "Regsvr32_AWL_Bypass",
+                "Sysmon_Driver_Unload",
+                "BitsJob_Download_And_Run",
+                "Dnscmd_AWL_Bypass",
+                "Self_Delete_Object",
+                "Subrule_CSC_Start_And_File_Create",
+                "XSL_Script_WMIC_Execution",
+                "SharpEventPersist_Usage",
+                "Run_Masquerading_Executable_File",
+                "Subrule_Possible_Process_From_Mounted_Disk",
+                "DLL_Side_Loading",
+                "Proxy_Execution_Via_WorkFolders",
+                "Copied_Or_Renamed_Executable",
+                "Process_Herpaderping_Injection",
+                "Safe_Mode_Boot",
+                "RTLO_Symbol_Usage",
+                "RegAsm_Or_RegSvcs_AWL_Bypass",
+                "Rundll32_Suspicious_System_DLL_Usage",
+                "IEExec_AWL_Bypass",
+                "Rundll32_AWL_Bypass",
+                "LoLBas_VS_Nodejstools",
+                "MSXSL_AWL_Bypass",
+                "Browser_LOLBin",
+                "DirtyVanity_Process_Injection",
+                "Abnormal_Directory_For_Process",
+                "Office_Security_Params_Changed",
+                "Blackout_AV_Disabling",
+                "Run_Executable_File_Without_Meta",
+                "Sysmon_Blinding",
+                "File_And_Directory_Permissions_Modification",
+                "Odbcconf_AWL_Bypass",
+                "Suspicious_Execution_Via_Regsvr32",
+                "AMSI_Bypass_Via_Powershell",
+                "Process_From_Mounted_Disk"
+            ],
+            "ATT&CK: «Изучение»": [
+                "WiFi_Networks_Configuration_Discovery",
+                "File_Directory_Discovery",
+                "System_Network_Connections_Discovery",
+                "Query_Registry",
+                "Process_Discovery",
+                "WindowsTitle_Discovery",
+                "USB_Tokens_Discovery",
+                "System_Network_Configuration_Discovery",
+                "System_Information_Discovery",
+                "Security_State_Discovery",
+                "AppLocker_Policies_Discovery",
+                "Net_Tool_Usage",
+                "Enumerating_Delegated_Credentials",
+                "Windows_Mass_Recon"
+            ],
+            "ATT&CK: «Выполнение»": [
+                "Execute_File_From_Sysvol_Share",
+                "Office_File_With_Macros",
+                "PowerShdll_Usage",
+                "Suspicious_Process_Execution_Sequence",
+                "Suspicious_ShortHanded_Process_Started",
+                "Finger_AWL_Bypass",
+                "Suspicious_Child_From_Messenger_Process",
+                "MSDT_Remote_Code_Execution",
+                "Suspicious_Child_From_Webserver_Process",
+                "Subrule_Script_Files_Execution",
+                "Execute_Via_Wmiprvse",
+                "Execute_Encoded_Powershell",
+                "Subrule_Payload_Download_Via_WebClient",
+                "Execute_Malicious_Command",
+                "Execute_PSEXEC",
+                "Malicious_Office_Document",
+                "Schtasks_Commandline",
+                "Fuegoshell_Remote_Shell",
+                "Execute_Suspicious_Command_Via_Cmd",
+                "Scheduled_Task_Execution",
+                "Tttracer_LOLBin",
+                "Dump_Bitlocker_Keys_From_Host",
+                "Remote_Registry_Enable",
+                "Suspicious_Wmic_Command",
+                "Windows_Path_Traversal",
+                "DotNetToJScript_Usage",
+                "LOLBin_Copying",
+                "Suspicious_Directory_For_Process",
+                "Run_Whoami_As_System",
+                "Script_Files_Execution"
+            ],
+            "ATT&CK: «Эксфильтрация данных»": [
+                "Bluetooth_File_Transfer",
+                "Rclone_Usage",
+                "Web_Service_Interaction_Via_LOLBins",
+                "Exfiltration_Over_Alternative_Protocol_Detection"
+            ],
+            "ATT&CK: «Деструктивное воздействие»": [
+                "Disk_Wipe",
+                "Shutdown_Tool_Usage",
+                "SMB_Takeover",
+                "Desktop_Wallpaper_Change",
+                "Shadow_Copies_Deletion_With_Builtin_Tools",
+                "Hosts_File_Modify"
+            ],
+            "ATT&CK: «Первоначальный доступ»": [
+                "Potential_Rogue_RDP_Attack",
+                "Start_Process_From_MOTW_Archive",
+                "Suspicious_File_Creation_From_Messenger_Or_Mail",
+                "Subrule_Binary_Start_From_Archive",
+                "Suspicious_Living_Off_Trusted_Sites_Usage",
+                "External_Link_Clicked"
+            ],
+            "ATT&CK: «Перемещение внутри периметра»": [
+                "Remoting_Windows_Shell",
+                "LiquidSnake_WMI_EventFilter",
+                "Powershell_Remoting",
+                "RDP_Shadow_Session_Initiation",
+                "Auth_Coerce_With_WebClient_Abuse",
+                "Client_Side_Execution_Via_DCOM",
+                "Subrule_Browser_Remote_Debugging",
+                "Subrule_Remoting_SSH",
+                "Impacket_Like_Execution",
+                "Remoting_SysInternals_PsExec",
+                "Modify_And_Start_Remote_Service",
+                "DCOMUploadExec",
+                "Remoting_WMI",
+                "RDP_Shared_Mountpoint_Usage",
+                "Creation_Suspicious_File",
+                "Input_Remote_PowerShell_Via_WinRM",
+                "DCOM_Excel_Abuse",
+                "Start_Browser_Pivoting",
+                "Remoting_SSH",
+                "Remote_Execution_Via_Custom_Impacket",
+                "Remote_Creation_Suspicious_File",
+                "Lateral_Movement_Via_WinRM"
+            ],
+            "ATT&CK: «Закрепление»": [
+                "Outlook_Malicious_Actions",
+                "Default_File_Association_Modify",
+                "Service_Created_Or_Modified",
+                "KeePass_Persistence",
+                "Browser_Extension_Install",
+                "WMI_Subscription_Execution",
+                "Add_User_To_Group",
+                "Accessibility_Feature_Tool_Abuse"
+            ],
+            "ATT&CK: «Повышение привилегий»": [
+                "ICMLuaUtil_UAC_Bypass",
+                "Subrule_Elevated_Process_Run",
+                "Subrule_Pwned_Pipe",
+                "Unquoted_Service_Path_Abuse",
+                "UAC_Bypass_Via_Registry_Hijacking",
+                "System_Process_By_Local_Or_Network_Service",
+                "Subrule_AutoElevate_Process_Parent_Run",
+                "Subrule_Action_After_Pipe_Connected",
+                "IHxExec_Arbitrary_Code_Execution",
+                "RunAs_System_Or_External_Tools",
+                "Byeintegrity_UAC_Bypass",
+                "PrivEsc_Via_StorSvc",
+                "Spoolsv_Priv_Escalation",
+                "DiskCleanup_UAC_Bypass",
+                "RunAs_Context_Menu_Subrule_Execute",
+                "Token_Manipulation",
+                "PrivEsc_Via_Comctl32",
+                "Intel_ShaderCache_UAC_Bypass",
+                "Subrule_S4UTomato_IMarshal_Creation",
+                "S4UTomato_PrivEsc"
+            ],
+            "Расследование запуска процессов и исследование сессий": [
+                "Suspicious_Webserver_Process_Chain",
+                "Suspicious_Office_Process_Chain",
+                "Suspicious_MSBuild_Process_Chain"
+            ],
+            "PostgreSQL": [
+                "Subrule_PostgreSQL_Create_Process",
+                "PostgreSQL_Code_Execution"
+            ],
+            "Безопасность удаленной работы": [
+                "Remote_Administration_Tools_Usage",
+                "LOLRMM_Tools_Usage",
+                "Windows_Firewall_Enable_Local_RDP"
+            ],
+            "Эксплуатация уязвимостей": [
+                "CVE_2021_41379_Exploitation",
+                "CVE_2025_47286_iTop_RCE",
+                "Subrule_CVE_2024_32002_RCE_Via_Git_Clone",
+                "Windows_Contacts_RCE",
+                "CVE_2024_30090_PrivEsc_Via_Microsoft_Streaming_Service",
+                "CVE_2022_26503_Subrule_1",
+                "CVE_2024_38077_RCE_RDP_Licensing_Server",
+                "Possible_CVE_2025_21204_Windows_Update_Stack",
+                "CVE_2021_41379_Subrule_Elevation_Service_Chain",
+                "CVE_2022_26500_26501_Exploitation",
+                "CVE_2023_38831_WinRar",
+                "CVE_2024_49113_LDAPNightmare",
+                "Subrule_StartProcess_And_Create_ConfigMsi",
+                "Foxit_PDF_Reader_RCE",
+                "MSDT_CVE_2022_30190",
+                "Subrule_CVE_2025_48799_PrivEsc_Via_Windows_Update_Service",
+                "Subrule_CVE_2025_24813_Tomcat_RCE",
+                "CVE_2021_41379_Subrule_Start_Elevation",
+                "CVE_2025_0411_7Zip_MotW_Bypass",
+                "CVE_2025_59287_WSUS_RCE",
+                "CVE_2024_32002_RCE_Via_Git_Clone",
+                "Subrule_CVE_2025_0411_7Zip_MotW_Bypass",
+                "CVE_2025_6218_WinRAR_Directory_Traversal",
+                "CVE_2022_26503_Subrule_2",
+                "CVE_2024_26229_CSC_Service_PrivEsc",
+                "Subrule_CVE_2025_24071_NTLM_Hash_Leak",
+                "Uptime_Kuma_RCE_Via_Fake_Chrome",
+                "PrivEsc_Via_UAC_Elevated_Data",
+                "MS17_010_SMB_Code_Execution",
+                "CVE_2025_33053_Internet_Shortcut_Files_RCE",
+                "CVE_2022_26503_Exploitation",
+                "PrintSpooler_PrivEsc_CVE_2022_30206",
+                "CVE_2025_48799_PrivEsc_Via_Windows_Update_Service",
+                "CVE_2025_24813_Tomcat_RCE",
+                "CVE_2025_24071_NTLM_Hash_Leak"
+            ],
+            "Аномальная активность веб-серверов": [
+                "Web_Automation_Tool"
+            ]
+        },
+        "event_src.title = \"sysmon\" and msgid = \"3\"": {
+            "Active Directory": [
+                "KrbRelay_Usage",
+                "LDAP_Discovery",
+                "RemoteKrbRelay_Usage"
+            ],
+            "Active Directory Certificate Services": [
+                "Subrule_Hostname_Mismatch",
+                "ADCS_Suspicious_Certificate_Authentication",
+                "ADCS_Certify_Coerce",
+                "Cert_Compromise_Via_NTLM_Relay"
+            ],
+            "Атаки с помощью специализированного ПО": [
+                "Subrule_SharpHound_Access_To_Wkssvc_Srvsvc",
+                "MsLDAPDump_Usage",
+                "Sliver_GetSystem",
+                "Empire_Stager",
+                "Subrule_Duplex_Powershell_Connect",
+                "Subrule_Sharphound_Client_Side",
+                "SharpHound_Sysvol_Access",
+                "SharpHound_LDAP_Requests",
+                "Sliver_PsExec",
+                "Subrule_Cobalt_Strike_RunDLL32",
+                "Subrule_SharpHound_LoggedOn",
+                "SOAPHound_Usage",
+                "Cobalt_Strike_Powershell_Stager",
+                "Subrule_SharpHound_Access_To_Samr_Srvsvc",
+                "Subrule_Invoke_Rubeus_Usage",
+                "Tuoni_Agent_Usage",
+                "SharpHound_Session",
+                "Cobalt_Strike_Powershell_Payload_Delivery",
+                "Sharphound_Client_Side",
+                "Cobalt_Strike_Elevate",
+                "Cobalt_Strike_SpawnAs",
+                "SharpHound_LoggedOn",
+                "SharpHound_Groups_Collection",
+                "Invoke_Rubeus_Usage"
+            ],
+            "Microsoft Endpoint Configuration Manager": [
+                "MECM_SharpSCCM",
+                "MECM_NTLM_Relay_Via_SharpSCCM"
+            ],
+            "ATT&CK: «Организация управления»": [
+                "Download_Via_Encoded_Powershell",
+                "Suspicious_Connection_After_Imageload",
+                "Tunnel_Process_Windows",
+                "Subrule_Connection_System_Process",
+                "Wintun_Network_Driver_Usage",
+                "Proxy_Tools_Usage",
+                "Subrule_External_SMB_Connect",
+                "Connect_Suspicious_File_To_API_Telegram",
+                "Subrule_DoublePulsar_IPC_Access",
+                "Subrule_Possible_Network_Local_Tunnel",
+                "Suspicious_Connection",
+                "Ligolo_Reverse_Tunneling",
+                "Possible_Network_Local_Tunnel",
+                "Download_File_Through_Curl",
+                "Dameware_MRC_Remote_Connect",
+                "Microsoft_Devtunnel_Usage",
+                "Subrule_Suspicious_Connection_System_Process",
+                "DoublePulsar_Activity",
+                "Possible_Proxy_Usage",
+                "Subrule_Possible_Proxy_Usage",
+                "Suspicious_Connection_System_Process"
+            ],
+            "ATT&CK: «Получение учетных данных»": [
+                "MultiDump_LSASS_Dump",
+                "Remote_Credential_Theft_By_Masky",
+                "Subrule_Access_To_Protected_Storage_Share",
+                "MultiDump_Registry_Dump",
+                "ETWHash_Dump",
+                "Subrule_Coerce_Auth",
+                "Subrule_Egress_System",
+                "Physmem2profit_LSASS_Dump",
+                "Subrule_NTLM_Logon",
+                "RdpStrike_Usage",
+                "Access_To_User_Secrets_Via_DPAPI",
+                "Coerce_Auth",
+                "SCF_Or_URL_File_Created",
+                "SCF_Or_URL_Forced_Authentication",
+                "Kekeo_Credentials_Relay_Via_NTLM"
+            ],
+            "ATT&CK: «Предотвращение обнаружения»": [
+                "Double_File_Extension_Masquerading",
+                "Regsvr32_AWL_Bypass",
+                "WDAC_Bypass_Via_Dbgsrv",
+                "Suspicious_Execution_Via_Regsvr32"
+            ],
+            "ATT&CK: «Изучение»": [
+                "Network_Service_Discovery_From_Localnet",
+                "Subrule_Net_Share_Access",
+                "Subrule_Whoami_Alternative",
+                "Port_Scan_From_Localnet_To_Single_Host",
+                "Net_Tool_Usage",
+                "Whoami_Alternative",
+                "Port_Scan_From_Localnet_To_Different_Hosts"
+            ],
+            "ATT&CK: «Выполнение»": [
+                "Suspicious_RPC_Server",
+                "Suspicious_Process_Execution_Sequence",
+                "Subrule_Payload_Download_Via_WebClient",
+                "Reverse_Shell_Via_Powershell",
+                "Subrule_Suspicious_RPC_Server",
+                "MSDT_Remote_Code_Execution"
+            ],
+            "ATT&CK: «Эксфильтрация данных»": [
+                "Rclone_Usage",
+                "Web_Service_Interaction_Via_LOLBins"
+            ],
+            "ATT&CK: «Первоначальный доступ»": [
+                "Potential_Rogue_RDP_Attack",
+                "Suspicious_File_Creation_From_Messenger_Or_Mail",
+                "Start_Process_From_MOTW_Archive"
+            ],
+            "ATT&CK: «Перемещение внутри периметра»": [
+                "NTLM_Relay_Auth",
+                "MSSQL_NTLM_Relay",
+                "Auth_Coerce_With_WebClient_Abuse",
+                "Subrule_Browser_Remote_Debugging",
+                "Subrule_SSH_Connect",
+                "Output_Remote_PowerShell_Via_WinRM",
+                "Subrule_Windows_Logon",
+                "Modify_And_Start_Remote_Service",
+                "Start_Browser_Pivoting",
+                "Remoting_SSH",
+                "Lateral_Movement_Via_WinRM"
+            ],
+            "ATT&CK: «Закрепление»": [
+                "Windows_Screensaver_Modification",
+                "Accessibility_Feature_Tool_Abuse"
+            ],
+            "ATT&CK: «Повышение привилегий»": [
+                "Subrule_IMarshal_Interface",
+                "Remote_Potato_Relay_Hash",
+                "Subrule_Not_Self_Relay",
+                "Subrule_HTTP_Request",
+                "SilverPotato_PrivEsc"
+            ],
+            "Сетевые устройства. Подозрительная сетевая активность": [
+                "Untrusted_DNS_Server_Usage",
+                "External_Mail_Service_Usage",
+                "External_Mail_Service_Usage_SMTP"
+            ],
+            "PT Network Attack Discovery": [
+                "NAD_Significant_Signature",
+                "NAD_CVE_On_Vulnerable_Host",
+                "NAD_Tunnel_Tool",
+                "NAD_Hacktool_Usage"
+            ],
+            "PT Next Generation Firewall": [
+                "NGFW_Antivirus_Alert",
+                "NGFW_Significiant_Signatures"
+            ],
+            "Безопасность удаленной работы": [
+                "VNC_Connection",
+                "RDP_Suspicious_Client",
+                "TeamViewer_Activity",
+                "SMB_RPC_Internet_Connection",
+                "Remote_Administration_Tools_Usage"
+            ],
+            "Samba DC directory service": [
+                "SambaDC_LDAP_Discovery"
+            ],
+            "Эксплуатация уязвимостей": [
+                "CVE_2022_26500_26501_Exploitation"
+            ]
+        },
+        "event_src.title = \"sysmon\" and msgid = \"12\"": {
+            "Атаки с помощью специализированного ПО": [
+                "Internal_Monologue_Attack"
+            ],
+            "Microsoft Endpoint Configuration Manager": [
+                "MECM_SharpSCCM",
+                "MECM_NTLM_Relay_Via_SharpSCCM"
+            ],
+            "ATT&CK: «Получение учетных данных»": [
+                "Remote_Credential_Theft_By_Masky"
+            ],
+            "ATT&CK: «Предотвращение обнаружения»": [
+                "RDP_Connection_History_Removal",
+                "Suspicious_Registry_Value",
+                "MiniNT_Key_Created",
+                "Disable_Sysmon",
+                "Changing_Restricted_Admin_Settings",
+                "Attribute_Changer_Usage",
+                "SharpEventPersist_Usage",
+                "Sysmon_Blinding",
+                "Disable_LSA_Protection",
+                "Disable_Credential_Guard"
+            ],
+            "ATT&CK: «Изучение»": [
+                "Subrule_Whoami_Alternative",
+                "Whoami_Alternative"
+            ],
+            "ATT&CK: «Выполнение»": [
+                "Hidden_Service_Create",
+                "Hidden_Scheduled_Task"
+            ],
+            "ATT&CK: «Деструктивное воздействие»": [
+                "Stop_Important_Service_Registry"
+            ],
+            "ATT&CK: «Закрепление»": [
+                "Hiding_Already_Existing_Task",
+                "Hidden_Account_Creation"
+            ],
+            "Эксплуатация уязвимостей": [
+                "PrintSpooler_PrivEsc_CVE_2022_30206"
+            ]
+        },
+        "event_src.title = \"sysmon\" and msgid = \"13\"": {
+            "Active Directory Certificate Services": [
+                "Enable_SAN_Flag_CA_Policy",
+                "ADCS_Disable_RPC_Enrollment_Encryption",
+                "ADCS_Disabled_Extensions_List_Modification"
+            ],
+            "Атаки с помощью специализированного ПО": [
+                "Internal_Monologue_Attack",
+                "Cobalt_Strike_HiddenDesktop",
+                "XRed_Backdoor_Usage",
+                "NimExec_Activity"
+            ],
+            "ATT&CK: «Организация управления»": [
+                "Port_Forwarding_Or_Tunneling",
+                "Dameware_MRC_Remote_Connect",
+                "Dameware_Install"
+            ],
+            "ATT&CK: «Получение учетных данных»": [
+                "LSASS_Dump_Via_SilentProcessExit",
+                "LSA_SSP_Change",
+                "Subrule_LSASS_For_DragonCastle",
+                "Abusing_CredSSP",
+                "Subrule_PPLmedic_DllLoad",
+                "Masky_Tool_Usage",
+                "Netlogon_Activated",
+                "Dangerous_Theme",
+                "DragonCastle_LSASS_Dump",
+                "PPLmedic_Process_Dump"
+            ],
+            "ATT&CK: «Предотвращение обнаружения»": [
+                "RDP_Connection_History_Removal",
+                "Attribute_Changer_Usage",
+                "DNS_Over_HTTPS_Enable",
+                "ControlPanel_AWL_Bypass",
+                "Process_From_Mounted_Disk",
+                "PowerShell_CLM_Bypass",
+                "ExtensionSpoofer_Usage",
+                "SharpEventPersist_Usage",
+                "Disable_LSA_Protection",
+                "Malicious_Activity_From_Office_Documents",
+                "Suspicious_Registry_Value",
+                "Changing_Restricted_Admin_Settings",
+                "SIP_And_Trust_Provider_Hijacking",
+                "Safe_Mode_Boot",
+                "Disable_Credential_Guard",
+                "Hide_Account_From_Logon_Screen",
+                "Task_Manager_Disable",
+                "LSASS_SilentProcessExit_Keys",
+                "Office_Security_Params_Changed",
+                "WDigest_Enable",
+                "Windows_Defender_Disable",
+                "NTLM_Downgrade",
+                "Disable_UAC_Remote_Restrictions"
+            ],
+            "ATT&CK: «Изучение»": [
+                "Always_Install_Elevated_Enable"
+            ],
+            "ATT&CK: «Выполнение»": [
+                "Hidden_Service_Create",
+                "Hidden_Scheduled_Task",
+                "Office_File_With_Macros"
+            ],
+            "ATT&CK: «Деструктивное воздействие»": [
+                "Subrule_SMB_Takeover",
+                "Desktop_Wallpaper_Change",
+                "Stop_Important_Service_Registry",
+                "SMB_Takeover"
+            ],
+            "ATT&CK: «Перемещение внутри периметра»": [
+                "Disable_Smartcard",
+                "Shadow_Key_Creation",
+                "Service_From_Remote_File_Creation",
+                "Modify_And_Start_Remote_Service"
+            ],
+            "ATT&CK: «Закрепление»": [
+                "Debugger_In_Image_File_Execution_Options",
+                "RID_Hijacking_Persistence",
+                "Default_File_Association_Modify",
+                "Windows_Accessibility_StickyKey_Modification",
+                "Browser_Extension_Install",
+                "AppCert_DLLs_Persist",
+                "Universal_Windows_Platform_Apps_Modify",
+                "Hiding_Already_Existing_Task",
+                "Outlook_Form_Creation",
+                "Office_Template_Modification",
+                "Registry_Winlogon_Helper",
+                "GlobalFlags_In_Image_File_Execution_Options",
+                "COM_Object_Persistence",
+                "Perf_Key_Modify",
+                "Userinitmprlogonscript_Modify",
+                "Network_Provider_Modification",
+                "Time_Providers_Persistence",
+                "Outlook_Malicious_Actions",
+                "EventViewer_Registry_Modify",
+                "Persistence_Netsh_DLL",
+                "Windows_Autorun_Modification",
+                "Command_Processor_Autorun_Modify",
+                "Windows_Screensaver_Modification",
+                "Office_XLL_Modification",
+                "NSSM_Service_Installed",
+                "Abusing_Windows_Telemetry_Persist",
+                "Hidden_Account_Creation",
+                "Outlook_Form_Exploitation",
+                "Windows_Startup_Folder_Modification"
+            ],
+            "ATT&CK: «Повышение привилегий»": [
+                "DelegateExecute_UAC_Bypass",
+                "Subrule_CVE_2022_38028_Creating_Artifacts",
+                "Registry_Modification_For_UAC_Bypass",
+                "S4UTomato_PrivEsc"
+            ],
+            "Безопасность удаленной работы": [
+                "Windows_Firewall_Enable_Local_RDP"
+            ],
+            "Эксплуатация уязвимостей": [
+                "PrintSpooler_PrivEsc",
+                "PrinterPort_Backdoor",
+                "PrintSpooler_PrivEsc_CVE_2022_30206",
+                "Symlink_Via_SpoolDirectory"
+            ]
+        }
     },
     "w os Win Optional": {
-        "queries": [
-            {
-                "event_src.title": "windows",
-                "msgid": [
-                    "4732",
-                    "4733",
-                    "4798",
-                    "4799",
-                    "5140",
-                    "5156",
-                    "5378",
-                    "5379",
-                    "6416",
-                    "7031",
-                    "20503",
-                    "1074",
-                    "4672",
-                    "4673",
-                    "4698",
-                    "4699",
-                    "4702",
-                    "4723",
-                    "4724",
-                    "4726",
-                    "4728"
-                ]
-            },
-            {
-                "event_src.title": "windows",
-                "msgid": "2",
-                "event_src.subsys": "application"
-            }
-        ],
-        "KB_packs": [
-            "Active Directory Certificate Services",
-            "ATT&CK: «Первоначальный доступ»",
-            "ATT&CK: «Сбор данных»",
-            "Атаки при помощи специализированного ПО",
-            "ATT&CK: «Изучение»",
-            "ATT&CK: «Деструктивное воздействие»",
-            "Универсальные правила. Тактика «Деструктивное воздействие»",
-            "ATT&CK: «Повышение привилегий»",
-            "PT Network Attack Discovery",
-            "ATT&CK: «Эксфильтрация данных»",
-            "ATT&CK: «Организация управления»",
-            "Active Directory",
-            "ATT&CK: «Выполнение»",
-            "ATT&CK: «Перемещение внутри периметра»",
-            "ATT&CK: «Предотвращение обнаружения»",
-            "ATT&CK: «Получение учетных данных»",
-            "Microsoft Endpoint Configuration Manager",
-            "PT Next Generation Firewall",
-            "ATT&CK: «Закрепление»"
-        ]
+        "event_src.title = \"windows\" and msgid = \"4732\"": {
+            "Active Directory": [
+                "Remote_Actions_With_Domain_Objects"
+            ],
+            "ATT&CK: «Закрепление»": [
+                "Add_User_To_Group",
+                "Account_Created_On_Local_System",
+                "Critical_Domain_Group_User_Add"
+            ]
+        },
+        "event_src.title = \"windows\" and msgid = \"4733\"": {
+            "Active Directory": [
+                "Remote_Actions_With_Domain_Objects"
+            ],
+            "ATT&CK: «Деструктивное воздействие»": [
+                "Remove_Account_From_Sensitive_Group"
+            ]
+        },
+        "event_src.title = \"windows\" and msgid = \"4798\"": {
+            "ATT&CK: «Изучение»": [
+                "Multiple_Users_Enum"
+            ]
+        },
+        "event_src.title = \"windows\" and msgid = \"4799\"": {
+            "ATT&CK: «Изучение»": [
+                "LocalGroupListMembers_From_Remote_Host",
+                "Multiple_Groups_Enum"
+            ]
+        },
+        "event_src.title = \"windows\" and msgid = \"5140\"": {
+            "Active Directory Certificate Services": [
+                "ADCS_Certify_Coerce"
+            ],
+            "ATT&CK: «Организация управления»": [
+                "Subrule_DoublePulsar_IPC_Access",
+                "DoublePulsar_Activity"
+            ],
+            "ATT&CK: «Получение учетных данных»": [
+                "DRSUAPI_User_Enumeration"
+            ],
+            "ATT&CK: «Изучение»": [
+                "Subrule_Net_Share_Access",
+                "Shares_Discovery",
+                "Net_Tool_Usage",
+                "Windows_Mass_Recon"
+            ],
+            "ATT&CK: «Перемещение внутри периметра»": [
+                "Remote_Admin_Share_Access"
+            ]
+        },
+        "event_src.title = \"windows\" and msgid = \"5156\"": {
+            "Active Directory Certificate Services": [
+                "ADCS_Certify_Coerce"
+            ],
+            "Атаки с помощью специализированного ПО": [
+                "Subrule_Duplex_Powershell_Connect",
+                "MsLDAPDump_Usage",
+                "Sliver_GetSystem",
+                "Subrule_Sharphound_Client_Side",
+                "Sliver_PsExec",
+                "Tuoni_Agent_Usage",
+                "Cobalt_Strike_Powershell_Payload_Delivery",
+                "Sharphound_Client_Side"
+            ],
+            "Microsoft Endpoint Configuration Manager": [
+                "MECM_SharpSCCM",
+                "MECM_NTLM_Relay_Via_SharpSCCM"
+            ],
+            "ATT&CK: «Организация управления»": [
+                "Suspicious_Connection_After_Imageload",
+                "Tunnel_Process_Windows",
+                "Wintun_Network_Driver_Usage",
+                "Subrule_External_SMB_Connect",
+                "Proxy_Tools_Usage",
+                "Subrule_Possible_Network_Local_Tunnel",
+                "Ligolo_Reverse_Tunneling",
+                "Possible_Network_Local_Tunnel",
+                "Possible_Proxy_Usage",
+                "Subrule_Possible_Proxy_Usage"
+            ],
+            "ATT&CK: «Получение учетных данных»": [
+                "MultiDump_LSASS_Dump",
+                "MultiDump_Registry_Dump",
+                "ETWHash_Dump",
+                "Subrule_Egress_System",
+                "Physmem2profit_LSASS_Dump",
+                "Subrule_Coerce_Auth",
+                "Coerce_Auth",
+                "SCF_Or_URL_File_Created",
+                "SCF_Or_URL_Forced_Authentication"
+            ],
+            "ATT&CK: «Изучение»": [
+                "Network_Service_Discovery_From_Localnet",
+                "Remote_Log_Read",
+                "Port_Scan_From_Localnet_To_Single_Host",
+                "Port_Scan_From_Localnet_To_Different_Hosts"
+            ],
+            "ATT&CK: «Выполнение»": [
+                "Reverse_Shell_Via_Powershell"
+            ],
+            "ATT&CK: «Эксфильтрация данных»": [
+                "Rclone_Usage",
+                "Exfiltration_Over_Alternative_Protocol_Detection"
+            ],
+            "ATT&CK: «Первоначальный доступ»": [
+                "Potential_Rogue_RDP_Attack"
+            ],
+            "ATT&CK: «Перемещение внутри периметра»": [
+                "Output_Remote_PowerShell_Via_WinRM",
+                "MSSQL_NTLM_Relay",
+                "Subrule_SSH_Connect",
+                "Subrule_Windows_Logon",
+                "Lateral_Movement_Via_WinRM",
+                "Remoting_SSH"
+            ],
+            "ATT&CK: «Повышение привилегий»": [
+                "Subrule_IMarshal_Interface",
+                "Subrule_Not_Self_Relay",
+                "Remote_Potato_Relay_Hash"
+            ],
+            "PT Network Attack Discovery": [
+                "NAD_Significant_Signature",
+                "NAD_CVE_On_Vulnerable_Host",
+                "NAD_Tunnel_Tool",
+                "NAD_Hacktool_Usage"
+            ],
+            "PT Next Generation Firewall": [
+                "NGFW_Antivirus_Alert",
+                "NGFW_Significiant_Signatures"
+            ],
+            "Безопасность удаленной работы": [
+                "SMB_RPC_Internet_Connection"
+            ]
+        },
+        "event_src.title = \"windows\" and msgid = \"5378\"": {
+            "ATT&CK: «Получение учетных данных»": [
+                "Failed_DefaultCredentials_Delegation"
+            ]
+        },
+        "event_src.title = \"windows\" and msgid = \"5379\"": {
+            "ATT&CK: «Первоначальный доступ»": [
+                "Start_Process_From_MOTW_Archive"
+            ]
+        },
+        "event_src.title = \"windows\" and msgid = \"6416\"": {
+            "Атаки с помощью специализированного ПО": [
+                "USB_Rubber_Ducky"
+            ]
+        },
+        "event_src.title = \"windows\" and msgid = \"7031\"": {
+            "Атаки с помощью специализированного ПО": [
+                "Sliver_GetSystem"
+            ],
+            "ATT&CK: «Предотвращение обнаружения»": [
+                "Remote_EventLog_Crashing",
+                "Blackout_AV_Disabling"
+            ]
+        },
+        "event_src.title = \"windows\" and msgid = \"20503\"": {
+            "ATT&CK: «Сбор данных»": [
+                "RDP_Shadow_Session"
+            ]
+        },
+        "event_src.title = \"windows\" and msgid = \"1074\"": {
+            "Универсальные правила. Тактика «Деструктивное воздействие»": [
+                "CAP_Stop_Application_Or_System"
+            ],
+            "ATT&CK: «Получение учетных данных»": [
+                "Failed_LSASS_Injection"
+            ]
+        },
+        "event_src.title = \"windows\" and msgid = \"4672\"": {
+            "ATT&CK: «Изучение»": [
+                "Remote_Log_Read"
+            ]
+        },
+        "event_src.title = \"windows\" and msgid = \"4673\"": {},
+        "event_src.title = \"windows\" and msgid = \"4698\"": {
+            "ATT&CK: «Предотвращение обнаружения»": [
+                "Suspicious_File_Creation_In_Sysvol"
+            ],
+            "ATT&CK: «Выполнение»": [
+                "Scheduled_Task_Manipulation",
+                "Hidden_Scheduled_Task"
+            ],
+            "ATT&CK: «Перемещение внутри периметра»": [
+                "Scheduled_Task_Was_Created_Or_Updated_Via_Schtasks"
+            ]
+        },
+        "event_src.title = \"windows\" and msgid = \"4699\"": {
+            "ATT&CK: «Выполнение»": [
+                "Scheduled_Task_Manipulation"
+            ]
+        },
+        "event_src.title = \"windows\" and msgid = \"4702\"": {
+            "ATT&CK: «Выполнение»": [
+                "Scheduled_Task_Manipulation",
+                "Hidden_Scheduled_Task"
+            ],
+            "ATT&CK: «Перемещение внутри периметра»": [
+                "Scheduled_Task_Was_Created_Or_Updated_Via_Schtasks"
+            ]
+        },
+        "event_src.title = \"windows\" and msgid = \"4723\"": {
+            "ATT&CK: «Деструктивное воздействие»": [
+                "Remove_Access_To_Sensitive_Account"
+            ]
+        },
+        "event_src.title = \"windows\" and msgid = \"4724\"": {
+            "Active Directory": [
+                "Remote_Actions_With_Domain_Objects"
+            ],
+            "ATT&CK: «Закрепление»": [
+                "Unauthorized_Reset_Password_For_Sensitive_Users",
+                "Fast_Create_And_Delete_Account"
+            ]
+        },
+        "event_src.title = \"windows\" and msgid = \"4726\"": {
+            "Active Directory": [
+                "Remote_Actions_With_Domain_Objects"
+            ],
+            "ATT&CK: «Закрепление»": [
+                "Fast_Create_And_Delete_Account"
+            ]
+        },
+        "event_src.title = \"windows\" and msgid = \"4728\"": {
+            "Active Directory": [
+                "Remote_Actions_With_Domain_Objects"
+            ],
+            "ATT&CK: «Закрепление»": [
+                "Add_User_To_Group",
+                "Critical_Domain_Group_User_Add"
+            ]
+        },
+        "event_src.title = \"windows\" and msgid = \"2\" and event_src.subsys = \"application\"": {
+            "ATT&CK: «Закрепление»": [
+                "Deserialization_Payload_WMI_Subscription"
+            ]
+        }
     },
     "w os Win Advanced": {
-        "queries": [
-            {
-                "event_src.title": "windows",
-                "msgid": [
-                    "4656",
-                    "4663"
-                ]
-            }
-        ],
-        "KB_packs": [
-            "ATT&CK: «Первоначальный доступ»",
-            "Атаки при помощи специализированного ПО",
-            "ATT&CK: «Изучение»",
-            "ATT&CK: «Эксфильтрация данных»",
-            "ATT&CK: «Организация управления»",
-            "ATT&CK: «Выполнение»",
-            "ATT&CK: «Перемещение внутри периметра»",
-            "ATT&CK: «Предотвращение обнаружения»",
-            "Эксплуатация уязвимостей",
-            "PostgreSQL",
-            "ATT&CK: «Получение учетных данных»",
-            "ATT&CK: «Закрепление»"
-        ]
+        "event_src.title = \"windows\" and msgid = \"4656\"": {
+            "ATT&CK: «Получение учетных данных»": [
+                "Remote_Password_Dump",
+                "LetMeowIn_LSASS_Dump",
+                "ETWHash_Dump",
+                "Reading_Registry_Objects",
+                "LSASS_Memory_Access_SubRule",
+                "LSASS_Handle_Duplicate",
+                "Comsvcs_Minidump_Usage",
+                "LSASS_Dump_Via_RPC",
+                "LSASS_Dump_Via_TaskManager",
+                "LSASS_Memory_Dump",
+                "ProcDump_Usage",
+                "Subrule_LetMeowIn_LSASS_Dump",
+                "Subrule_LOLBins_LSASS_Dump",
+                "MultiDump_LSASS_Dump"
+            ],
+            "ATT&CK: «Предотвращение обнаружения»": [
+                "Attribute_Changer_Usage"
+            ],
+            "ATT&CK: «Перемещение внутри периметра»": [
+                "Output_Remote_PowerShell_Via_WinRM",
+                "Lateral_Movement_Via_WinRM"
+            ]
+        },
+        "event_src.title = \"windows\" and msgid = \"4663\"": {
+            "Атаки с помощью специализированного ПО": [
+                "Go_Secdump_Activity"
+            ],
+            "ATT&CK: «Организация управления»": [
+                "Remote_File_Download_Via_Certutil"
+            ],
+            "ATT&CK: «Получение учетных данных»": [
+                "MultiDump_LSASS_Dump",
+                "ProcDump_Usage",
+                "PPLdump_Usage",
+                "Credential_Dump_In_Local_Registry",
+                "MultiDump_Registry_Dump",
+                "PuntoSwitcher_Diary_Open",
+                "SharpSecretsdump_Usage",
+                "LetMeowIn_LSASS_Dump",
+                "Access_To_Files_Containing_Passwords",
+                "LSASS_Memory_Dump",
+                "Reading_Registry_Objects",
+                "Access_To_User_Secrets_Via_DPAPI",
+                "Veeam_Credential_Recovery_Script",
+                "Credential_Access_To_Passwords_Storage",
+                "AvDump_LSASS_Dump",
+                "Subrule_LOLBins_LSASS_Dump"
+            ],
+            "ATT&CK: «Предотвращение обнаружения»": [
+                "File_And_Directory_Permissions_Modification",
+                "RDP_Connection_History_Removal",
+                "Attribute_Changer_Usage"
+            ],
+            "ATT&CK: «Изучение»": [
+                "WiFi_Networks_Configuration_Discovery",
+                "Audit_Policies_Discovery"
+            ],
+            "ATT&CK: «Выполнение»": [
+                "Hidden_Service_Create"
+            ],
+            "ATT&CK: «Эксфильтрация данных»": [
+                "Bluetooth_File_Transfer",
+                "Cloud_Client_Synchronization_Folder_Usage"
+            ],
+            "ATT&CK: «Первоначальный доступ»": [
+                "Suspicious_Living_Off_Trusted_Sites_Usage",
+                "Suspicious_File_Creation_From_Messenger_Or_Mail",
+                "Start_Process_From_MOTW_Archive"
+            ],
+            "ATT&CK: «Перемещение внутри периметра»": [
+                "Output_Remote_PowerShell_Via_WinRM",
+                "Lateral_Movement_Via_WinRM"
+            ],
+            "ATT&CK: «Закрепление»": [
+                "Windows_Startup_Folder_Modification",
+                "IIS_Module_Filter_Installation"
+            ],
+            "PostgreSQL": [
+                "PostgreSQL_Dump_Credentials",
+                "PostgreSQL_Update_Configuration"
+            ],
+            "Эксплуатация уязвимостей": [
+                "CVE_2025_48799_PrivEsc_Via_Windows_Update_Service",
+                "CVE_2021_36934_HiveNightmare"
+            ]
+        }
     },
     "u os auditd": {
-        "queries": [
-            {
-                "event_src.title": "unix_like",
-                "event_src.subsys": "auditd",
-                "msgid": [
-                    "execve",
-                    "LOGIN"
-                ]
-            },
-            {
-                "event_src.title": "unix_like",
-                "event_src.subsys": null
-            }
-        ],
-        "KB_packs": [
-            "Unix-системы. ATT&CK: «Перемещение внутри периметра»",
-            "Unix-системы. ATT&CK: «Получение учетных данных»",
-            "Unix-системы. ATT&CK: «Закрепление»",
-            "Unix-системы. ATT&CK: «Исследование»",
-            "Oracle MySQL",
-            "Unix-системы. ATT&CK: «Предотвращение обнаружения»",
-            "Атаки при помощи специализированного ПО",
-            "ATT&CK: «Изучение»",
-            "ATT&CK: «Деструктивное воздействие»",
-            "Unix-системы. ATT&CK: «Выполнение»",
-            "Универсальные правила. Тактика «Деструктивное воздействие»",
-            "Unix-системы. ATT&CK: «Первоначальный доступ»",
-            "PT Network Attack Discovery",
-            "Вредоносное ПО и нежелательные рассылки",
-            "Служба каталогов Samba DC",
-            "ATT&CK: «Организация управления»",
-            "Сетевые устройства. Подозрительная сетевая активность",
-            "Универсальные правила. Подозрительные входы в ПО",
-            "Unix-системы. ATT&CK: «Деструктивное воздействие»",
-            "Unix-системы. ATT&CK: «Организация управления»",
-            "Elasticsearch. Подозрительная активность",
-            "ATT&CK: «Предотвращение обнаружения»",
-            "Эксплуатация уязвимостей",
-            "ALD Pro (FreeIPA). Подозрительная активность",
-            "PostgreSQL",
-            "PT Container Security",
-            "SaltStack. Подозрительная активность",
-            "Аномалии в цепочках поставок",
-            "PT Next Generation Firewall",
-            "Аномальная активность веб-серверов",
-            "Unix-системы. ATT&CK: «Сбор данных»",
-            "Unix-системы. ATT&CK: «Повышение привилегий»"
-        ]
+        "event_src.title = \"unix_like\" and event_src.subsys = \"auditd\" and msgid = \"execve\"": {
+            "Вредоносное ПО и нежелательные рассылки": [
+                "KSCL_Add_Main_Administrator"
+            ],
+            "ALD Pro (FreeIPA). Подозрительная активность": [
+                "FreeIPA_Recon_Commands",
+                "FreeIPA_Cache_Credentials_Access",
+                "FreeIPA_Id2entry_Dump"
+            ],
+            "Атаки с помощью специализированного ПО": [
+                "VNT_Usage"
+            ],
+            "ATT&CK: «Организация управления»": [
+                "Microsoft_Devtunnel_Usage"
+            ],
+            "ATT&CK: «Предотвращение обнаружения»": [
+                "Browser_LOLBin"
+            ],
+            "ATT&CK: «Изучение»": [
+                "WiFi_Networks_Configuration_Discovery"
+            ],
+            "ATT&CK: «Деструктивное воздействие»": [
+                "Disk_Wipe"
+            ],
+            "Oracle MySQL": [
+                "Subrule_MySQL_Create_Process",
+                "MySQL_Code_Execution"
+            ],
+            "PostgreSQL": [
+                "Subrule_PostgreSQL_Create_Process",
+                "PostgreSQL_Code_Execution"
+            ],
+            "SaltStack": [
+                "SaltStack_Run_Get_Url_Dir_Command",
+                "SaltStack_Run_List_Master_Command"
+            ],
+            "Samba DC directory service": [
+                "SambaDC_Critical_Files_Access"
+            ],
+            "Unix-системы. ATT&CK: «Организация управления»": [
+                "Unix_Tunneling_Via_SSHuttle",
+                "Unix_Possible_GSocket_Usage",
+                "Unix_Droppers_By_Daemons",
+                "Unix_Tunneling_Via_SSH",
+                "Unix_Possible_GS_Netcat_Usage"
+            ],
+            "Unix-системы. ATT&CK: «Получение учетных данных»": [
+                "Unix_Private_Keys_Read",
+                "Unix_Cred_Files_Read",
+                "Unix_Mimipenguin_Cred_Dump"
+            ],
+            "Unix-системы. ATT&CK: «Предотвращение обнаружения»": [
+                "Unix_Suspicious_Emodji_Cmdline",
+                "Unix_Run_Process_From_Suspicious_Directory",
+                "Unix_Run_Process_From_Home_Directory",
+                "Unix_Shell_Command_Via_GTFOBINS",
+                "Unix_Clear_Command_History",
+                "Unix_Firewall_Disable_Config_Modify",
+                "Unix_Hidden_User",
+                "Unix_Disable_Auditd",
+                "Unix_Suspicious_Hidden_Files",
+                "Unix_Disable_SELinux",
+                "Unix_Disable_AppArmor",
+                "Unix_Disable_Syslog",
+                "Unix_Impair_Command_Logging"
+            ],
+            "Unix-системы. ATT&CK: «Исследование»": [
+                "Unix_Password_Policy_Discovery",
+                "Unix_System_Information_Discovery",
+                "Unix_Local_Account_Discovery",
+                "Unix_Software_Discovery",
+                "Unix_Internet_Connection_Discovery",
+                "Unix_X_Windows_Properties_Discovery",
+                "Unix_Security_Software_Discovery",
+                "Unix_System_User_Discovery",
+                "Unix_System_Network_Configuration_Discovery",
+                "Unix_Process_Discovery",
+                "Unix_System_Service_Discovery",
+                "Unix_Local_Mass_Recon"
+            ],
+            "Unix-системы. ATT&CK: «Выполнение»": [
+                "Unix_Connect_From_Suspicious_Dir",
+                "Unix_Reverse_Shell_Via_Bash",
+                "Unix_Inline_Reverse_Or_Bind_Shell",
+                "Unix_Hacktool_Usage",
+                "Unix_Suspicious_Process_Execution_Sequence",
+                "Unix_Suspicious_Command",
+                "Unix_Recon_Tools_And_Commands",
+                "Unix_Bind_Shell",
+                "Unix_Connect_From_Home_Dir",
+                "Unix_Reverse_Shell"
+            ],
+            "Unix-системы. ATT&CK: «Деструктивное воздействие»": [
+                "Cryptominer_Activity"
+            ],
+            "Unix-системы. ATT&CK: «Перемещение внутри периметра»": [
+                "Unix_Exploiting_SambaCry",
+                "Subrule_Unix_Dump_SSH_Auth_Sock",
+                "Unix_SSH_Agent_Hijacking"
+            ],
+            "Unix-системы. ATT&CK: «Первоначальный доступ»": [
+                "Unix_Suspicious_Activity_By_Web_User",
+                "Unix_Process_Started_Via_Office_Macros"
+            ],
+            "Unix-системы. ATT&CK: «Закрепление»": [
+                "Unix_Systemd_Timers",
+                "Unix_Boot_Modify",
+                "Unix_User_Creation"
+            ],
+            "Unix-системы. ATT&CK: «Повышение привилегий»": [
+                "Unix_Run_Process_Via_Ldso",
+                "Unix_Privilege_Escalation_Via_GTFOBINS",
+                "Unix_Exploiting_OverlayFS",
+                "Unix_PrivEsc_Via_PKexec"
+            ],
+            "Эксплуатация уязвимостей": [
+                "CVE_2023_27350_PaperCut_Authentication_Bypass",
+                "CVE_2025_1974_Kubernetes_IngressNightmare",
+                "CVE_2025_38001_Linux_HFSC_LPE",
+                "Subrule_CVE_2025_24813_Tomcat_RCE",
+                "Subrule_CVE_2023_4911_GLIBC_Buffer_Overflow",
+                "CVE_2024_29510_Ghostscript",
+                "CVE_2025_47286_iTop_RCE",
+                "CVE_2023_46604_ActiveMQ_RCE",
+                "Possible_CVE_2022_0847_Dirty_Pipe",
+                "CVE_2024_21683_Confluence_RCE",
+                "CVE_2024_22116_Zabbix_Command_Injection",
+                "Uptime_Kuma_RCE_Via_Fake_Chrome",
+                "Subrule_ActiveMQ_Connect",
+                "CVE_2025_24813_Tomcat_RCE",
+                "CVE_2023_4911_GLIBC_Buffer_Overflow"
+            ],
+            "Аномальная активность веб-серверов": [
+                "Web_Automation_Tool"
+            ]
+        },
+        "event_src.title = \"unix_like\" and event_src.subsys = \"auditd\" and msgid = \"LOGIN\"": {}
     },
     "u os old": {
-        "queries": [
-            {
-                "event_src.title": "unix_like",
-                "event_src.subsys": null,
-                "id": [
-                    "PT_UNIX_like_auditd_syslog_user_login",
-                    "PT_UNIX_like_auditd_syslog_user_cmd_syscall",
-                    "PT_UNIX_like_auditd_fake_for_show_no_auditd"
-                ]
-            }
-        ],
-        "KB_packs": []
+        "event_src.title = \"unix_like\" and not event_src.subsys and id = \"PT_UNIX_like_auditd_syslog_user_login\"": {},
+        "event_src.title = \"unix_like\" and not event_src.subsys and id = \"PT_UNIX_like_auditd_syslog_user_cmd_syscall\"": {}
     },
     "n os 3com": {
-        "queries": [
-            {
-                "event_src.title": "3com"
-            }
-        ],
-        "KB_packs": [
-            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
-            "Универсальные правила. Подозрительные входы в ПО"
-        ]
+        "event_src.title = \"3com\"": {
+            "Атаки методом перебора": [
+                "Subrule_SSHGuard",
+                "SSHGuard_Bruteforce",
+                "SSHGuard_Spraying"
+            ],
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора": [
+                "CAP_Password_Spraying",
+                "CAP_Password_Brute"
+            ],
+            "Универсальные правила. Подозрительные входы в ПО": [
+                "CAP_Default_Account_Logon"
+            ],
+            "Профилирование доступа к критически важным системам": [
+                "Application_Abnormal_Access"
+            ]
+        }
     },
     "n os cisco fw": {
-        "queries": [
-            {
-                "event_src.vendor": "cisco",
-                "event_src.title": [
-                    "asa",
-                    "fwsm",
-                    "pix"
-                ]
-            }
-        ],
-        "KB_packs": [
-            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
-            "Универсальные правила. Запросы к подозрительным или вредоносным ресурсам",
-            "Сетевые устройства. Индикаторы компрометации",
-            "Универсальные правила. Подозрительные входы в ПО",
-            "ATT&CK: «Изучение»"
-        ]
+        "event_src.vendor = \"cisco\" and event_src.title = \"asa\"": {
+            "Атаки методом перебора": [
+                "Subrule_SSHGuard",
+                "Cisco_FW_Password_Brute",
+                "Multifactor_Brute_Second_Factor",
+                "Probing_Auth_On_Various_Hosts",
+                "SSHGuard_Bruteforce",
+                "SSHGuard_Spraying"
+            ],
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора": [
+                "CAP_User_Creation",
+                "CAP_User_Blocking_Or_Removing"
+            ],
+            "Универсальные правила. Запросы к подозрительным или вредоносным ресурсам": [
+                "CAP_Attack_Detected"
+            ],
+            "Универсальные правила. Подозрительные входы в ПО": [
+                "CAP_Default_Account_Logon"
+            ],
+            "ATT&CK: «Изучение»": [
+                "Network_Service_Discovery_From_Localnet",
+                "Port_Scan_From_Localnet_To_Single_Host",
+                "Port_Scan_From_Localnet_To_Different_Hosts"
+            ],
+            "Сетевые устройства. Индикаторы компрометации": [
+                "Cisco_ASA_Disable_Username_Hiding",
+                "Cisco_ASA_Logging_To_Untrusted_Host",
+                "Cisco_ASA_Logging_Usernames_Outside"
+            ],
+            "Профилирование доступа к критически важным системам": [
+                "Cisco_Abnormal_Access"
+            ],
+            "Безопасность удаленной работы": [
+                "Duplicate_Remote_Session",
+                "TeamViewer_Activity",
+                "VPN_Abnormal_Access",
+                "RDP_Connect_After_RDG",
+                "Remote_Administration_Tools_Usage"
+            ]
+        },
+        "event_src.vendor = \"cisco\" and event_src.title = \"fwsm\"": {
+            "Атаки методом перебора": [
+                "Subrule_SSHGuard",
+                "Cisco_FW_Password_Brute",
+                "Probing_Auth_On_Various_Hosts",
+                "SSHGuard_Bruteforce",
+                "SSHGuard_Spraying"
+            ],
+            "Универсальные правила. Подозрительные входы в ПО": [
+                "CAP_Default_Account_Logon"
+            ],
+            "ATT&CK: «Изучение»": [
+                "Network_Service_Discovery_From_Localnet",
+                "Port_Scan_From_Localnet_To_Single_Host",
+                "Port_Scan_From_Localnet_To_Different_Hosts"
+            ],
+            "Профилирование доступа к критически важным системам": [
+                "Cisco_Abnormal_Access"
+            ],
+            "Безопасность удаленной работы": [
+                "TeamViewer_Activity",
+                "Remote_Administration_Tools_Usage"
+            ]
+        },
+        "event_src.vendor = \"cisco\" and event_src.title = \"pix\"": {
+            "Атаки методом перебора": [
+                "Subrule_SSHGuard",
+                "Cisco_FW_Password_Brute",
+                "Probing_Auth_On_Various_Hosts",
+                "SSHGuard_Bruteforce",
+                "SSHGuard_Spraying"
+            ],
+            "ATT&CK: «Изучение»": [
+                "Network_Service_Discovery_From_Localnet",
+                "Port_Scan_From_Localnet_To_Single_Host",
+                "Port_Scan_From_Localnet_To_Different_Hosts"
+            ],
+            "Сетевые устройства. Индикаторы компрометации": [
+                "Cisco_ASA_Disable_Username_Hiding",
+                "Cisco_ASA_Logging_To_Untrusted_Host",
+                "Cisco_ASA_Logging_Usernames_Outside"
+            ],
+            "Профилирование доступа к критически важным системам": [
+                "Cisco_Abnormal_Access"
+            ],
+            "Безопасность удаленной работы": [
+                "TeamViewer_Activity",
+                "Remote_Administration_Tools_Usage"
+            ]
+        }
     },
     "n os cisco": {
-        "queries": [
-            {
-                "event_src.vendor": "cisco",
-                "event_src.title": [
-                    "ios",
-                    "ios_xe",
-                    "ios_xr",
-                    "ise"
-                ]
-            }
-        ],
-        "KB_packs": [
-            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
-            "Сетевые устройства. Подозрительная сетевая активность",
-            "Сетевые устройства. Индикаторы компрометации",
-            "Эксплуатация уязвимостей",
-            "Универсальные правила. Подозрительные входы в ПО",
-            "ATT&CK: «Изучение»"
-        ]
+        "event_src.vendor = \"cisco\" and event_src.title = \"ios\"": {
+            "Атаки методом перебора": [
+                "Subrule_SSHGuard",
+                "Cisco_IOS_Password_Brute",
+                "Probing_Auth_On_Various_Hosts",
+                "SSHGuard_Bruteforce",
+                "SSHGuard_Spraying"
+            ],
+            "Универсальные правила. Подозрительные входы в ПО": [
+                "CAP_Default_Account_Logon"
+            ],
+            "ATT&CK: «Изучение»": [
+                "Network_Service_Discovery_From_Localnet",
+                "Port_Scan_From_Localnet_To_Single_Host",
+                "Port_Scan_From_Localnet_To_Different_Hosts"
+            ],
+            "Сетевые устройства. Подозрительная сетевая активность": [
+                "Possible_Rogue_FHRP_Peer",
+                "Smart_Install_Usage"
+            ],
+            "Сетевые устройства. Индикаторы компрометации": [
+                "DHCP_Starvation",
+                "Cisco_IOS_Change_Config_By_SNMP",
+                "Cisco_Execute_Suspicious_Command"
+            ],
+            "Профилирование доступа к критически важным системам": [
+                "Cisco_Abnormal_Access"
+            ],
+            "Безопасность удаленной работы": [
+                "TeamViewer_Activity",
+                "Remote_Administration_Tools_Usage"
+            ],
+            "Эксплуатация уязвимостей": [
+                "Possible_CVE_2023_20198_Cisco_IOS_XE"
+            ]
+        },
+        "event_src.vendor = \"cisco\" and event_src.title = \"ios_xe\"": {
+            "ATT&CK: «Изучение»": [
+                "Network_Service_Discovery_From_Localnet",
+                "Port_Scan_From_Localnet_To_Single_Host",
+                "Port_Scan_From_Localnet_To_Different_Hosts"
+            ]
+        },
+        "event_src.vendor = \"cisco\" and event_src.title = \"ios_xr\"": {
+            "Атаки методом перебора": [
+                "Subrule_SSHGuard",
+                "SSHGuard_Bruteforce",
+                "SSHGuard_Spraying"
+            ],
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора": [
+                "CAP_Password_Spraying",
+                "CAP_Password_Brute"
+            ],
+            "Универсальные правила. Подозрительные входы в ПО": [
+                "CAP_Default_Account_Logon"
+            ],
+            "Сетевые устройства. Подозрительная сетевая активность": [
+                "Possible_Rogue_FHRP_Peer"
+            ]
+        },
+        "event_src.vendor = \"cisco\" and event_src.title = \"ise\"": {
+            "Атаки методом перебора": [
+                "Subrule_SSHGuard",
+                "SSHGuard_Bruteforce",
+                "SSHGuard_Spraying"
+            ],
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора": [
+                "CAP_User_Modified",
+                "CAP_Password_Spraying",
+                "CAP_Password_Brute"
+            ],
+            "Универсальные правила. Подозрительные входы в ПО": [
+                "CAP_Default_Account_Logon"
+            ]
+        }
     },
     "n os fortigate": {
-        "queries": [
-            {
-                "event_src.title": "fortigate"
-            }
-        ],
-        "KB_packs": [
-            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
-            "Универсальные правила. Запросы к подозрительным или вредоносным ресурсам",
-            "Вредоносное ПО и нежелательные рассылки",
-            "Сетевые устройства. Подозрительная сетевая активность",
-            "Универсальные правила. Подозрительные входы в ПО",
-            "Универсальные правила. Отключение и обход защитных механизмов",
-            "ATT&CK: «Изучение»"
-        ]
+        "event_src.title = \"fortigate\"": {
+            "Вредоносное ПО и нежелательные рассылки": [
+                "Malicious_URL_Detected"
+            ],
+            "Атаки методом перебора": [
+                "Subrule_SSHGuard",
+                "SSHGuard_Bruteforce",
+                "SSHGuard_Spraying"
+            ],
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора": [
+                "CAP_Password_Spraying",
+                "CAP_Password_Brute"
+            ],
+            "Универсальные правила. Отключение и обход защитных механизмов": [
+                "CAP_Clear_Or_Deletion_Logs"
+            ],
+            "Универсальные правила. Подозрительные входы в ПО": [
+                "CAP_Default_Account_Logon"
+            ],
+            "Универсальные правила. Запросы к подозрительным или вредоносным ресурсам": [
+                "CAP_Attack_Detected"
+            ],
+            "ATT&CK: «Изучение»": [
+                "Port_Scan_From_Localnet_To_Single_Host",
+                "Port_Scan_From_Localnet_To_Different_Hosts"
+            ],
+            "Сетевые устройства. Подозрительная сетевая активность": [
+                "External_VPN_Service_Usage",
+                "Untrusted_DNS_Server_Usage",
+                "External_Mail_Service_Usage_SMTP",
+                "Smart_Install_Usage",
+                "Possible_SNMP_Bruteforce_Different_Hosts",
+                "Possible_SNMP_Bruteforce_Single_Host"
+            ],
+            "Профилирование доступа к критически важным системам": [
+                "Fortigate_Abnormal_Access"
+            ],
+            "Безопасность удаленной работы": [
+                "Duplicate_Remote_Session",
+                "VPN_Client_To_Client_Connection",
+                "VPN_Abnormal_Access",
+                "RDP_Connect_After_RDG"
+            ]
+        }
     },
     "n os watchguard": {
-        "queries": [
-            {
-                "event_src.subsys": [
-                    "admd",
-                    "dhcpd",
-                    "sessiond",
-                    "wgagent"
-                ],
-                "event_src.title": "fireware_xtmv"
-            }
-        ],
-        "KB_packs": [
-            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
-            "Сетевые устройства. Индикаторы компрометации",
-            "Универсальные правила. Подозрительные входы в ПО"
-        ]
+        "event_src.title = \"fireware_xtmv\" and event_src.subsys = \"admd\"": {
+            "Атаки методом перебора": [
+                "Subrule_SSHGuard",
+                "SSHGuard_Bruteforce",
+                "SSHGuard_Spraying"
+            ],
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора": [
+                "CAP_Password_Spraying",
+                "CAP_Password_Brute"
+            ]
+        },
+        "event_src.title = \"fireware_xtmv\" and event_src.subsys = \"dhcpd\"": {
+            "Сетевые устройства. Индикаторы компрометации": [
+                "DHCP_Starvation"
+            ]
+        },
+        "event_src.title = \"fireware_xtmv\" and event_src.subsys = \"sessiond\"": {
+            "Атаки методом перебора": [
+                "Subrule_SSHGuard",
+                "SSHGuard_Bruteforce",
+                "SSHGuard_Spraying"
+            ],
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора": [
+                "CAP_Password_Spraying",
+                "CAP_Password_Brute"
+            ],
+            "Универсальные правила. Подозрительные входы в ПО": [
+                "CAP_Default_Account_Logon"
+            ],
+            "Профилирование доступа к критически важным системам": [
+                "Application_Abnormal_Access"
+            ]
+        },
+        "event_src.title = \"fireware_xtmv\" and event_src.subsys = \"wgagent\"": {
+            "Атаки методом перебора": [
+                "Subrule_SSHGuard",
+                "SSHGuard_Bruteforce",
+                "SSHGuard_Spraying"
+            ],
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора": [
+                "CAP_Password_Spraying",
+                "CAP_Password_Brute"
+            ]
+        }
     },
     "n os fortimail": {
-        "queries": [
-            {
-                "event_src.title": "fortimail"
-            }
-        ],
-        "KB_packs": [
-            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
-            "Вредоносное ПО и нежелательные рассылки",
-            "Универсальные правила. Подозрительные входы в ПО"
-        ]
+        "event_src.title = \"fortimail\"": {
+            "Вредоносное ПО и нежелательные рассылки": [
+                "Spam_Mail_Detected"
+            ],
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора": [
+                "CAP_Password_Spraying",
+                "CAP_Password_Brute"
+            ],
+            "Универсальные правила. Подозрительные входы в ПО": [
+                "CAP_Default_Account_Logon"
+            ]
+        }
     },
     "n os checkpoint": {
-        "queries": [
-            {
-                "event_src.title": "gaia"
-            }
-        ],
-        "KB_packs": [
-            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
-            "Универсальные правила. Запросы к подозрительным или вредоносным ресурсам",
-            "Вредоносное ПО и нежелательные рассылки",
-            "Сетевые устройства. Подозрительная сетевая активность",
-            "Сетевые устройства. Индикаторы компрометации",
-            "Эксплуатация уязвимостей",
-            "Универсальные правила. Подозрительные входы в ПО",
-            "ATT&CK: «Изучение»"
-        ]
+        "event_src.title = \"gaia\"": {
+            "Вредоносное ПО и нежелательные рассылки": [
+                "Malicious_URL_Detected",
+                "Mass_Infection"
+            ],
+            "Атаки методом перебора": [
+                "Subrule_SSHGuard",
+                "Multifactor_Brute_Second_Factor",
+                "SSHGuard_Bruteforce",
+                "SSHGuard_Spraying"
+            ],
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора": [
+                "CAP_Password_Spraying",
+                "CAP_Password_Brute"
+            ],
+            "Универсальные правила. Подозрительные входы в ПО": [
+                "CAP_Default_Account_Logon"
+            ],
+            "Универсальные правила. Запросы к подозрительным или вредоносным ресурсам": [
+                "CAP_Attack_Detected"
+            ],
+            "ATT&CK: «Изучение»": [
+                "Network_Service_Discovery_From_Localnet",
+                "Port_Scan_From_Localnet_To_Single_Host",
+                "Port_Scan_From_Localnet_To_Different_Hosts"
+            ],
+            "Сетевые устройства. Подозрительная сетевая активность": [
+                "Untrusted_DNS_Server_Usage",
+                "Possible_SNMP_Bruteforce_Different_Hosts",
+                "External_Mail_Service_Usage_SMTP",
+                "Possible_SNMP_Bruteforce_Single_Host"
+            ],
+            "Сетевые устройства. Индикаторы компрометации": [
+                "Checkpoint_Admin_Modification"
+            ],
+            "Профилирование доступа к критически важным системам": [
+                "Checkpoint_Abnormal_Access"
+            ],
+            "Безопасность удаленной работы": [
+                "Connect_to_significant_hosts_from_VPN",
+                "TeamViewer_Activity",
+                "VPN_Client_To_Client_Connection",
+                "Remote_Session_Changed_Address_CheckPoint",
+                "VPN_Abnormal_Access",
+                "Remote_Administration_Tools_Usage"
+            ],
+            "Эксплуатация уязвимостей": [
+                "CVE_on_Vulnerable_Host",
+                "CVE_2024_24919_CheckPoint_Information_Disclosure"
+            ]
+        }
     },
     "n os jun": {
-        "queries": [
-            {
-                "event_src.title": "junos"
-            }
-        ],
-        "KB_packs": [
-            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
-            "Универсальные правила. Запросы к подозрительным или вредоносным ресурсам",
-            "Универсальные правила. Подозрительные входы в ПО",
-            "ATT&CK: «Изучение»"
-        ]
+        "event_src.title = \"junos\"": {
+            "Атаки методом перебора": [
+                "Subrule_SSHGuard",
+                "SSHGuard_Bruteforce",
+                "SSHGuard_Spraying"
+            ],
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора": [
+                "CAP_Password_Spraying",
+                "CAP_Password_Brute",
+                "CAP_User_Blocking_Or_Removing"
+            ],
+            "Универсальные правила. Подозрительные входы в ПО": [
+                "CAP_Default_Account_Logon"
+            ],
+            "Универсальные правила. Запросы к подозрительным или вредоносным ресурсам": [
+                "CAP_Attack_Detected"
+            ],
+            "ATT&CK: «Изучение»": [
+                "Network_Service_Discovery_From_Localnet",
+                "Port_Scan_From_Localnet_To_Single_Host",
+                "Port_Scan_From_Localnet_To_Different_Hosts"
+            ],
+            "Профилирование доступа к критически важным системам": [
+                "Application_Abnormal_Access"
+            ],
+            "Безопасность удаленной работы": [
+                "TeamViewer_Activity",
+                "Remote_Administration_Tools_Usage"
+            ]
+        }
     },
     "n os pan": {
-        "queries": [
-            {
-                "event_src.title": "pan_os"
-            }
-        ],
-        "KB_packs": [
-            "Универсальные правила. Тактика «Деструктивное воздействие»",
-            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
-            "Универсальные правила. Запросы к подозрительным или вредоносным ресурсам",
-            "Вредоносное ПО и нежелательные рассылки",
-            "Сетевые устройства. Подозрительная сетевая активность",
-            "Эксплуатация уязвимостей",
-            "Универсальные правила. Подозрительные входы в ПО",
-            "Универсальные правила. Отключение и обход защитных механизмов",
-            "ATT&CK: «Изучение»"
-        ]
+        "event_src.title = \"pan_os\"": {
+            "Вредоносное ПО и нежелательные рассылки": [
+                "Mass_Infection"
+            ],
+            "Атаки методом перебора": [
+                "Subrule_SSHGuard",
+                "SSHGuard_Bruteforce",
+                "SSHGuard_Spraying"
+            ],
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора": [
+                "CAP_User_Modified",
+                "CAP_Password_Spraying",
+                "CAP_Password_Brute"
+            ],
+            "Универсальные правила. Отключение и обход защитных механизмов": [
+                "CAP_Clear_Or_Deletion_Logs"
+            ],
+            "Универсальные правила. Подозрительные входы в ПО": [
+                "CAP_Default_Account_Logon"
+            ],
+            "Универсальные правила. Тактика «Деструктивное воздействие»": [
+                "CAP_Stop_Application_Or_System"
+            ],
+            "Универсальные правила. Запросы к подозрительным или вредоносным ресурсам": [
+                "CAP_Attack_Detected"
+            ],
+            "ATT&CK: «Изучение»": [
+                "Port_Scan_From_Localnet_To_Single_Host",
+                "Port_Scan_From_Localnet_To_Different_Hosts"
+            ],
+            "Сетевые устройства. Подозрительная сетевая активность": [
+                "Untrusted_DNS_Server_Usage",
+                "External_VPN_Service_Usage"
+            ],
+            "Профилирование доступа к критически важным системам": [
+                "Application_Abnormal_Access"
+            ],
+            "Безопасность удаленной работы": [
+                "Duplicate_Remote_Session",
+                "VPN_Abnormal_Access",
+                "RDP_Connect_After_RDG"
+            ],
+            "Эксплуатация уязвимостей": [
+                "CVE_2024_9474_PaloAlto_Command_Injection"
+            ]
+        }
     },
     "n os stonesoft ngfw": {
-        "queries": [
-            {
-                "event_src.title": "stonesoft_ngfw"
-            }
-        ],
-        "KB_packs": [
-            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
-            "Универсальные правила. Запросы к подозрительным или вредоносным ресурсам",
-            "Сетевые устройства. Подозрительная сетевая активность",
-            "Универсальные правила. Подозрительные входы в ПО",
-            "ATT&CK: «Изучение»"
-        ]
+        "event_src.title = \"stonesoft_ngfw\"": {
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора": [
+                "CAP_Password_Spraying",
+                "CAP_Password_Brute"
+            ],
+            "Универсальные правила. Подозрительные входы в ПО": [
+                "CAP_Default_Account_Logon"
+            ],
+            "Универсальные правила. Запросы к подозрительным или вредоносным ресурсам": [
+                "CAP_Attack_Detected"
+            ],
+            "ATT&CK: «Изучение»": [
+                "Port_Scan_From_Localnet_To_Single_Host",
+                "Port_Scan_From_Localnet_To_Different_Hosts"
+            ],
+            "Сетевые устройства. Подозрительная сетевая активность": [
+                "External_VPN_Service_Usage",
+                "Untrusted_DNS_Server_Usage"
+            ],
+            "Профилирование доступа к критически важным системам": [
+                "Application_Abnormal_Access"
+            ]
+        }
     },
     "n os huawei": {
-        "queries": [
-            {
-                "event_src.title": "vrp"
-            }
-        ],
-        "KB_packs": [
-            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
-            "Универсальные правила. Подозрительные входы в ПО"
-        ]
+        "event_src.title = \"vrp\"": {
+            "Атаки методом перебора": [
+                "Subrule_SSHGuard",
+                "SSHGuard_Bruteforce",
+                "SSHGuard_Spraying"
+            ],
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора": [
+                "CAP_Password_Spraying",
+                "CAP_Password_Brute",
+                "CAP_User_Blocking_Or_Removing"
+            ],
+            "Универсальные правила. Подозрительные входы в ПО": [
+                "CAP_Default_Account_Logon"
+            ],
+            "Профилирование доступа к критически важным системам": [
+                "Application_Abnormal_Access"
+            ]
+        }
     },
     "p ptaf": {
-        "queries": [
-            {
-                "event_src.title": "application_firewall"
-            }
-        ],
-        "KB_packs": [
-            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
-            "PT Application Firewall",
-            "Универсальные правила. Подозрительные входы в ПО",
-            "Универсальные правила. Отключение и обход защитных механизмов"
-        ]
+        "event_src.title = \"application_firewall\"": {
+            "Атаки методом перебора": [
+                "Subrule_SSHGuard",
+                "Probing_Auth_On_Various_Hosts",
+                "PTAF_Password_Brute",
+                "SSHGuard_Bruteforce",
+                "SSHGuard_Spraying"
+            ],
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора": [
+                "CAP_Group_Or_Role_Creation",
+                "CAP_User_Modified",
+                "CAP_User_Blocking_Or_Removing",
+                "CAP_User_Creation",
+                "CAP_Group_Or_Role_Removing"
+            ],
+            "Универсальные правила. Отключение и обход защитных механизмов": [
+                "CAP_Disabling_Protective_Mechanisms"
+            ],
+            "Универсальные правила. Подозрительные входы в ПО": [
+                "CAP_Default_Account_Logon"
+            ],
+            "Профилирование доступа к критически важным системам": [
+                "PTAF_Abnormal_Access"
+            ],
+            "PT Application Firewall": [
+                "PTAF_Hacktool_Detected",
+                "PTAF_Path_Traversal_Detected",
+                "PTAF_Old_Or_Unknown_HTTP_Version",
+                "PTAF_Command_Injection_Detected",
+                "PTAF_Reflected_File_Download_Detected",
+                "PTAF_Bulk_Failed_Logins",
+                "PTAF_SQL_Injection_Detected",
+                "PTAF_Alert_Detected",
+                "PTAF_LFI_Detected",
+                "PTAF_BruteForce_Detected",
+                "PTAF_Scanner_Detected",
+                "PTAF_XSS_Attack_Detected",
+                "PTAF_CVE_Detected",
+                "PTAF_Webshell_Detected"
+            ]
+        }
     },
     "p fortiweb": {
-        "queries": [
-            {
-                "event_src.title": "fortiweb"
-            }
-        ],
-        "KB_packs": [
-            "Универсальные правила. Запросы к подозрительным или вредоносным ресурсам",
-            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
-            "Универсальные правила. Подозрительные входы в ПО"
-        ]
+        "event_src.title = \"fortiweb\"": {
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора": [
+                "CAP_Password_Spraying",
+                "CAP_Password_Brute"
+            ],
+            "Универсальные правила. Подозрительные входы в ПО": [
+                "CAP_Default_Account_Logon"
+            ],
+            "Универсальные правила. Запросы к подозрительным или вредоносным ресурсам": [
+                "CAP_Attack_Detected"
+            ]
+        }
     },
     "p siteprotector": {
-        "queries": [
-            {
-                "event_src.title": "siteprotector"
-            }
-        ],
-        "KB_packs": []
+        "event_src.title = \"siteprotector\"": {}
     },
     "p apache": {
-        "queries": [
-            {
-                "event_src.title": "apache"
-            }
-        ],
-        "KB_packs": [
-            "Эксплуатация уязвимостей",
-            "Аномальная активность веб-серверов"
-        ]
+        "event_src.title = \"apache\"": {
+            "Профилирование доступа к критически важным системам": [
+                "Subrule_Teampass_Login_Successful",
+                "Teampass_Abnormal_Access"
+            ],
+            "Эксплуатация уязвимостей": [
+                "CVE_2023_7028_Gitlab_Password_Reset",
+                "CVE_2024_4577_PHP_CGI_RCE",
+                "CMS_1C_Bitrix_Race_Landing_Exploit",
+                "CVE_2025_53770_SharePoint_Unauthenticated_RCE",
+                "CVE_2024_22116_Zabbix_Command_Injection"
+            ],
+            "Аномальная активность веб-серверов": [
+                "Web_Bulk_Failed_URL_Access",
+                "Web_Request_Missing_Useragent",
+                "Web_Headless_Browser_Detected",
+                "Web_Searching_Non_Existent_Artifacts",
+                "Web_Automation_Tool"
+            ]
+        }
     },
     "p nginx": {
-        "queries": [
-            {
-                "event_src.title": "nginx"
-            }
-        ],
-        "KB_packs": [
-            "Эксплуатация уязвимостей",
-            "Аномальная активность веб-серверов"
-        ]
+        "event_src.title = \"nginx\"": {
+            "Профилирование доступа к критически важным системам": [
+                "Subrule_Teampass_Login_Successful",
+                "Teampass_Abnormal_Access"
+            ],
+            "Эксплуатация уязвимостей": [
+                "CVE_2023_7028_Gitlab_Password_Reset",
+                "CVE_2024_4577_PHP_CGI_RCE",
+                "CMS_1C_Bitrix_Race_Landing_Exploit",
+                "CVE_2025_53770_SharePoint_Unauthenticated_RCE",
+                "CVE_2024_22116_Zabbix_Command_Injection"
+            ],
+            "Аномальная активность веб-серверов": [
+                "Web_Bulk_Failed_URL_Access",
+                "Web_Request_Missing_Useragent",
+                "Web_Headless_Browser_Detected",
+                "Web_Searching_Non_Existent_Artifacts",
+                "Web_Automation_Tool"
+            ]
+        }
     },
     "p lighttpd": {
-        "queries": [
-            {
-                "event_src.title": "lighttpd"
-            }
-        ],
-        "KB_packs": [
-            "Эксплуатация уязвимостей",
-            "Аномальная активность веб-серверов"
-        ]
+        "event_src.title = \"lighttpd\"": {
+            "Профилирование доступа к критически важным системам": [
+                "Subrule_Teampass_Login_Successful",
+                "Teampass_Abnormal_Access"
+            ],
+            "Эксплуатация уязвимостей": [
+                "CVE_2023_7028_Gitlab_Password_Reset",
+                "CVE_2024_4577_PHP_CGI_RCE",
+                "CMS_1C_Bitrix_Race_Landing_Exploit",
+                "CVE_2025_53770_SharePoint_Unauthenticated_RCE",
+                "CVE_2024_22116_Zabbix_Command_Injection"
+            ],
+            "Аномальная активность веб-серверов": [
+                "Web_Bulk_Failed_URL_Access",
+                "Web_Request_Missing_Useragent",
+                "Web_Headless_Browser_Detected",
+                "Web_Searching_Non_Existent_Artifacts",
+                "Web_Automation_Tool"
+            ]
+        }
     },
     "p haproxy": {
-        "queries": [
-            {
-                "event_src.title": "haproxy"
-            }
-        ],
-        "KB_packs": [
-            "Эксплуатация уязвимостей",
-            "Универсальные правила. Тактика «Деструктивное воздействие»"
-        ]
+        "event_src.title = \"haproxy\"": {
+            "Универсальные правила. Тактика «Деструктивное воздействие»": [
+                "CAP_Stop_Application_Or_System"
+            ],
+            "Эксплуатация уязвимостей": [
+                "CVE_2025_24813_Tomcat_RCE"
+            ]
+        }
     },
     "s 1c": {
-        "queries": [
-            {
-                "event_src.title": "1c_enterprise"
-            }
-        ],
-        "KB_packs": [
-            "«1C:Предприятие» 8.3 и «Битрикс24»",
-            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
-            "Профилирование доступа к критически важным системам"
-        ]
+        "event_src.title = \"1c_enterprise\"": {
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора": [
+                "CAP_Password_Spraying",
+                "CAP_Password_Brute"
+            ],
+            "1C:Предприятие 8.3 и Битрикс24": [
+                "Enterprise_1C_Using_Various_Accounts_On_One_Terminal",
+                "Enterprise_1C_Create_User_Without_Password",
+                "Enterprise_1C_User_Locked_Too_Many_Logons",
+                "Enterprise_1C_Standard_Password_Set",
+                "Enterprise_1C_Manipulate_Critical_Data",
+                "Enterprise_1C_Disable_User_Password_In_Authentication",
+                "Enterprise_1C_Enable_Account_And_Login",
+                "Enterprise_1C_Multiple_User_Lock",
+                "Enterprise_1C_Logon_Same_User_From_Different_Terminals",
+                "Enterprise_1C_Multiple_User_Unlock",
+                "Enterprise_1C_Multiple_User_Password_Change"
+            ],
+            "Профилирование доступа к критически важным системам": [
+                "App_1C_Enterprise_Object_Modify",
+                "App_1C_Enterprise_Abnormal_Access"
+            ]
+        }
     },
     "s bitrix24": {
-        "queries": [
-            {
-                "event_src.title": "bitrix24"
-            }
-        ],
-        "KB_packs": [
-            "«1C:Предприятие» 8.3 и «Битрикс24»",
-            "Универсальные правила. Подозрительные входы в ПО"
-        ]
+        "event_src.title = \"bitrix24\"": {
+            "Атаки методом перебора": [
+                "Subrule_SSHGuard",
+                "SSHGuard_Bruteforce",
+                "SSHGuard_Spraying"
+            ],
+            "Универсальные правила. Подозрительные входы в ПО": [
+                "CAP_Default_Account_Logon"
+            ],
+            "1C:Предприятие 8.3 и Битрикс24": [
+                "Enterprise_1C_Multiple_User_Password_Change",
+                "Enterprise_1C_Using_Various_Accounts_On_One_Terminal",
+                "Enterprise_1C_Multiple_User_Lock",
+                "Enterprise_1C_Logon_Same_User_From_Different_Terminals"
+            ]
+        }
     },
     "s VMware vCenter": {
-        "queries": [
-            {
-                "event_src.title": "vsphere",
-                "event_src.subsys": "vpxd"
-            },
-            {
-                "event_src.title": "vsphere",
-                "event_src.subsys": null
-            }
-        ],
-        "KB_packs": [
-            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
-            "VMware vSphere. Подозрительная активность пользователей",
-            "Универсальные правила. Подозрительные входы в ПО"
-        ]
+        "event_src.title = \"vsphere\" and event_src.subsys = \"vpxd\"": {
+            "Атаки методом перебора": [
+                "Subrule_SSHGuard",
+                "Probing_Auth_On_Various_Hosts",
+                "SSHGuard_Bruteforce",
+                "SSHGuard_Spraying"
+            ],
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора": [
+                "CAP_User_Creation",
+                "CAP_Group_Or_Role_Creation",
+                "CAP_User_Modified",
+                "CAP_User_Blocking_Or_Removing"
+            ],
+            "Универсальные правила. Подозрительные входы в ПО": [
+                "CAP_Default_Account_Logon"
+            ],
+            "Профилирование доступа к критически важным системам": [
+                "VCenter_Abnormal_Access"
+            ],
+            "VMware vSphere. Подозрительная активность пользователей": [
+                "Disabling_Protective_VM",
+                "Reconfiguring_Protective_VM",
+                "Downloading_Files_Of_Critical_VM",
+                "Mass_Disabling_Protective_VM",
+                "Mass_Reconfiguring_Protective_VM",
+                "Mass_Downloading_Files_Of_Critical_VM"
+            ]
+        },
+        "event_src.title = \"vsphere\" and not event_src.subsys": {
+            "Атаки методом перебора": [
+                "Subrule_SSHGuard",
+                "Probing_Auth_On_Various_Hosts",
+                "SSHGuard_Bruteforce",
+                "SSHGuard_Spraying"
+            ],
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора": [
+                "CAP_User_Creation",
+                "CAP_Group_Or_Role_Creation",
+                "CAP_User_Modified",
+                "CAP_User_Blocking_Or_Removing"
+            ],
+            "Универсальные правила. Подозрительные входы в ПО": [
+                "CAP_Default_Account_Logon"
+            ],
+            "Профилирование доступа к критически важным системам": [
+                "VCenter_Abnormal_Access"
+            ],
+            "VMware vSphere. Подозрительная активность пользователей": [
+                "Disabling_Protective_VM",
+                "Reconfiguring_Protective_VM",
+                "Downloading_Files_Of_Critical_VM",
+                "Mass_Disabling_Protective_VM",
+                "Mass_Reconfiguring_Protective_VM",
+                "Mass_Downloading_Files_Of_Critical_VM"
+            ]
+        }
     },
     "s VMware ESXi": {
-        "queries": [
-            {
-                "event_src.title": "esxi",
-                "action": "login",
-                "status": "success"
-            }
-        ],
-        "KB_packs": [
-            "Универсальные правила. Подозрительные входы в ПО"
-        ]
+        "event_src.title = \"esxi\" and action = \"login\" and status = \"success\"": {
+            "Атаки методом перебора": [
+                "Subrule_SSHGuard",
+                "Probing_Auth_On_Various_Hosts",
+                "SSHGuard_Bruteforce",
+                "SSHGuard_Spraying"
+            ],
+            "Универсальные правила. Подозрительные входы в ПО": [
+                "CAP_Default_Account_Logon"
+            ],
+            "Профилирование доступа к критически важным системам": [
+                "VCenter_Abnormal_Access"
+            ]
+        }
     },
     "s VMware Horizon": {
-        "queries": [
-            {
-                "event_src.title": "horizon"
-            }
-        ],
-        "KB_packs": [
-            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора"
-        ]
+        "event_src.title = \"horizon\"": {
+            "Атаки методом перебора": [
+                "Subrule_SSHGuard",
+                "SSHGuard_Bruteforce",
+                "SSHGuard_Spraying"
+            ],
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора": [
+                "CAP_Password_Spraying",
+                "CAP_Password_Brute"
+            ]
+        }
     },
     "sw AD DC": {
-        "queries": [
-            {
-                "event_src.subsys": "Security",
-                "msgid": [
-                    "4931",
-                    "4769"
-                ]
-            },
-            {
-                "event_src.subsys": "active_directory",
-                "msgid": [
-                    "4928",
-                    "4929",
-                    "5136",
-                    "5137"
-                ]
-            },
-            {
-                "event_src.subsys": "directory service",
-                "msgid": [
-                    "1644",
-                    "2946"
-                ]
-            }
-        ],
-        "KB_packs": [
-            "ATT&CK: «Получение учетных данных»",
-            "Microsoft Endpoint Configuration Manager",
-            "Атаки при помощи специализированного ПО",
-            "Эксплуатация уязвимостей",
-            "Active Directory Certificate Services",
-            "Active Directory",
-            "ATT&CK: «Выполнение»",
-            "ATT&CK: «Изучение»"
-        ]
+        "event_src.subsys = \"security\" and msgid = \"4931\"": {},
+        "event_src.subsys = \"security\" and msgid = \"4769\"": {
+            "Active Directory": [
+                "BadSuccessor_Attack",
+                "TGS_Request_By_Non_Existent_User",
+                "Abuse_Kerberos_RC4",
+                "Subrule_Tickets_Requested",
+                "Kerberoasting"
+            ],
+            "ATT&CK: «Получение учетных данных»": [
+                "Sessions_Hijacked"
+            ]
+        },
+        "event_src.subsys = \"security\" and msgid = \"4928\"": {
+            "Active Directory": [
+                "Replication_To_Unauthorized_DRA"
+            ]
+        },
+        "event_src.subsys = \"security\" and msgid = \"4929\"": {
+            "Active Directory": [
+                "Replication_To_Unauthorized_DRA"
+            ]
+        },
+        "event_src.subsys = \"security\" and msgid = \"5136\"": {
+            "Active Directory": [
+                "Remote_Actions_With_Domain_Objects",
+                "SIDHistory_Modification_Attack",
+                "Subrule_BadSuccessor_Attack",
+                "Computer_Delegation_Configured",
+                "Subrule_MSA_Account_Created",
+                "GPO_Created_Or_Modified",
+                "PowerViewPy_RBCD_Attack",
+                "ShadowCred_Used",
+                "DCSync_Privileges_Given",
+                "BadSuccessor_Attack",
+                "AdminSDHolder_Modification_Attack",
+                "Machine_Account_Quota_Changes",
+                "GPO_Manipulation"
+            ],
+            "Active Directory Certificate Services": [
+                "ADCS_Certificate_Template_Disable_SID_Publication",
+                "Cert_Request_After_Account_Edit",
+                "ADCS_Create_Vulnerable_Certificate_Template",
+                "Cert_Explicit_Mapping_Reference_Adding",
+                "Cert_Subject_Name_Different_From_UPN"
+            ],
+            "Microsoft Exchange Server": [
+                "Exchange_Illegal_Distribution_Group_Modify"
+            ],
+            "ATT&CK: «Организация управления»": [
+                "CC_Channel_Through_AD"
+            ],
+            "ATT&CK: «Закрепление»": [
+                "ScriptPath_Attribute_Changed",
+                "Machine_Account_Attribute_Manipulation",
+                "KRBTGT_Delegation"
+            ],
+            "ATT&CK: «Повышение привилегий»": [
+                "Changing_UAC_Flags"
+            ],
+            "Эксплуатация уязвимостей": [
+                "Windows_Roaming_Credential_Used",
+                "Certified_Priv_Esc_CVE_2022_26923"
+            ]
+        },
+        "event_src.subsys = \"security\" and msgid = \"5137\"": {
+            "Active Directory": [
+                "GPO_Created_Or_Modified"
+            ],
+            "Active Directory Certificate Services": [
+                "ADCS_Create_Vulnerable_Certificate_Template"
+            ]
+        },
+        "event_src.subsys = \"directory service\" and msgid = \"1644\"": {
+            "Active Directory": [
+                "LDAP_Discovery",
+                "Subrule_PowerView_Objects_Actions",
+                "Machine_Account_Quota_Access",
+                "DACL_Resolver_Aced",
+                "ActiveDirectory_Data_Collection",
+                "Subrule_MSA_LDAP_Query",
+                "Kerberoasting",
+                "PowerViewPy_RBCD_Attack",
+                "Asreproasting",
+                "ShadowCred_Used",
+                "Machine_Account_Quota_Changes",
+                "Active_Directory_Snapshot",
+                "Remote_Actions_With_Domain_Objects",
+                "KDS_Root_Key_Access",
+                "MSA_Password_Access"
+            ],
+            "Active Directory Certificate Services": [
+                "ADCS_Recon"
+            ],
+            "Атаки методом перебора": [
+                "Windows_Machine_Account_Password_Spraying",
+                "Possible_Pre2k_Machine_Account_Pasword_Guessing"
+            ],
+            "Атаки с помощью специализированного ПО": [
+                "NetExec_Usage_LDAP",
+                "ShadowHound_LDAP_Requests",
+                "SharpHound_LDAP_Requests",
+                "SharpHound_Session",
+                "SilentHound_AD_Enumeration"
+            ],
+            "Microsoft Endpoint Configuration Manager": [
+                "MECM_Discovery_Via_LDAP"
+            ],
+            "ATT&CK: «Получение учетных данных»": [
+                "DRSUAPI_User_Enumeration",
+                "LAPS_Passwords_Access"
+            ],
+            "ATT&CK: «Изучение»": [
+                "Ldapdomaindump_Queries",
+                "Delegated_Accounts_Recon",
+                "LAPS_Enumeration",
+                "Shares_Discovery",
+                "PowerView_Recon",
+                "User_Object_Ldap_Request",
+                "Whoami_Alternative",
+                "Dump_Bitlocker_Keys_From_AD",
+                "Domain_Dump_Tools_Via_LDAP",
+                "Computer_Object_Ldap_Request",
+                "SPN_LDAP_Requests",
+                "ADIDNS_Dump",
+                "Windows_Mass_Recon"
+            ],
+            "ATT&CK: «Выполнение»": [
+                "PowerViewPy_Init_Connection"
+            ],
+            "Эксплуатация уязвимостей": [
+                "CVE_2025_33073_SMB_Client_Elevation",
+                "Windows_Roaming_Credential_Used"
+            ]
+        },
+        "event_src.subsys = \"directory service\" and msgid = \"2946\"": {
+            "Active Directory": [
+                "MSA_Account_Obtain_Ticket",
+                "Subrule_MSA_LDAP_Query",
+                "KDS_Root_Key_Access",
+                "MSA_Password_Access"
+            ]
+        }
     },
     "sw AD CS": {
-        "queries": [
-            {
-                "event_src.subsys": "certification_authority",
-                "msgid": [
-                    "4871",
-                    "4872",
-                    "4887",
-                    "4888",
-                    "4889",
-                    "4898"
-                ]
-            }
-        ],
-        "KB_packs": []
+        "event_src.title = \"certification_authority\" and msgid = \"4871\"": {
+            "Active Directory Certificate Services": [
+                "ADCS_CRL_Abusing"
+            ]
+        },
+        "event_src.title = \"certification_authority\" and msgid = \"4872\"": {
+            "Active Directory Certificate Services": [
+                "ADCS_CRL_Abusing"
+            ]
+        },
+        "event_src.title = \"certification_authority\" and msgid = \"4887\"": {
+            "Active Directory Certificate Services": [
+                "Cert_Request_After_Account_Edit",
+                "Cert_Allowed_Alt_SAN",
+                "Cert_Request_And_Approved_With_Alt_SAN",
+                "Cert_Subject_Name_Different_From_UPN",
+                "Cert_Compromise_Via_NTLM_Relay",
+                "Cert_Application_Policy_Abuse",
+                "Bulk_Certs_Allowed_To_One_User",
+                "Enrollment_Agent_Cert_For_Low_Privilege_Groups",
+                "ADCSync_Attack"
+            ]
+        },
+        "event_src.title = \"certification_authority\" and msgid = \"4888\"": {
+            "Active Directory Certificate Services": [
+                "Cert_Request_After_Account_Edit",
+                "Cert_Subject_Name_Different_From_UPN"
+            ]
+        },
+        "event_src.title = \"certification_authority\" and msgid = \"4889\"": {},
+        "event_src.title = \"certification_authority\" and msgid = \"4898\"": {
+            "Active Directory Certificate Services": [
+                "ADCS_Certificate_Template_Disable_SID_Publication",
+                "Cert_Allowed_Alt_SAN",
+                "Cert_Application_Policy_Abuse",
+                "Enrollment_Agent_Cert_For_Low_Privilege_Groups",
+                "ADCSync_Attack"
+            ]
+        }
     },
     "sw AD WS": {
-        "queries": [
-            {
-                "event_src.subsys": "active directory web services",
-                "msgid": [
-                    "1",
-                    "5"
-                ]
-            }
-        ],
-        "KB_packs": []
+        "event_src.subsys = \"active directory web services\" and msgid = \"1\"": {},
+        "event_src.subsys = \"active directory web services\" and msgid = \"5\"": {}
     },
     "sw AD FS": {
-        "queries": [
-            {
-                "event_src.subsys": "ad fs",
-                "msgid": [
-                    "1200",
-                    "1201"
-                ]
-            }
-        ],
-        "KB_packs": [
-            "Атаки методом перебора"
-        ]
+        "event_src.subsys = \"ad fs\" and msgid = \"1200\"": {
+            "Атаки методом перебора": [
+                "ADFS_Password_Spraying",
+                "ADFS_Password_Brute"
+            ],
+            "Профилирование доступа к критически важным системам": [
+                "ADFS_Abnormal_Access"
+            ]
+        },
+        "event_src.subsys = \"ad fs\" and msgid = \"1201\"": {
+            "Атаки методом перебора": [
+                "ADFS_Password_Spraying",
+                "ADFS_Password_Brute"
+            ],
+            "Профилирование доступа к критически важным системам": [
+                "ADFS_Abnormal_Access"
+            ]
+        }
     },
     "sw AD DNS": {
-        "queries": [
-            {
-                "event_src.subsys": "",
-                "msgid": [
-                    "6001",
-                    "6525"
-                ]
-            }
-        ],
-        "KB_packs": []
+        "event_src.subsys = \"\" and msgid = \"6001\"": {},
+        "event_src.subsys = \"\" and msgid = \"6525\"": {}
     },
     "sw AD mecm": {
-        "queries": [
-            {
-                "event_src.title": "mecm"
-            }
-        ],
-        "KB_packs": [
-            "Microsoft Endpoint Configuration Manager"
-        ]
+        "event_src.title = \"mecm\"": {
+            "Microsoft Endpoint Configuration Manager": [
+                "MECM_Change_Configuration",
+                "MECM_Create_New_Roles",
+                "MECM_Run_Script",
+                "MECM_Privileges_Escalation_Via_Role",
+                "MECM_Deploy_Application",
+                "MECM_Created_Modified_Scripts",
+                "MECM_Deploy_Program",
+                "MECM_Created_Modified_Program",
+                "MECM_Remove_Accounts",
+                "MECM_Distribute_Content",
+                "MECM_ConfigurationItem",
+                "MECM_Not_Allowed_Operation_With_Roles",
+                "MECM_Created_Modified_Package",
+                "MECM_Client"
+            ],
+            "Профилирование доступа к критически важным системам": [
+                "MECM_Abnormal_Access"
+            ]
+        }
     },
     "sw AD exchange": {
-        "queries": [
-            {
-                "event_src.title": "exchange",
-                "event_src.subsys": [
-                    "application",
-                    "msexchange management",
-                    "anti-spam"
-                ]
-            }
-        ],
-        "KB_packs": [
-            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
-            "Вредоносное ПО и нежелательные рассылки",
-            "Microsoft Exchange Server"
-        ]
+        "event_src.title = \"exchange\" and event_src.subsys = \"application\"": {
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора": [
+                "CAP_Password_Spraying"
+            ]
+        },
+        "event_src.title = \"exchange\" and event_src.subsys = \"msexchange management\"": {
+            "Microsoft Exchange Server": [
+                "Exchange_Distribution_Group_Member_Added",
+                "Exchange_Admin_Role_Actions",
+                "Exchange_Mass_Deletion_Of_Mailboxes",
+                "Exchange_Mass_Deletion_Of_Groups",
+                "Exchange_Critical_Group_Manipulate",
+                "Exchange_Role_Assignment_Policy_Actions",
+                "Exchange_Owa_Policy_Actions",
+                "Exchange_Transport_Rule_Actions",
+                "Exchange_Remove_Federation_Trust",
+                "Exchange_Remove_Dismount_Mailbox_Database",
+                "Exchange_PST_upload_via_Administrator",
+                "Exchange_Remove_MalwareFilter_Policy",
+                "Exchange_Journal_Rule_Actions"
+            ]
+        },
+        "event_src.title = \"exchange\" and event_src.subsys = \"anti-spam\"": {
+            "Вредоносное ПО и нежелательные рассылки": [
+                "Subrule_Sandbox_Mail_IP",
+                "Subrule_Sandbox_Mail_Attachment",
+                "Sandbox_Different_Sender_Info",
+                "Sandbox_Full_Scan_Malware",
+                "Sandbox_Spam_Attack_By_Attachment",
+                "Sandbox_Spam_Attack_By_Source",
+                "Sandbox_Spam_Attack_By_Title"
+            ],
+            "Безопасность удаленной работы": [
+                "Possible_Mail_Spoofing_Attack"
+            ]
+        }
     },
     "sw sharepoint": {
-        "queries": [
-            {
-                "event_src.title": "sharepoint"
-            }
-        ],
-        "KB_packs": [
-            "Эксплуатация уязвимостей",
-            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
-            "Microsoft SharePoint Server. Подозрительная активность"
-        ]
+        "event_src.title = \"sharepoint\"": {
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора": [
+                "CAP_Password_Spraying"
+            ],
+            "Microsoft SharePoint Server. Подозрительная активность": [
+                "Sharepoint_Significant_Feature_Manipulation",
+                "Sharepoint_Grant_User_Access",
+                "Sharepoint_Critical_Data_Manipulation",
+                "Sharepoint_Part_Logging_Exclude"
+            ],
+            "Эксплуатация уязвимостей": [
+                "Sharepoint_Remote_Code_Execution"
+            ]
+        }
     },
     "sw nps": {
-        "queries": [
-            {
-                "event_src.title": "nps"
-            }
-        ],
-        "KB_packs": [
-            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
-            "Универсальные правила. Подозрительные входы в ПО"
-        ]
+        "event_src.title = \"nps\"": {
+            "Атаки методом перебора": [
+                "Subrule_SSHGuard",
+                "SSHGuard_Bruteforce",
+                "SSHGuard_Spraying"
+            ],
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора": [
+                "CAP_Password_Spraying",
+                "CAP_Password_Brute",
+                "CAP_User_Blocking_Or_Removing"
+            ],
+            "Универсальные правила. Подозрительные входы в ПО": [
+                "CAP_Default_Account_Logon"
+            ],
+            "Профилирование доступа к критически важным системам": [
+                "Wifi_Abnormal_Access"
+            ]
+        }
     },
     "sw mssql": {
-        "queries": [
-            {
-                "event_src.title": "sql_server"
-            }
-        ],
-        "KB_packs": [
-            "ATT&CK: «Перемещение внутри периметра»",
-            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
-            "ATT&CK: «Получение учетных данных»",
-            "Microsoft SQL Server",
-            "Универсальные правила. Подозрительные входы в ПО"
-        ]
+        "event_src.title = \"sql_server\"": {
+            "Атаки методом перебора": [
+                "Subrule_SSHGuard",
+                "MSSQL_Password_Brute",
+                "SSHGuard_Bruteforce",
+                "SSHGuard_Spraying"
+            ],
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора": [
+                "CAP_User_Creation",
+                "CAP_User_Modified",
+                "CAP_User_Blocking_Or_Removing"
+            ],
+            "Универсальные правила. Подозрительные входы в ПО": [
+                "CAP_Default_Account_Logon"
+            ],
+            "ATT&CK: «Получение учетных данных»": [
+                "Veeam_Credential_Recovery_Script"
+            ],
+            "ATT&CK: «Перемещение внутри периметра»": [
+                "Subrule_MSSQL_NTLM_Relay",
+                "MSSQL_NTLM_Relay"
+            ],
+            "Microsoft SQL Server": [
+                "MSSQL_Windows_Service_Discovery",
+                "MSSQL_Dump_Credential_Hashes",
+                "MSSQL_Self_Permissions_Discovery",
+                "MSSQL_Administrator_List_Query",
+                "MSSQL_Dedicated_Administrator_Connection",
+                "MSSQL_Backup_Location_Discovery",
+                "MSSQL_Enable_Nonsecure_Parameter",
+                "MSSQL_Enable_Remote_Admin_Connection",
+                "MSSQL_Read_Registry_Value",
+                "MSSQL_Encryption_Configuration_Discovery",
+                "MSSQL_Version_Detect",
+                "MSSQL_Send_Query_Results",
+                "MSSQL_Audit_Configuration_Discovery",
+                "MSSQL_Login_Configuration_Change",
+                "MSSQL_Pattern_Search_Usage",
+                "MSSQL_Db_Accounts_Discovery",
+                "MSSQL_Enable_Remote_Access",
+                "MSSQL_File_System_Discovery",
+                "MSSQL_Write_Registry_Value",
+                "MSSQL_Windows_Service_Control",
+                "MSSQL_Audit_Configuration_Change",
+                "MSSQL_Windows_Accounts_Discovery",
+                "MSSQL_Dump_Key_Or_Certificate",
+                "MSSQL_Dump_Database",
+                "MSSQL_Enable_Nonsecure_Property",
+                "MSSQL_Policy_Check_Off",
+                "MSSQL_Administrator_Role_Manipulation",
+                "MSSQL_Create_File_In_System",
+                "MSSQL_Sql_Server_Users_Discovery",
+                "MSSQL_Enable_Mixed_Authentication",
+                "MSSQL_System_Command_Usage"
+            ],
+            "Профилирование доступа к критически важным системам": [
+                "MSSQL_Abnormal_Access"
+            ]
+        }
     },
     "sw rds": {
-        "queries": [
-            {
-                "event_src.title": "windows",
-                "event_src.subsys": [
-                    "microsoft-windows-terminalservices-remoteconnectionmanager/operational",
-                    "microsoft-windows-terminalservices-localsessionmanager/operational"
-                ]
-            }
-        ],
-        "KB_packs": [
-            "ATT&CK: «Организация управления»",
-            "ATT&CK: «Сбор данных»"
-        ]
+        "event_src.title = \"windows\" and event_src.subsys = \"microsoft-windows-terminalservices-remoteconnectionmanager/operational\"": {
+            "ATT&CK: «Сбор данных»": [
+                "RDP_Shadow_Session"
+            ],
+            "Безопасность удаленной работы": [
+                "RDP_Tunneling"
+            ]
+        },
+        "event_src.title = \"windows\" and event_src.subsys = \"microsoft-windows-terminalservices-localsessionmanager/operational\"": {
+            "Атаки методом перебора": [
+                "Probing_Auth_On_Various_Hosts"
+            ],
+            "ATT&CK: «Организация управления»": [
+                "Microsoft_Devtunnel_Usage"
+            ]
+        }
     },
     "sw rdg": {
-        "queries": [
-            {
-                "event_src.title": "windows",
-                "event_src.subsys": [
-                    "microsoft-windows-terminalservices-gateway/operational"
-                ]
-            }
-        ],
-        "KB_packs": [
-            "Безопасность удаленной работы"
-        ]
+        "event_src.title = \"windows\" and event_src.subsys = \"microsoft-windows-terminalservices-gateway/operational\"": {
+            "Безопасность удаленной работы": [
+                "Duplicate_Remote_Session",
+                "RDG_Abnormal_Access",
+                "Remote_Login_From_Not_Allowed_Country",
+                "RDP_Connect_After_RDG"
+            ]
+        }
     },
     "sw iis": {
-        "queries": [
-            {
-                "event_src.title": "internet_information_services"
-            }
-        ],
-        "KB_packs": [
-            "PT Application Firewall",
-            "Эксплуатация уязвимостей",
-            "ATT&CK: «Изучение»",
-            "ATT&CK: «Первоначальный доступ»",
-            "Аномальная активность веб-серверов",
-            "ATT&CK: «Выполнение»",
-            "Атаки при помощи специализированного ПО",
-            "Microsoft Exchange Server"
-        ]
+        "event_src.title = \"internet_information_services\"": {
+            "Атаки методом перебора": [
+                "LyncSmash_Use",
+                "Exchange_Password_Brute",
+                "IIS_Password_Spraying",
+                "Exchange_Password_Spraying"
+            ],
+            "Атаки с помощью специализированного ПО": [
+                "Ruler_Usage"
+            ],
+            "Microsoft Exchange Server": [
+                "Exchange_Get_Global_Address_List",
+                "Exchange_RPC_over_HTTPv2",
+                "Exchange_ActiveSync_Emails_Access_via_PEAS",
+                "Exchange_NTLM_Scan"
+            ],
+            "ATT&CK: «Изучение»": [
+                "Users_Discovery_Via_Skype"
+            ],
+            "ATT&CK: «Выполнение»": [
+                "Suspicious_Webscript"
+            ],
+            "ATT&CK: «Первоначальный доступ»": [
+                "Service_Account_Mail_Auth"
+            ],
+            "Профилирование доступа к критически важным системам": [
+                "Owa_Abnormal_Access"
+            ],
+            "PT Application Firewall": [
+                "PTAF_Old_Or_Unknown_HTTP_Version"
+            ],
+            "Безопасность удаленной работы": [
+                "Mail_Abnormal_Access"
+            ],
+            "Эксплуатация уязвимостей": [
+                "CVE_2025_53770_SharePoint_Unauthenticated_RCE"
+            ],
+            "Аномальная активность веб-серверов": [
+                "Web_Bulk_Failed_URL_Access",
+                "Web_Request_Missing_Useragent",
+                "Web_Automation_Tool"
+            ]
+        }
     },
     "sa symantec": {
-        "queries": [
-            {
-                "event_src.vendor": "symantec",
-                "event_src.title": "endpoint_protection_manager"
-            }
-        ],
-        "KB_packs": [
-            "Универсальные правила. Тактика «Деструктивное воздействие»",
-            "Вредоносное ПО и нежелательные рассылки"
-        ]
+        "event_src.vendor = \"symantec\" and event_src.title = \"endpoint_protection_manager\"": {
+            "Вредоносное ПО и нежелательные рассылки": [
+                "Malware_Not_Remediated",
+                "Mass_Infection",
+                "Malware_Remediated"
+            ],
+            "Универсальные правила. Тактика «Деструктивное воздействие»": [
+                "CAP_Stop_Application_Or_System"
+            ]
+        }
     },
     "sa kes": {
-        "queries": [
-            {
-                "event_src.subsys": "kaspersky endpoint security",
-                "event_src.title": "endpoint_security"
-            }
-        ],
-        "KB_packs": [
-            "Универсальные правила. Запросы к подозрительным или вредоносным ресурсам",
-            "Вредоносное ПО и нежелательные рассылки",
-            "Универсальные правила. Отключение и обход защитных механизмов",
-            "Продукты «Лаборатория Касперского». Выявление вредоносной активности"
-        ]
+        "event_src.subsys = \"kaspersky endpoint security\" and event_src.title = \"endpoint_security\"": {
+            "Вредоносное ПО и нежелательные рассылки": [
+                "Kaspersky_Disabled_On_Critical_Host",
+                "Mass_Infection",
+                "Malware_Remediated",
+                "Malware_Not_Remediated",
+                "Malicious_URL_Detected"
+            ],
+            "Универсальные правила. Отключение и обход защитных механизмов": [
+                "CAP_Disabling_Protective_Mechanisms"
+            ],
+            "Универсальные правила. Запросы к подозрительным или вредоносным ресурсам": [
+                "CAP_Attack_Detected"
+            ],
+            "Продукты «Лаборатория Касперского»": [
+                "Kaspersky_Endpoint_Disable",
+                "Kaspersky_Application_Deny",
+                "Kaspersky_Endpoint_Policy_Modification"
+            ],
+            "ATT&CK: «Изучение»": [
+                "Port_Scan_From_Localnet_To_Single_Host",
+                "Port_Scan_From_Localnet_To_Different_Hosts"
+            ]
+        }
     },
     "sa PT EDR": {
-        "queries": [
-            {
-                "event_src.title": "xdr",
-                "msgid": [
-                    "rule_engine",
-                    "yara_scanner"
-                ]
-            }
-        ],
-        "KB_packs": []
+        "event_src.title = \"xdr\" and msgid = \"rule_engine\"": {},
+        "event_src.title = \"xdr\" and msgid = \"yara_scanner\"": {}
     },
     "sa eset": {
-        "queries": [
-            {
-                "event_src.title": "eset_security_management_center"
-            }
-        ],
-        "KB_packs": [
-            "Универсальные правила. Запросы к подозрительным или вредоносным ресурсам",
-            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
-            "Вредоносное ПО и нежелательные рассылки"
-        ]
+        "event_src.title = \"eset_security_management_center\"": {
+            "Вредоносное ПО и нежелательные рассылки": [
+                "Malware_Not_Remediated",
+                "Mass_Infection",
+                "Malware_Remediated"
+            ],
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора": [
+                "CAP_Password_Spraying"
+            ],
+            "Универсальные правила. Запросы к подозрительным или вредоносным ресурсам": [
+                "CAP_Attack_Detected"
+            ]
+        }
     },
     "sa drweb": {
-        "queries": [
-            {
-                "event_src.subsys": "control center",
-                "event_src.title": "security_suite"
-            }
-        ],
-        "KB_packs": [
-            "Dr.Web Enterprise Security Suite. Подозрительная активность",
-            "Универсальные правила. Подозрительные входы в ПО",
-            "Универсальные правила. Отключение и обход защитных механизмов"
-        ]
+        "event_src.subsys = \"control center\" and event_src.title = \"security_suite\"": {
+            "Атаки методом перебора": [
+                "DrWeb_Password_Brute",
+                "Subrule_SSHGuard",
+                "SSHGuard_Bruteforce",
+                "SSHGuard_Spraying"
+            ],
+            "Универсальные правила. Отключение и обход защитных механизмов": [
+                "CAP_Disabling_Protective_Mechanisms"
+            ],
+            "Универсальные правила. Подозрительные входы в ПО": [
+                "CAP_Default_Account_Logon"
+            ],
+            "Dr.Web Enterprise Security Suite. Подозрительная активность": [
+                "DrWeb_Endpoint_Disable",
+                "DrWeb_Endpoint_Policy_Modification",
+                "DrWeb_Admin_Account_Modify",
+                "DrWeb_Installation_Package_Modification"
+            ],
+            "Профилирование доступа к критически важным системам": [
+                "Application_Abnormal_Access"
+            ]
+        }
     },
     "sa vipnet ids hs": {
-        "queries": [
-            {
-                "event_src.title": "vipnet_ids_hs"
-            }
-        ],
-        "KB_packs": [
-            "Универсальные правила. Запросы к подозрительным или вредоносным ресурсам",
-            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
-            "Атаки методом перебора"
-        ]
+        "event_src.title = \"vipnet_ids_hs\"": {
+            "Атаки методом перебора": [
+                "Subrule_SSHGuard",
+                "SSHGuard_Bruteforce",
+                "SSHGuard_Spraying"
+            ],
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора": [
+                "CAP_User_Creation",
+                "CAP_Password_Spraying",
+                "CAP_Password_Brute",
+                "CAP_User_Blocking_Or_Removing"
+            ],
+            "Универсальные правила. Запросы к подозрительным или вредоносным ресурсам": [
+                "CAP_Attack_Detected"
+            ],
+            "Профилирование доступа к критически важным системам": [
+                "Application_Abnormal_Access"
+            ]
+        }
     },
     "sa infowatch personal-monitor": {
-        "queries": [
-            {
-                "event_src.title": "personal_monitor"
-            }
-        ],
-        "KB_packs": [
-            "Универсальные правила. Запросы к подозрительным или вредоносным ресурсам",
-            "ATT&CK: «Предотвращение обнаружения»",
-            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора"
-        ]
+        "event_src.title = \"personal_monitor\"": {
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора": [
+                "CAP_Password_Spraying"
+            ],
+            "Универсальные правила. Запросы к подозрительным или вредоносным ресурсам": [
+                "CAP_Attack_Detected"
+            ],
+            "ATT&CK: «Предотвращение обнаружения»": [
+                "Sysmon_Blinding"
+            ]
+        }
     },
     "s netiq": {
-        "queries": [
-            {
-                "event_src.vendor": "netiq",
-                "event_src.title": "advanced_authentication",
-                "msgid": [
-                    "101",
-                    "102",
-                    "105"
-                ]
-            }
-        ],
-        "KB_packs": [
-            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
-            "Универсальные правила. Подозрительные входы в ПО"
-        ]
+        "event_src.vendor = \"netiq\" and event_src.title = \"advanced_authentication\" and msgid = \"101\"": {
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора": [
+                "CAP_Password_Spraying",
+                "CAP_Password_Brute"
+            ],
+            "Универсальные правила. Подозрительные входы в ПО": [
+                "CAP_Default_Account_Logon"
+            ],
+            "Профилирование доступа к критически важным системам": [
+                "Application_Abnormal_Access"
+            ]
+        },
+        "event_src.vendor = \"netiq\" and event_src.title = \"advanced_authentication\" and msgid = \"102\"": {
+            "Атаки методом перебора": [
+                "Subrule_SSHGuard",
+                "SSHGuard_Bruteforce",
+                "SSHGuard_Spraying"
+            ],
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора": [
+                "CAP_Password_Spraying",
+                "CAP_Password_Brute"
+            ]
+        },
+        "event_src.vendor = \"netiq\" and event_src.title = \"advanced_authentication\" and msgid = \"105\"": {
+            "Атаки методом перебора": [
+                "Subrule_SSHGuard",
+                "SSHGuard_Bruteforce",
+                "SSHGuard_Spraying"
+            ],
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора": [
+                "CAP_Password_Spraying",
+                "CAP_Password_Brute"
+            ]
+        }
     },
     "s netapp": {
-        "queries": [
-            {
-                "event_src.vendor": "netapp",
-                "event_src.title": "aff"
-            }
-        ],
-        "KB_packs": [
-            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора"
-        ]
+        "event_src.vendor = \"netapp\" and event_src.title = \"aff\"": {
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора": [
+                "CAP_Password_Spraying",
+                "CAP_Password_Brute"
+            ]
+        }
     },
     "s arti": {
-        "queries": [
-            {
-                "event_src.title": "artifactory"
-            }
-        ],
-        "KB_packs": [
-            "Аномалии в цепочках поставок",
-            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
-            "Универсальные правила. Подозрительные входы в ПО"
-        ]
+        "event_src.title = \"artifactory\"": {
+            "Атаки методом перебора": [
+                "Artifactory_Password_Brute",
+                "Probing_Auth_On_Various_Hosts",
+                "Subrule_SSHGuard",
+                "Artifactory_Password_Spraying",
+                "SSHGuard_Bruteforce",
+                "SSHGuard_Spraying"
+            ],
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора": [
+                "CAP_Group_Or_Role_Creation",
+                "CAP_User_Modified",
+                "CAP_User_Blocking_Or_Removing",
+                "CAP_User_Creation",
+                "CAP_Group_Or_Role_Removing"
+            ],
+            "Универсальные правила. Подозрительные входы в ПО": [
+                "CAP_Default_Account_Logon"
+            ],
+            "Аномалии в цепочках поставок": [
+                "SupplyChain_Default_Account_Logon",
+                "SupplyChain_Dependency_Confusion",
+                "SupplyChain_File_Upload_To_Important_Repository"
+            ]
+        }
     },
     "s vsp aria": {
-        "queries": [
-            {
-                "event_src.title": "aria_operations_for_logs"
-            }
-        ],
-        "KB_packs": [
-            "VMware Aria. Подозрительная активность"
-        ]
+        "event_src.title = \"aria_operations_for_logs\"": {
+            "Атаки методом перебора": [
+                "AOFL_Password_Bruteforce",
+                "AOFL_Password_Spraying"
+            ],
+            "VMware Aria. Подозрительная активность": [
+                "AOFL_Data_Partition_Remove",
+                "AOFL_Role_Manage",
+                "AOFL_Massive_Alerts_Remove",
+                "AOFL_User_Manage",
+                "AOFL_Massive_Change_Agent_Groups",
+                "AOFL_Cloud_Account_Added_Critical_Permission",
+                "AOFL_Added_New_Log_Filter",
+                "AOFL_Possible_Upgrade_Via_Malicious_Pak",
+                "AOFL_Change_Global_Agent_Config"
+            ]
+        }
     },
     "s es-prom bastion": {
-        "queries": [
-            {
-                "event_src.title": "bastion"
-            }
-        ],
-        "KB_packs": [
-            "ATT&CK: «Предотвращение обнаружения»"
-        ]
+        "event_src.title = \"bastion\"": {
+            "ATT&CK: «Предотвращение обнаружения»": [
+                "Sysmon_Blinding"
+            ]
+        }
     },
     "s clickhouse": {
-        "queries": [
-            {
-                "event_src.title": "clickhouse"
-            }
-        ],
-        "KB_packs": [
-            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
-            "Универсальные правила. Запросы к подозрительным или вредоносным ресурсам",
-            "ClickHouse"
-        ]
+        "event_src.title = \"clickhouse\"": {
+            "Атаки методом перебора": [
+                "Subrule_SSHGuard",
+                "SSHGuard_Bruteforce",
+                "SSHGuard_Spraying"
+            ],
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора": [
+                "CAP_User_Rights_Revoked",
+                "CAP_Password_Spraying",
+                "CAP_User_Rights_Granted",
+                "CAP_Password_Brute"
+            ],
+            "ClickHouse": [
+                "ClickHouse_Modify_Password_To_Plaintext",
+                "ClickHouse_Disable_User_Password",
+                "ClickHouse_Account_Discovery",
+                "ClickHouse_Data_Manipulation",
+                "ClickHouse_Grant_All_Roles",
+                "ClickHouse_Backup",
+                "ClickHouse_Logon_Same_User_From_Different_Hosts",
+                "ClickHouse_Audit_Table_Modified",
+                "ClickHouse_Users_Privileges_Discovery",
+                "ClickHouse_Outfile_Query",
+                "ClickHouse_Create_User_Without_Password",
+                "ClickHouse_DBMS_Version_Discovery",
+                "ClickHouse_System_Info_Discovery",
+                "ClickHouse_Drop_Multiple_Tables",
+                "ClickHouse_Logon_Same_Host_Different_Users",
+                "ClickHouse_Create_User_With_Plaintext_Password",
+                "ClickHouse_Users_Directory_Discovery",
+                "ClickHouse_Drop_Database",
+                "ClickHouse_Pattern_Search",
+                "ClickHouse_Backup_Directory_Discovery",
+                "ClickHouse_Config_Applied"
+            ],
+            "Универсальные правила. Запросы к подозрительным или вредоносным ресурсам": [
+                "CAP_Activity_From_Known_Malicious_Hostname"
+            ],
+            "Профилирование доступа к критически важным системам": [
+                "Application_Abnormal_Access"
+            ]
+        }
     },
     "s cyberark": {
-        "queries": [
-            {
-                "event_src.title": "enterprise_password_vault"
-            }
-        ],
-        "KB_packs": [
-            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
-            "Универсальные правила. Подозрительные входы в ПО",
-            "Универсальные правила. Отключение и обход защитных механизмов"
-        ]
+        "event_src.title = \"enterprise_password_vault\"": {
+            "Атаки методом перебора": [
+                "Subrule_SSHGuard",
+                "SSHGuard_Bruteforce",
+                "SSHGuard_Spraying"
+            ],
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора": [
+                "CAP_Password_Spraying",
+                "CAP_Password_Brute",
+                "CAP_User_Blocking_Or_Removing"
+            ],
+            "Универсальные правила. Подозрительные входы в ПО": [
+                "CAP_Default_Account_Logon"
+            ],
+            "Универсальные правила. Отключение и обход защитных механизмов": [
+                "CAP_Clear_Or_Deletion_Logs"
+            ],
+            "Профилирование доступа к критически важным системам": [
+                "Application_Abnormal_Access"
+            ]
+        }
     },
     "s ksc": {
-        "queries": [
-            {
-                "event_src.title": "security_center"
-            }
-        ],
-        "KB_packs": [
-            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
-            "Универсальные правила. Запросы к подозрительным или вредоносным ресурсам",
-            "Вредоносное ПО и нежелательные рассылки",
-            "Универсальные правила. Подозрительные входы в ПО",
-            "Универсальные правила. Отключение и обход защитных механизмов",
-            "Продукты «Лаборатория Касперского». Выявление вредоносной активности"
-        ]
+        "event_src.title = \"security_center\"": {
+            "Вредоносное ПО и нежелательные рассылки": [
+                "Kaspersky_Disabled_On_Critical_Host",
+                "Mass_Infection",
+                "Malware_Remediated",
+                "Malware_Not_Remediated",
+                "Malicious_URL_Detected",
+                "KSCL_Add_Main_Administrator"
+            ],
+            "Атаки методом перебора": [
+                "Subrule_SSHGuard",
+                "SSHGuard_Bruteforce",
+                "SSHGuard_Spraying"
+            ],
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора": [
+                "CAP_Password_Spraying",
+                "CAP_Password_Brute"
+            ],
+            "Универсальные правила. Подозрительные входы в ПО": [
+                "CAP_Default_Account_Logon"
+            ],
+            "Универсальные правила. Отключение и обход защитных механизмов": [
+                "CAP_Disabling_Protective_Mechanisms"
+            ],
+            "Универсальные правила. Запросы к подозрительным или вредоносным ресурсам": [
+                "CAP_Attack_Detected"
+            ],
+            "Продукты «Лаборатория Касперского»": [
+                "Kaspersky_Installation_Package_Modification",
+                "Kaspersky_Modify_Administration_Policy",
+                "Subrule_Kaspersky_Run_Task_Install_App",
+                "Kaspersky_Add_Role_To_User",
+                "Kaspersky_Enable_User",
+                "Kaspersky_Remove_AV_By_Task",
+                "Subrule_Kaspersky_Create_Package_And_Task",
+                "Kaspersky_Admgroup_Changed",
+                "Kaspersky_Install_Malicious_App"
+            ],
+            "Профилирование доступа к критически важным системам": [
+                "KSC_Console_Abnormal_Access"
+            ]
+        }
     },
     "s gitlab": {
-        "queries": [
-            {
-                "event_src.title": "gitlab",
-                "event_src.subsys": "security"
-            }
-        ],
-        "KB_packs": []
+        "event_src.title = \"gitlab\" and event_src.subsys = \"security\"": {}
     },
     "s katap": {
-        "queries": [
-            {
-                "event_src.title": "kaspersky_anti_targeted_attack_platform"
-            }
-        ],
-        "KB_packs": [
-            "Универсальные правила. Запросы к подозрительным или вредоносным ресурсам",
-            "Вредоносное ПО и нежелательные рассылки"
-        ]
+        "event_src.title = \"kaspersky_anti_targeted_attack_platform\"": {
+            "Вредоносное ПО и нежелательные рассылки": [
+                "Mass_Infection",
+                "Malware_Remediated",
+                "Malware_Not_Remediated",
+                "Malicious_URL_Detected",
+                "Spam_Mail_Detected"
+            ],
+            "Универсальные правила. Запросы к подозрительным или вредоносным ресурсам": [
+                "CAP_Attack_Detected"
+            ],
+            "Профилирование доступа к критически важным системам": [
+                "Application_Abnormal_Access"
+            ]
+        }
     },
     "s ksmg": {
-        "queries": [
-            {
-                "event_src.title": "kaspersky_anti_targeted_attack_platform"
-            }
-        ],
-        "KB_packs": [
-            "Универсальные правила. Запросы к подозрительным или вредоносным ресурсам",
-            "Вредоносное ПО и нежелательные рассылки"
-        ]
+        "event_src.title = \"kaspersky_anti_targeted_attack_platform\"": {
+            "Вредоносное ПО и нежелательные рассылки": [
+                "Mass_Infection",
+                "Malware_Remediated",
+                "Malware_Not_Remediated",
+                "Malicious_URL_Detected",
+                "Spam_Mail_Detected"
+            ],
+            "Универсальные правила. Запросы к подозрительным или вредоносным ресурсам": [
+                "CAP_Attack_Detected"
+            ],
+            "Профилирование доступа к критически важным системам": [
+                "Application_Abnormal_Access"
+            ]
+        }
     },
     "s kontinent": {
-        "queries": [
-            {
-                "event_src.title": "kontinent"
-            }
-        ],
-        "KB_packs": [
-            "АПКШ «Континент 4». Подозрительная активность",
-            "Универсальные правила. Тактика «Деструктивное воздействие»",
-            "Универсальные правила. Запросы к подозрительным или вредоносным ресурсам",
-            "Сетевые устройства. Подозрительная сетевая активность",
-            "Универсальные правила. Подозрительные входы в ПО",
-            "Универсальные правила. Отключение и обход защитных механизмов",
-            "ATT&CK: «Изучение»"
-        ]
+        "event_src.title = \"kontinent\"": {
+            "Атаки методом перебора": [
+                "Kontinent_Password_Spraying",
+                "Subrule_SSHGuard",
+                "Probing_Auth_On_Various_Hosts",
+                "Kontinent_Password_Brute",
+                "SSHGuard_Bruteforce",
+                "SSHGuard_Spraying"
+            ],
+            "Универсальные правила. Отключение и обход защитных механизмов": [
+                "CAP_Disabling_Protective_Mechanisms",
+                "CAP_Clear_Or_Deletion_Logs"
+            ],
+            "Универсальные правила. Тактика «Деструктивное воздействие»": [
+                "CAP_Stop_Application_Or_System"
+            ],
+            "Универсальные правила. Запросы к подозрительным или вредоносным ресурсам": [
+                "CAP_Attack_Detected"
+            ],
+            "Универсальные правила. Подозрительные входы в ПО": [
+                "CAP_Default_Account_Logon"
+            ],
+            "АПКШ «Континент 4». Подозрительная активность": [
+                "Kontinent_Security_Host_Shutdown",
+                "Kontinent_Account_Manipulation",
+                "Kontinent_Rules_Manipulation",
+                "Kontinent_Role_Manipulation"
+            ],
+            "ATT&CK: «Изучение»": [
+                "Port_Scan_From_Localnet_To_Single_Host",
+                "Port_Scan_From_Localnet_To_Different_Hosts"
+            ],
+            "Сетевые устройства. Подозрительная сетевая активность": [
+                "Untrusted_DNS_Server_Usage"
+            ],
+            "Профилирование доступа к критически важным системам": [
+                "Application_Abnormal_Access",
+                "Kontinent_Abnormal_Access"
+            ],
+            "Безопасность удаленной работы": [
+                "Duplicate_Remote_Session",
+                "VPN_Abnormal_Access",
+                "RDP_Connect_After_RDG"
+            ]
+        }
     },
     "s yandex_cloud": {
-        "queries": [
-            {
-                "event_src.title": "yandex_cloud"
-            }
-        ],
-        "KB_packs": [
-            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
-            "Yandex Cloud. Подозрительная активность"
-        ]
+        "event_src.title = \"yandex_cloud\"": {
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора": [
+                "CAP_Password_Spraying",
+                "CAP_Password_Brute"
+            ],
+            "Профилирование доступа к критически важным системам": [
+                "Application_Abnormal_Access"
+            ],
+            "Yandex Cloud. Подозрительная активность": [
+                "Yandex_Cloud_Bucket_Became_Public",
+                "Yandex_Cloud_LoadBalancer_Without_Security_Group_Creation",
+                "Yandex_Cloud_Service_Account_Suspicious_Activity",
+                "Yandex_Cloud_Virtual_Machine_Serial_Port_Enable",
+                "Yandex_Cloud_Virtual_Machine_With_Image_ID_From_Marketplace_Creation",
+                "Yandex_Cloud_Kubernetes_External_Address_Connection",
+                "Yandex_Cloud_Virtual_Machine_Suspicious_Service_Account_Assign",
+                "Yandex_Cloud_Virtual_Machine_AWS_Token_Enable",
+                "Yandex_Cloud_Access_Key_Manipulation",
+                "Yandex_Cloud_Admin_Role_Assign",
+                "Yandex_Cloud_Cluster_Admin_Role_Assign",
+                "Yandex_Cloud_Privileged_Accounts_Activity",
+                "Yandex_Cloud_Identity_Federation_Certificate_Creation",
+                "Yandex_Cloud_Kubernetes_Nodes_Potentially_Dangerous_Setting_Enable",
+                "Yandex_Cloud_Symmetric_Key_Removal",
+                "Yandex_Cloud_Virtual_Machine_Existing_Address_Assign",
+                "Yandex_Cloud_Gitlab_Instance_Creation",
+                "Yandex_Cloud_PostgreSQL_Cluster_Log_Statement_Disable",
+                "Yandex_Cloud_Virtual_Machine_Public_Address_Assign",
+                "Yandex_Cloud_Membership_Manage_Role_Assign",
+                "Yandex_Cloud_Symmetric_Key_Access_Manage",
+                "Yandex_Cloud_Virtual_Machine_Without_Security_Group_Creation",
+                "Yandex_Cloud_Cluster_User_Manage",
+                "Yandex_Cloud_Security_Group_Insecure_ACL_Assign",
+                "Yandex_Cloud_Cluster_Potentially_Dangerous_Setting_Enable",
+                "Yandex_Cloud_Virtual_Machine_Metadata_Contains_Sensitive_Value",
+                "Yandex_Cloud_Security_Group_Manipulation",
+                "Yandex_Cloud_Kubernetes_Cluster_Potentially_Dangerous_Setting_Enable",
+                "Yandex_Cloud_Bucket_Became_Public_Using_ACL",
+                "Yandex_Cloud_Bucket_Suspicious_Activity",
+                "Yandex_Cloud_Kubernetes_Cluster_Without_Security_Group_Creation",
+                "Yandex_Cloud_Cluster_Without_Security_Group_Creation",
+                "Yandex_Cloud_Public_Address_Without_DDoS_Protection_Creation",
+                "Yandex_Cloud_Virtual_Machine_Multiple_Addresses_Assign",
+                "Yandex_Cloud_Secret_Access_Manage",
+                "Yandex_Cloud_API_Suspicious_Access",
+                "Yandex_Cloud_Cluster_Creation_By_Not_Admin",
+                "Yandex_Cloud_Identity_Federation_Change"
+            ]
+        }
     },
     "s netbackup": {
-        "queries": [
-            {
-                "event_src.title": "netbackup"
-            }
-        ],
-        "KB_packs": [
-            "ATT&CK: «Предотвращение обнаружения»",
-            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора"
-        ]
+        "event_src.title = \"netbackup\"": {
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора": [
+                "CAP_Password_Spraying",
+                "CAP_Password_Brute"
+            ],
+            "ATT&CK: «Предотвращение обнаружения»": [
+                "Sysmon_Blinding"
+            ],
+            "Профилирование доступа к критически важным системам": [
+                "Application_Abnormal_Access"
+            ]
+        }
     },
     "s passwork": {
-        "queries": [
-            {
-                "event_src.title": "passwork"
-            }
-        ],
-        "KB_packs": [
-            "ATT&CK: «Получение учетных данных»",
-            "Универсальные правила. Подозрительные входы в ПО",
-            "«Пассворк». Подозрительная активность"
-        ]
+        "event_src.title = \"passwork\"": {
+            "Атаки методом перебора": [
+                "Subrule_SSHGuard",
+                "Passwork_Password_Brute",
+                "Passwork_Password_Spraying",
+                "SSHGuard_Bruteforce",
+                "SSHGuard_Spraying"
+            ],
+            "Универсальные правила. Подозрительные входы в ПО": [
+                "CAP_Default_Account_Logon"
+            ],
+            "ATT&CK: «Получение учетных данных»": [
+                "Passwork_Credential_Collection"
+            ],
+            "«Пассворк». Подозрительная активность": [
+                "Passwork_Logon_Same_User_from_Different_Terminals",
+                "Passwork_Logon_Different_Users_on_Same_Terminal",
+                "Passwork_Mass_Deletion_Of_Users",
+                "Passwork_Admin_Role_Assignment",
+                "Passwork_Mass_Deletion_Of_Resources",
+                "Passwork_Password_Export"
+            ],
+            "Профилирование доступа к критически важным системам": [
+                "Passwork_Abnormal_Access"
+            ]
+        }
     },
     "s teamcity": {
-        "queries": [
-            {
-                "event_src.title": "teamcity"
-            }
-        ],
-        "KB_packs": [
-            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
-            "Эксплуатация уязвимостей",
-            "Универсальные правила. Подозрительные входы в ПО",
-            "Аномалии в цепочках поставок"
-        ]
+        "event_src.title = \"teamcity\"": {
+            "Атаки методом перебора": [
+                "Subrule_SSHGuard",
+                "SSHGuard_Bruteforce",
+                "SSHGuard_Spraying"
+            ],
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора": [
+                "CAP_Group_Or_Role_Creation",
+                "CAP_User_Modified",
+                "CAP_User_Blocking_Or_Removing",
+                "CAP_User_Creation",
+                "CAP_Group_Or_Role_Removing",
+                "CAP_Password_Brute",
+                "CAP_Password_Spraying"
+            ],
+            "Универсальные правила. Подозрительные входы в ПО": [
+                "CAP_Default_Account_Logon"
+            ],
+            "Профилирование доступа к критически важным системам": [
+                "Teamcity_Abnormal_BuildConfig_Modify",
+                "Teamcity_Abnormal_Access"
+            ],
+            "Аномалии в цепочках поставок": [
+                "SupplyChain_TeamCity_Execution_Via_Request",
+                "SupplyChain_Default_Account_Logon",
+                "SupplyChain_TeamCity_Plugin_Modify",
+                "SupplyChain_TeamCity_Modify_Group"
+            ],
+            "Эксплуатация уязвимостей": [
+                "CVE_2024_27198_TeamCity_Authentication_Bypass",
+                "CVE_2023_42793_Teamcity_Token_Manipulation"
+            ]
+        }
     },
     "s openvpn": {
-        "queries": [
-            {
-                "event_src.title": "openvpn",
-                "event_src.subsys": "vpn-gateway"
-            }
-        ],
-        "KB_packs": [
-            "Универсальные правила. Подозрительные входы в ПО"
-        ]
+        "event_src.title = \"openvpn\" and event_src.subsys = \"vpn-gateway\"": {
+            "Атаки методом перебора": [
+                "OpenVPN_Password_Brute",
+                "OpenVPN_Password_Spraying",
+                "Subrule_SSHGuard",
+                "Probing_Auth_On_Various_Hosts",
+                "Multifactor_Brute_Second_Factor",
+                "SSHGuard_Bruteforce",
+                "SSHGuard_Spraying"
+            ],
+            "Универсальные правила. Подозрительные входы в ПО": [
+                "CAP_Default_Account_Logon"
+            ],
+            "Безопасность удаленной работы": [
+                "VPN_MultiUser_IP",
+                "Duplicate_Remote_Session",
+                "Remote_Login_From_Not_Allowed_Country",
+                "VPN_Abnormal_Access",
+                "RDP_Connect_After_RDG"
+            ]
+        }
     },
     "s mysql": {
-        "queries": [
-            {
-                "event_src.title": "mysql"
-            }
-        ],
-        "KB_packs": [
-            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора",
-            "Oracle MySQL",
-            "Универсальные правила. Доступ к критически важным данным"
-        ]
+        "event_src.title = \"mysql\"": {
+            "Атаки методом перебора": [
+                "Subrule_SSHGuard",
+                "SSHGuard_Bruteforce",
+                "SSHGuard_Spraying"
+            ],
+            "Универсальные правила. Доступ к критически важным данным": [
+                "CAP_Access_To_Sensitive_Database"
+            ],
+            "Универсальные правила. Подозрительные действия с учетными записями, ролями и группами, атаки методом перебора": [
+                "CAP_Password_Spraying",
+                "CAP_Password_Brute"
+            ],
+            "Oracle MySQL": [
+                "MySQL_Audit_Table_Modify",
+                "MySQL_Audit_Table_Rename",
+                "MySQL_Permissions_Operation",
+                "MySQL_Audit_Disable",
+                "MySQL_Disconnect_User",
+                "MySQL_Audit_Table_Access",
+                "MySQL_Host_Cache_Table_Truncate",
+                "MySQL_Audit_Table_Truncate",
+                "MySQL_Dump_Credential_Hashes",
+                "MySQL_Code_Execution",
+                "MySQL_Users_Discovery",
+                "MySQL_User_Operation",
+                "MySQL_Server_Connections_Discovery",
+                "MySQL_File_System_Actions",
+                "MySQL_Structure_Discovery"
+            ],
+            "Профилирование доступа к критически важным системам": [
+                "Application_Abnormal_Access"
+            ]
+        }
     },
     "s postgresql": {
-        "queries": [
-            {
-                "event_src.title": "postgresql"
-            }
-        ],
-        "KB_packs": [
-            "PostgreSQL",
-            "Универсальные правила. Подозрительные входы в ПО"
-        ]
+        "event_src.title = \"postgresql\"": {
+            "Атаки методом перебора": [
+                "PostgreSQL_Password_Brute",
+                "Subrule_SSHGuard",
+                "SSHGuard_Bruteforce",
+                "SSHGuard_Spraying"
+            ],
+            "Универсальные правила. Подозрительные входы в ПО": [
+                "CAP_Default_Account_Logon"
+            ],
+            "PostgreSQL": [
+                "PostgreSQL_Func_Discovery",
+                "PostgreSQL_Users_Discovery",
+                "PostgreSQL_Structure_Discovery",
+                "PostgreSQL_Update_Configuration",
+                "PostgreSQL_Assignment_Sensitive_Privilege",
+                "PostgreSQL_Code_Execution",
+                "PostgreSQL_SecDef_Function_PrivEsc",
+                "PostgreSQL_Port_Scan",
+                "PostgreSQL_Disable_Security_Options",
+                "PostgreSQL_Dump_Credentials",
+                "PostgreSQL_File_System_Actions"
+            ],
+            "Профилирование доступа к критически важным системам": [
+                "PostgreSQL_Abnormal_Access"
+            ]
+        }
     }
 }

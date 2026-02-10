@@ -1,0 +1,2700 @@
+{
+    "Acronis_Disabling_Active_Protection": [],
+    "Acronis_Mass_Drop_Machine_Or_Backup_Plan": [],
+    "Abuse_Kerberos_RC4": [],
+    "ActiveDirectory_Data_Collection": [],
+    "Active_Directory_Snapshot": [],
+    "AdminSDHolder_Modification_Attack": [],
+    "Asreproasting": [],
+    "BadSuccessor_Attack": [],
+    "Computer_Delegation_Configured": [],
+    "DACL_Resolver_Aced": [],
+    "DCShadow_Attack": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "DCSync_Attack": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "DCSync_Privileges_Given": [],
+    "DC_Auth_With_Pfx": [],
+    "DNS_Zone_Transfer_To_Untrusted_Host": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "Failed_Access_With_Unknown_User": [],
+    "Golden_Cert": [],
+    "Golden_Ticket_Failed_Auth": [],
+    "GPO_Created_Or_Modified": [],
+    "GPO_Manipulation": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "KDS_Root_Key_Access": [],
+    "Kerberoasting": [],
+    "Kerberoasting_Without_Preauth": [],
+    "Kerberos_Silver_Ticket": [
+        {
+            "AssetGrid_AD_User": "No_manual_changes"
+        }
+    ],
+    "Kerberos_Ticket_Dump": [],
+    "KrbRelay_Usage": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "LDAP_Discovery": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "Machine_Account_Quota_Access": [],
+    "Machine_Account_Quota_Changes": [],
+    "MSA_Account_Obtain_Ticket": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "MSA_Password_Access": [],
+    "PowerViewPy_RBCD_Attack": [],
+    "RemoteKrbRelay_Usage": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "Remote_Actions_With_Domain_Objects": [],
+    "Replication_To_Unauthorized_DRA": [],
+    "SAM_Account_Name_Spoofing": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "ShadowCred_Used": [],
+    "SIDHistory_Modification_Attack": [],
+    "Subrule_Asreproast_Auth": [],
+    "Subrule_BadSuccessor_Attack": [
+        {
+            "AssetGrid_AD_User": "No_manual_changes"
+        }
+    ],
+    "Subrule_MSA_Account_Created": [],
+    "Subrule_MSA_LDAP_Query": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "Subrule_PowerView_Objects_Actions": [],
+    "Subrule_Tickets_Requested": [],
+    "TGS_Request_By_Non_Existent_User": [],
+    "Untrusted_Terminal_Server_Activity": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "Zerologon_Attack": [],
+    "ADCSync_Attack": [],
+    "ADCS_Certificate_Template_Disable_SID_Publication": [],
+    "ADCS_Certify_Coerce": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "ADCS_Create_Vulnerable_Certificate_Template": [],
+    "ADCS_CRL_Abusing": [
+        {
+            "CRL_Publication_Time": "No_manual_changes"
+        }
+    ],
+    "ADCS_Disabled_Extensions_List_Modification": [],
+    "ADCS_Disable_RPC_Enrollment_Encryption": [],
+    "ADCS_Recon": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "ADCS_Suspicious_Certificate_Authentication": [],
+    "Bulk_Certs_Allowed_To_One_User": [],
+    "CA_Cert_Export": [],
+    "Cert_Allowed_Alt_SAN": [],
+    "Cert_Application_Policy_Abuse": [],
+    "Cert_Compromise_Via_NTLM_Relay": [],
+    "Cert_Explicit_Mapping_Reference_Adding": [],
+    "Cert_Request_After_Account_Edit": [],
+    "Cert_Request_And_Approved_With_Alt_SAN": [],
+    "Cert_Subject_Name_Different_From_UPN": [],
+    "Enable_SAN_Flag_CA_Policy": [],
+    "Enrollment_Agent_Cert_For_Low_Privilege_Groups": [],
+    "Enroll_And_Export_Certificate_For_Authentication": [],
+    "Subrule_Hostname_Mismatch": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "AWS_Cross_Account_Access": [],
+    "AWS_Discovery": [],
+    "AWS_IAM_Account_Manipulation_Via_Lambda": [],
+    "AWS_IAM_Create_Access_Key": [],
+    "AWS_IAM_Enable_Management_Console_Access": [],
+    "AWS_IAM_Password_Recovery_Or_Change": [],
+    "AWS_IAM_Privileged_Policy_Attached": [],
+    "AWS_Known_Malicious_Artifact": [],
+    "AWS_Logging_Malfunction": [],
+    "AWS_S3_Bucket_Creation": [],
+    "AWS_S3_Bucket_Deletion": [],
+    "AWS_S3_Bucket_LifeCycle_Modification": [],
+    "AWS_S3_Bucket_Logging_Disable": [],
+    "AWS_S3_Bucket_Modification": [],
+    "AWS_S3_Bucket_Versioning_Disable": [],
+    "Critical_Host_Threat_Detection": [
+        {
+            "Critical_Hosts_Manual": "No_manual_changes"
+        },
+        {
+            "Critical_Hosts": "No_manual_changes"
+        }
+    ],
+    "Kaspersky_Disabled_On_Critical_Host": [
+        {
+            "Critical_Hosts_Manual": "No_manual_changes"
+        },
+        {
+            "Critical_Hosts": "No_manual_changes"
+        }
+    ],
+    "KSCL_Add_Main_Administrator": [],
+    "KSMG_Configuration_Modified": [],
+    "KSMG_Encrypted_Message_Detected": [],
+    "KSMG_Malware_Detect_And_Clean": [],
+    "KSMG_Malware_Remove": [],
+    "KSMG_Massmail_Allowed": [],
+    "KSMG_Spam_Detected": [],
+    "Malicious_File_Is_Run": [],
+    "Malicious_URL_Detected": [],
+    "Malware_Not_Remediated": [],
+    "Malware_Remediated": [],
+    "Mass_Infection": [],
+    "MP_EDR_Detected_Malicious_Object": [],
+    "Sandbox_Different_Sender_Info": [],
+    "Sandbox_Full_Scan_Malware": [],
+    "Sandbox_Spam_Attack_By_Attachment": [
+        {
+            "Sensitive_Mail_Contact_Groups": "No_manual_changes"
+        }
+    ],
+    "Sandbox_Spam_Attack_By_Source": [
+        {
+            "Sensitive_Mail_Contact_Groups": "No_manual_changes"
+        }
+    ],
+    "Sandbox_Spam_Attack_By_Title": [
+        {
+            "Sensitive_Mail_Contact_Groups": "No_manual_changes"
+        }
+    ],
+    "Spam_Mail_Detected": [],
+    "Subrule_Sandbox_Count_Mail_Attachments": [],
+    "Subrule_Sandbox_File_Verdict": [],
+    "Subrule_Sandbox_Mail_Attachment": [],
+    "Subrule_Sandbox_Mail_IP": [],
+    "Suspicious_Behavior_Of_MS_Office_Process": [],
+    "Suspicious_Behavior_Of_Server_Process": [],
+    "Suspicious_Behavior_Of_System_Process": [],
+    "Apache_Cassandra_Create_Superuser_Role": [],
+    "Apache_Cassandra_Drop_Keyspace": [],
+    "Apache_Cassandra_Grant_All_Permissions": [],
+    "Apache_Cassandra_Revoke_All_Permissions": [],
+    "Apache_Cassandra_Structure_Discovery": [],
+    "BAD_High_Risk_Score_Rule": [],
+    "BAD_Many_Correlation_Rules_Triggered_on_Host": [],
+    "BAD_Significant_Rule_Triggered": [
+        {
+            "BAD_Significant_Rules": "No_manual_changes"
+        }
+    ],
+    "BIND_DNS_Zone_Transfer_From_Untrusted_Host": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "BIND_DNS_Zone_Transfer_To_Untrusted_Host": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "BIND_Many_DNS_TXT_Records_Requests": [],
+    "Bitbucket_Audit_Log_Configuration_Modify": [],
+    "Bitbucket_Export_Users": [],
+    "Bitbucket_Global_SSH_Setting_Disable": [],
+    "Bitbucket_Important_Permission_Assign": [],
+    "Bitbucket_Important_Permission_Revoke": [],
+    "Bitbucket_Login_From_New_Address": [],
+    "Bitbucket_Possible_RCE_via_API": [],
+    "Bitbucket_Pull_Request_Merge_From_New_Address": [],
+    "Bitbucket_Pull_Request_Merge_Without_Approvers": [],
+    "Bitbucket_Push_By_Non_Standard_User": [],
+    "Bitbucket_Secret_Scanning_Action": [],
+    "Bitbucket_Secret_Scanning_Rule_Removed": [],
+    "Bitbucket_Unauthorized_Access_To_Resource": [],
+    "Subrule_Bitbucket_Branch_Protect": [
+        {
+            "Bitbucket_Important_Branches_Registry": "No_manual_changes"
+        }
+    ],
+    "Subrule_Bitbucket_User_Or_Group_Permission_Remove": [
+        {
+            "Bitbucket_User_Permission_Registry": "No_manual_changes"
+        },
+        {
+            "Bitbucket_Group_Permission_Registry": "No_manual_changes"
+        }
+    ],
+    "Acronis_Password_Brute": [],
+    "ADFS_Password_Brute": [],
+    "ADFS_Password_Spraying": [],
+    "AOFL_Password_Bruteforce": [],
+    "AOFL_Password_Spraying": [],
+    "Apache_cassandra_password_brute": [],
+    "Aria_Operations_Admin_Panel_Password_Bruteforce": [],
+    "Aria_Operations_Password_Bruteforce": [],
+    "Aria_Operations_Password_Spraying": [],
+    "Arista_EOS_Password_Brute": [],
+    "Artifactory_Password_Brute": [],
+    "Artifactory_Password_Spraying": [],
+    "BAD_Password_Guessing": [],
+    "Bamboo_Password_Brute": [],
+    "Bruteforce_Sensitive_Users": [
+        {
+            "Sensitive_Users": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Critical_Domain_Accounts": "No_manual_changes"
+        }
+    ],
+    "Cisco_FW_Password_Brute": [],
+    "Cisco_IOS_Password_Brute": [],
+    "Citrix_NS_ADC_Password_Brute": [],
+    "Citrix_NS_ADC_Password_Spraying": [],
+    "DrWeb_Password_Brute": [],
+    "Elasticsearch_Password_Brute": [],
+    "Elasticsearch_Password_Spraying": [],
+    "Eltex_Password_Brute": [],
+    "Eltex_Password_Spraying": [],
+    "Exchange_IMAP_POP_Password_Brute": [],
+    "Exchange_IMAP_POP_Password_Spraying": [],
+    "Exchange_Password_Brute": [],
+    "Exchange_Password_Spraying": [],
+    "Freebsd_SSH_Password_Brute": [],
+    "Freebsd_SSH_Password_Spraying": [],
+    "FreeIPA_Password_Brute": [],
+    "FreeIPA_Password_Spraying": [],
+    "Gitlab_Password_Brute": [],
+    "Gitlab_Password_Spraying": [],
+    "Grafana_Password_Brute": [],
+    "Hashicorp_Vault_Password_Brute": [],
+    "Hashicorp_Vault_Password_Spraying": [],
+    "IIS_Password_Spraying": [],
+    "IIS_Web_Application_Password_Brute": [
+        {
+            "Specific_Local_Networks": "No_manual_changes"
+        }
+    ],
+    "IIS_Web_Application_Password_Spraying": [
+        {
+            "Specific_Local_Networks": "No_manual_changes"
+        }
+    ],
+    "Infowatch_TM_Password_Brute": [],
+    "Infowatch_TM_Password_Spraying": [],
+    "Kontinent_Password_Brute": [],
+    "Kontinent_Password_Spraying": [],
+    "LyncSmash_Use": [],
+    "Mikrotik_RouterOS_Password_Brute": [],
+    "Mikrotik_RouterOS_Password_Spraying": [],
+    "MongoDB_Password_Brute": [],
+    "MongoDB_Password_Spraying": [],
+    "MSSQL_Password_Brute": [],
+    "Multifactor_2FA_Password_Bruteforce": [],
+    "Multifactor_Brute_Second_Factor": [],
+    "NGate_Password_Brute": [],
+    "NGate_Password_Spraying": [],
+    "OpenVPN_Password_Brute": [],
+    "OpenVPN_Password_Spraying": [],
+    "Passwork_Password_Brute": [],
+    "Passwork_Password_Spraying": [],
+    "Possible_Pre2k_Machine_Account_Pasword_Guessing": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "Postfix_SASL_Brute": [],
+    "PostgreSQL_Password_Brute": [],
+    "Probing_Auth_On_Various_Hosts": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "ProxMox_VE_Password_Brute": [],
+    "ProxMox_VE_Password_Spraying": [],
+    "PTAF_Password_Brute": [],
+    "Reason_Account_Blocked": [],
+    "SambaDC_Kerberos_Brute": [],
+    "SambaDC_Kerberos_Spraying": [],
+    "Samba_Password_Brute": [],
+    "Samba_Password_Spraying": [],
+    "SecretNet_Password_Brute": [],
+    "SSHGuard_Bruteforce": [],
+    "SSHGuard_Spraying": [],
+    "Subrule_SSHGuard": [],
+    "TeamPass_Password_Brute": [],
+    "Teleport_Password_Brute": [],
+    "Teleport_Password_Spraying": [],
+    "UEM_SafeMobile_Password_Brute": [],
+    "UEM_SafeMobile_Password_Spraying": [],
+    "Unix_FTP_Password_Brute": [],
+    "Unix_FTP_Password_Spraying": [],
+    "Unix_SSH_Password_Brute": [],
+    "Unix_SSH_Password_Spraying": [],
+    "ViPNet_IDS_Password_Brute": [],
+    "ViPNet_IDS_Password_Spraying": [],
+    "ViPNet_TIAS_Password_Brute": [],
+    "ViPNet_TIAS_Password_Spraying": [],
+    "Windows_Machine_Account_Password_Spraying": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "Windows_Password_Brute": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "Windows_Password_Spraying": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "Windows_SSH_FTP_Brute": [],
+    "Windows_SSH_FTP_Spraying": [],
+    "Windows_Ticket_Brute": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "Zabbix_Password_Brute": [],
+    "Zabbix_Password_Spraying": [],
+    "CAP_Default_User_Enabling": [],
+    "CAP_Fired_User_Enabling": [
+        {
+            "AssetGrid_Fired_Users_Accounts": "No_manual_changes"
+        },
+        {
+            "Dismissed_Users": "No_manual_changes"
+        }
+    ],
+    "CAP_Group_Or_Role_Creation": [],
+    "CAP_Group_Or_Role_Removing": [],
+    "CAP_Password_Brute": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "CAP_Password_Spraying": [],
+    "CAP_User_Blocking_Or_Removing": [],
+    "CAP_User_Creation": [],
+    "CAP_User_Modified": [],
+    "CAP_User_Rights_Granted": [],
+    "CAP_User_Rights_Revoked": [],
+    "CAP_Access_to_Sensitive_Data": [
+        {
+            "Applications_Critical_Data_Values": "No_manual_changes"
+        }
+    ],
+    "CAP_Access_To_Sensitive_Database": [
+        {
+            "Sensitive_DB_Tables": "No_manual_changes"
+        }
+    ],
+    "CAP_Add_Dangerous_Permissions": [],
+    "CAP_Database_Table_Cleared": [
+        {
+            "Sensitive_DB_Tables": "No_manual_changes"
+        }
+    ],
+    "CAP_Clear_Or_Deletion_Logs": [],
+    "CAP_Disabling_Protective_Mechanisms": [],
+    "CAP_Stop_Application_Or_System": [],
+    "CAP_Stop_Service": [],
+    "CAP_Default_Account_Logon": [],
+    "CAP_Significant_User_Logon": [],
+    "CAP_Activity_From_Known_Malicious_Hostname": [],
+    "CAP_Attack_Detected": [],
+    "CAP_Base64_Encoded_DNS_Request": [],
+    "CAP_DNS_Request_to_Malicious_Domain": [],
+    "CAP_DNS_Request_to_Suspicious_Domain": [],
+    "CAP_High_Frequency_DNS_Requests_From_Host": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "CAP_Suspicious_Pipe_Connected": [],
+    "Citrix_NS_ADC_Login_With_Default_Credentials": [],
+    "ClickHouse_Account_Discovery": [],
+    "ClickHouse_Audit_Table_Modified": [],
+    "ClickHouse_Backup": [],
+    "ClickHouse_Backup_directory_discovery": [],
+    "ClickHouse_Config_Applied": [],
+    "ClickHouse_Create_User_Without_Password": [],
+    "ClickHouse_Create_User_With_Plaintext_Password": [],
+    "ClickHouse_Data_Manipulation": [
+        {
+            "Applications_Critical_Data_Values": "No_manual_changes"
+        }
+    ],
+    "ClickHouse_DBMS_Version_Discovery": [],
+    "ClickHouse_Disable_User_Password": [],
+    "ClickHouse_Drop_Database": [],
+    "ClickHouse_Drop_Multiple_Tables": [],
+    "ClickHouse_Grant_All_Roles": [],
+    "ClickHouse_Logon_Same_Host_Different_Users": [],
+    "ClickHouse_Logon_Same_User_From_Different_Hosts": [],
+    "ClickHouse_Modify_Password_To_Plaintext": [],
+    "ClickHouse_Outfile_Query": [],
+    "ClickHouse_Pattern_Search": [],
+    "ClickHouse_System_Info_Discovery": [],
+    "ClickHouse_Users_Directory_Discovery": [],
+    "ClickHouse_Users_Privileges_Discovery": [],
+    "Confluence_App_Installed": [],
+    "Confluence_Automated_Search": [],
+    "Confluence_Many_Attachments_Downloaded": [],
+    "Confluence_Mass_Content_Deletion": [],
+    "Confluence_Mass_Pages_Export": [],
+    "Confluence_Restricted_Page_Access": [],
+    "Confluence_URL_Whitelist_Changed": [],
+    "Dnsmasq_DNS_Query_High_Frequency": [],
+    "Dnsmasq_DNS_Zone_Transfer": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "Dnsmasq_TFTP_File_Recon": [],
+    "Dnsmasq_TXT_Query_High_Frequency": [],
+    "DrWeb_Admin_Account_Modify": [],
+    "DrWeb_Application_Deny": [],
+    "DrWeb_Endpoint_Disable": [],
+    "DrWeb_Endpoint_Policy_Modification": [],
+    "DrWeb_Installation_Package_Modification": [],
+    "Elasticsearch_Critical_Role_Assign": [
+        {
+            "Elasticsearch_critical_role": "No_manual_changes"
+        }
+    ],
+    "Elasticsearch_Critical_Users_Modify": [
+        {
+            "Elasticsearch_critical_user": "No_manual_changes"
+        }
+    ],
+    "Elasticsearch_Delete_Index": [],
+    "Elasticsearch_Dump_Indices": [],
+    "Elasticsearch_Remove_Users": [],
+    "Elasticsearch_Upload_Backup": [],
+    "Eltex_Abnormal_Broadcast_Traffic": [],
+    "Eltex_ARP_Spoofing": [],
+    "Eltex_ARP_Storm": [],
+    "Eltex_DHCP_Starvation": [],
+    "Eltex_ESR_Alert_Detect": [],
+    "Eltex_Fastpath_Disable_Logging": [],
+    "Eltex_Logging_To_Untrusted_Host": [],
+    "Eltex_MAC_Flooding": [],
+    "Eltex_Ros_Disable_Logging": [],
+    "Eltex_TCP_SYN_Attack": [],
+    "Enterprise_1C_Create_User_Without_Password": [],
+    "Enterprise_1C_Disable_User_Password_In_Authentication": [],
+    "Enterprise_1C_Enable_Account_And_Login": [],
+    "Enterprise_1C_Logon_Same_User_From_Different_Terminals": [],
+    "Enterprise_1C_Manipulate_Critical_Data": [
+        {
+            "Applications_Critical_Data_Values": "No_manual_changes"
+        }
+    ],
+    "Enterprise_1C_Manipulate_User_With_Critical_Roles": [],
+    "Enterprise_1C_Multiple_User_Lock": [],
+    "Enterprise_1C_Multiple_User_Password_Change": [],
+    "Enterprise_1C_Multiple_User_Unlock": [],
+    "Enterprise_1C_Standard_Password_Set": [],
+    "Enterprise_1C_User_Locked_Too_Many_Logons": [],
+    "Enterprise_1C_Using_Various_Accounts_On_One_Terminal": [],
+    "FreeIPA_Cache_Credentials_Access": [],
+    "FreeIPA_CVE_2024_3183_Kerberoasting": [],
+    "FreeIPA_Directory_Data_Collection": [],
+    "FreeIPA_Id2entry_Dump": [],
+    "FreeIPA_Kerbrute_Userenum": [],
+    "FreeIPA_Multiple_User_Lock": [],
+    "FreeIPA_Multiple_User_Password_Change": [],
+    "FreeIPA_Privileged_Account_Blocking": [
+        {
+            "FreeIPA_Privileged_Accounts": "No_manual_changes"
+        }
+    ],
+    "FreeIPA_Recon_Commands": [],
+    "FreeIPA_Suspicious_LDAP_Request": [],
+    "FreeIPA_User_Locked_Too_Many_Logons": [],
+    "FreeIPA_User_Manipulate_With_Critical_User": [],
+    "Subrule_FreeIPA_CVE_2024_3183_Kerberoasting": [],
+    "Grafana_Organization_Removed": [],
+    "Grafana_Plugin_Stopped": [],
+    "Grafana_Service_Account_Created": [],
+    "AdPEAS_Usage": [],
+    "Atexec_Activity": [],
+    "Cobalt_Strike_Assembly": [],
+    "Cobalt_Strike_Browserpivot": [],
+    "Cobalt_Strike_Child_Process": [],
+    "Cobalt_Strike_DumpHashes": [],
+    "Cobalt_Strike_Elevate": [],
+    "Cobalt_Strike_HiddenDesktop": [],
+    "Cobalt_Strike_Inject_Into_Process": [],
+    "Cobalt_Strike_Make_Token": [],
+    "Cobalt_Strike_Payload_Delivery_Check": [],
+    "Cobalt_Strike_Powershell_Payload_Delivery": [],
+    "Cobalt_Strike_Powershell_Stager": [],
+    "Cobalt_Strike_Process_Injection": [],
+    "Cobalt_Strike_Psexec_Jump": [],
+    "Cobalt_Strike_RunAs_Escalate": [],
+    "Cobalt_Strike_Service_Move": [],
+    "Cobalt_Strike_SMB_Beacon": [],
+    "Cobalt_Strike_SpawnAs": [],
+    "Cobalt_Strike_Stager": [],
+    "Covenant_File_Upload": [],
+    "Covenant_Get_System": [],
+    "Covenant_Launcher_Start": [],
+    "Covenant_Persistence": [],
+    "Covenant_Shellcmd_Usage": [],
+    "DSInternals_Usage": [],
+    "Empire_Stager": [],
+    "Go_Secdump_Activity": [],
+    "Havoc_Powerpick": [],
+    "Havoc_Powershell_Command_Execution": [],
+    "Impacket_Secretsdump": [],
+    "Impacket_SMBEXEC": [],
+    "Internal_Monologue_Attack": [],
+    "Invoke_Rubeus_Usage": [],
+    "Koadic_Bitsadmin_Stager": [],
+    "Koadic_MSHTA_Stager": [],
+    "Koadic_REGSVR32_Stager": [],
+    "Koadic_Rundll32_Stager": [],
+    "Koadic_WMIC_Stager": [],
+    "Metasploit_Payload": [],
+    "Mimikatz_Command": [],
+    "MsLDAPDump_Usage": [],
+    "NetCat_Usage": [],
+    "NetExec_Usage_LDAP": [],
+    "NimExec_Activity": [],
+    "PhantomCore_Tools_Usage": [],
+    "Powermad_Usage": [],
+    "PPLBlade_Cmdline": [],
+    "PsMapExec_First_Usage": [],
+    "PVE_Find_AD_User_Usage": [],
+    "Remote_Connection_Through_SMBEXEC_WinXP": [],
+    "Rootkit_R77_Usage": [],
+    "Rubeus_Non_Cmdline_Usage": [],
+    "Rubeus_Usage": [],
+    "Ruler_Usage": [],
+    "ShadowHound_LDAP_Requests": [],
+    "ShadowHound_Usage": [],
+    "SharPersist_Usage": [],
+    "Sharphound_Client_Side": [],
+    "SharpHound_Groups_Collection": [],
+    "SharpHound_LDAP_Requests": [],
+    "SharpHound_LoggedOn": [],
+    "Sharphound_Server_Side": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "SharpHound_Session": [],
+    "SharpHound_Sysvol_Access": [],
+    "SharpKatz_Usage": [],
+    "SharpMapExec_Usage": [],
+    "SharpRDPThief_Usage": [],
+    "SharpSploit_Usage": [],
+    "SharpToken_Usage": [],
+    "SharpWMI_Usage": [],
+    "SilentHound_AD_Enumeration": [],
+    "SilentTrinity_Stager": [],
+    "Sliver_GetSystem": [],
+    "Sliver_PsExec": [],
+    "Sliver_Shell_Usage": [],
+    "SOAPHound_Usage": [],
+    "Stracciatella_Usage": [],
+    "Subrule_C2_Beacon_Stop": [],
+    "Subrule_Cobalt_Strike_RunDLL32": [],
+    "Subrule_Cobalt_Strike_Service_Creation": [],
+    "Subrule_Duplex_Powershell_Connect": [],
+    "Subrule_Invoke_Rubeus_Usage": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "Subrule_MSTSC_SharpRDPThief_Usage": [],
+    "Subrule_PVE_Find_AD_User_Usage": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "Subrule_SharpHound_Access_To_Samr_Srvsvc": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "Subrule_SharpHound_Access_To_Wkssvc_Srvsvc": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "Subrule_Sharphound_Client_Side": [],
+    "Subrule_SharpHound_LoggedOn": [],
+    "Subrule_Sharphound_Server_Side": [],
+    "Subrule_Thread_SharpRDPThief_Usage": [],
+    "Subrule_WannaMine_Usage": [],
+    "Suspicious_BYOVKD_Driver_Loaded": [],
+    "ToxicEye_Usage": [],
+    "Tuoni_Agent_Usage": [],
+    "USB_Rubber_Ducky": [],
+    "VNT_Usage": [],
+    "WannaMine_Usage": [],
+    "Windows_Hacktool_Copied_To_Share": [],
+    "Windows_Hacktool_Usage": [],
+    "WMEye_Event_Filter_Creation": [],
+    "WMEye_Execution": [],
+    "XRed_Backdoor_Usage": [],
+    "Hashicorp_Vault_Auth_Method_Modify": [],
+    "Hashicorp_Vault_Important_Engines_Manipulation": [
+        {
+            "Hashicorp_Vault_Important_Engines": "No_manual_changes"
+        }
+    ],
+    "Hashicorp_Vault_Important_Secrets_Deleted": [
+        {
+            "Hashicorp_Vault_Important_Secrets": "No_manual_changes"
+        }
+    ],
+    "Hashicorp_Vault_Important_Secrets_Rewrite": [
+        {
+            "Hashicorp_Vault_Important_Secrets": "No_manual_changes"
+        }
+    ],
+    "Hashicorp_Vault_Infrastructure_Discovery": [
+        {
+            "Hashicorp_Vault_Important_Secrets": "No_manual_changes"
+        }
+    ],
+    "Hashicorp_Vault_Policy_Modified": [],
+    "Hashicorp_Vault_Policy_Revoked": [],
+    "Indeed_Credentials_Check_After_Policy_Change": [],
+    "Indeed_Executing_Forbidden_Command_via_SSH": [],
+    "Indeed_Important_Applications_Actions": [
+        {
+            "Significant_Applications": "No_manual_changes"
+        }
+    ],
+    "Indeed_Important_Configuration_Parameter_Change": [],
+    "Indeed_Important_PAM_Account_Actions": [],
+    "Indeed_Important_PAM_Host_Account_Actions": [],
+    "Indeed_Important_PAM_User_Group_Actions": [
+        {
+            "Significant_PAM_Groups": "No_manual_changes"
+        }
+    ],
+    "Indeed_Important_Policy_Parameter_Change": [],
+    "Indeed_Important_Resources_Actions": [
+        {
+            "Significant_Resources": "No_manual_changes"
+        }
+    ],
+    "Infowatch_TM_Notifications_Manipulation": [],
+    "Infowatch_TM_Persistence_Via_User_Creation": [],
+    "Infowatch_TM_Policy_Manipulation": [],
+    "Infowatch_TM_Roles_Area_Manipulation": [],
+    "Infowatch_TM_User_Roles_Area_Manipulation": [],
+    "SKDPUNT_Blacklisted_Command": [],
+    "SKDPUNT_Collecting_Sessions_Info": [],
+    "SKDPUNT_Connection_In_Session_Closed": [],
+    "SKDPUNT_Connection_In_Session_Open": [],
+    "SKDPUNT_Login_Failure": [],
+    "SKDPUNT_Manual_Incident": [],
+    "SKDPUNT_Multiple_Access_Attempts": [],
+    "SKDPUNT_Potentially_Dangerous_Command": [],
+    "SKDPUNT_Session_From_Different_Subnet": [],
+    "SKDPUNT_Sftp_Access_Failure": [],
+    "SKDPUNT_Suspicious_Command": [],
+    "SKDPUNT_Unusual_Access": [],
+    "SKDPUNT_Unusual_Amount_Of_File_Transfered": [],
+    "SKDPUNT_Unusual_User_Activity": [],
+    "SKDPUNT_Unusual_User_Activity_Time": [],
+    "Kaspersky_Add_Role_To_User": [],
+    "Kaspersky_Admgroup_Changed": [],
+    "Kaspersky_Application_Deny": [],
+    "Kaspersky_Enable_User": [],
+    "Kaspersky_Endpoint_Disable": [],
+    "Kaspersky_Endpoint_Policy_Modification": [],
+    "Kaspersky_Installation_Package_Modification": [],
+    "Kaspersky_Install_Malicious_App": [],
+    "Kaspersky_Modify_Administration_Policy": [],
+    "Kaspersky_Remove_AV_By_Task": [],
+    "Subrule_Kaspersky_Create_Package_And_Task": [],
+    "Subrule_Kaspersky_Run_Task_Install_App": [],
+    "Kontinent_Account_Manipulation": [],
+    "Kontinent_Role_Manipulation": [],
+    "Kontinent_Rules_Manipulation": [],
+    "Kontinent_Security_Host_Shutdown": [],
+    "Exchange_ActiveSync_Discovery_SMB": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "Exchange_ActiveSync_Emails_Access_via_PEAS": [],
+    "Exchange_Admin_Role_Actions": [],
+    "Exchange_Blacklisted_Account_Login": [
+        {
+            "Exchange_Black_List_Users": "No_manual_changes"
+        }
+    ],
+    "Exchange_Critical_Group_Manipulate": [
+        {
+            "Exchange_Critical_Distribution_Groups": "No_manual_changes"
+        }
+    ],
+    "Exchange_Distribution_Group_Member_Added": [],
+    "Exchange_Get_Global_Address_List": [],
+    "Exchange_Illegal_Distribution_Group_Modify": [],
+    "Exchange_Journal_Rule_Actions": [],
+    "Exchange_Mass_Deletion_Of_Groups": [],
+    "Exchange_Mass_Deletion_Of_Mailboxes": [],
+    "Exchange_NTLM_Scan": [],
+    "Exchange_Owa_Policy_Actions": [],
+    "Exchange_ProxyNotShell": [],
+    "Exchange_PST_upload_via_Administrator": [],
+    "Exchange_Remove_Dismount_Mailbox_Database": [],
+    "Exchange_Remove_Federation_Trust": [],
+    "Exchange_Remove_MalwareFilter_Policy": [],
+    "Exchange_Role_Assignment_Policy_Actions": [],
+    "Exchange_RPC_over_HTTPv2": [],
+    "Exchange_Transport_Rule_Actions": [],
+    "HyperV_Critical_VMs_Manipulation": [
+        {
+            "Significant_VMs": "No_manual_changes"
+        }
+    ],
+    "HyperV_VM_Enumeration": [],
+    "MECM_Change_Configuration": [],
+    "MECM_Client": [],
+    "MECM_ConfigurationItem": [],
+    "MECM_Created_Modified_Package": [],
+    "MECM_Created_Modified_Program": [],
+    "MECM_Create_modified_scripts": [],
+    "MECM_Create_New_Roles": [],
+    "MECM_Deploy_Application": [],
+    "MECM_Deploy_Program": [],
+    "MECM_Discovery_Via_LDAP": [],
+    "MECM_Discovery_Via_WMI": [],
+    "MECM_Distribute_Content": [],
+    "MECM_Not_Allowed_Operation_With_Roles": [],
+    "MECM_NTLM_Relay_Via_SharpSCCM": [],
+    "MECM_Privileges_Escalation_Via_Role": [],
+    "MECM_Remove_Accounts": [],
+    "MECM_Run_Script": [],
+    "MECM_SharpSCCM": [],
+    "O365_Add_New_Federated_Domain": [],
+    "O365_Add_Suspicious_Permission_To_Application": [],
+    "O365_Application_Added": [],
+    "O365_Application_New_Certificate_Or_Secret": [],
+    "O365_Collection_Via_File_Actions": [],
+    "O365_Device_Registration_After_OAuth": [],
+    "O365_Email_Collection": [],
+    "O365_Email_Security_Feature_Changed": [],
+    "O365_Mailbox_Email_Suspicious_Activity": [],
+    "O365_Mailbox_Permission_Modification": [],
+    "O365_Mail_Forwarding": [],
+    "O365_Mass_Content_Deletion": [],
+    "O365_MFA_Bypass": [],
+    "O365_MFA_Settings_Modification": [],
+    "O365_OAuth_Via_Suspicious_App": [],
+    "O365_Service_Principal_Credentials_Added": [],
+    "O365_Suspicious_Activity": [],
+    "O365_Suspicious_Authoriaztion_Policy_Modification": [],
+    "O365_Suspicious_Search": [],
+    "O365_User_Added_To_Privilleged_Role": [],
+    "O365_User_Advanced_Audit_Disable": [],
+    "Sharepoint_Critical_Data_Manipulation": [
+        {
+            "Applications_Critical_Data_Values": "No_manual_changes"
+        }
+    ],
+    "Sharepoint_Grant_Critical_Role": [],
+    "Sharepoint_Grant_User_Access": [],
+    "Sharepoint_Part_Logging_Exclude": [],
+    "Sharepoint_Significant_Feature_Manipulation": [
+        {
+            "Sharepoint_Critical_Features": "No_manual_changes"
+        }
+    ],
+    "Access_Into_Sensitive_Files_Via_Network_Share": [],
+    "Access_PST_File_In_Share": [],
+    "Clipboard_Access": [],
+    "Clipboard_Access_Powershell": [],
+    "Copying_Files": [],
+    "Data_Compression": [],
+    "Documents_Access_Via_Console": [],
+    "Export_Certs": [],
+    "RDP_Shadow_Session": [],
+    "Shadow_Screen_Save": [],
+    "Suspicious_Access_To_Users_Folder": [],
+    "CC_Channel_Through_AD": [],
+    "CC_Triangulation_Trojan": [],
+    "Connect_Suspicious_File_To_API_Telegram": [],
+    "Dameware_Install": [],
+    "Dameware_MRC_Remote_Connect": [],
+    "DoublePulsar_Activity": [],
+    "Download_File_Through_Curl": [],
+    "Download_File_Through_Windows_Defender": [],
+    "Download_Via_Encoded_Powershell": [],
+    "Ligolo_Reverse_Tunneling": [],
+    "Microsoft_Devtunnel_Usage": [],
+    "Port_Forwarding_Or_Tunneling": [],
+    "Possible_Network_Local_Tunnel": [],
+    "Possible_Proxy_Usage": [],
+    "Proxy_Tools_Usage": [],
+    "Remote_File_Download_Via_Certutil": [],
+    "SlothfulMedia_Trojan": [],
+    "Subrule_Connection_System_Process": [
+        {
+            "Specific_Local_Networks": "No_manual_changes"
+        },
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "Subrule_DoublePulsar_IPC_Access": [],
+    "Subrule_DoublePulsar_Process_Access": [],
+    "Subrule_External_SMB_Connect": [],
+    "Subrule_Possible_Network_Local_Tunnel": [],
+    "Subrule_Possible_Proxy_Usage": [],
+    "Subrule_SlothfulMedia_Execute_Request": [],
+    "Subrule_Suspicious_Connection_System_Process": [],
+    "Suspicious_Connection": [
+        {
+            "Specific_Local_Networks": "No_manual_changes"
+        }
+    ],
+    "Suspicious_Connection_After_Imageload": [
+        {
+            "Specific_Local_Networks": "No_manual_changes"
+        }
+    ],
+    "Suspicious_Connection_System_Process": [
+        {
+            "Specific_Local_Networks": "No_manual_changes"
+        }
+    ],
+    "Tunnel_Process_Windows": [],
+    "Windows_Desktopimgdownldr_Ingress_Tool_Transfer": [],
+    "Wintun_Network_Driver_Usage": [],
+    "Abusing_CredSSP": [],
+    "Access_System_Credential_Files_Via_Cmdline": [],
+    "Access_To_Files_Containing_Passwords": [],
+    "Access_To_User_Secrets_Via_DPAPI": [],
+    "Access_To_Web_Browsers_Process": [],
+    "AvDump_LSASS_Dump": [],
+    "Coerce_Auth": [],
+    "Comsvcs_Minidump_Usage": [],
+    "Create_Remote_Thread_Into_LSASS": [],
+    "Credential_Access_To_Passwords_Storage": [],
+    "Credential_Dump_In_Local_Registry": [],
+    "Dangerous_Theme": [],
+    "DNS_Spoofing": [],
+    "DragonCastle_LSASS_Dump": [],
+    "DRSUAPI_User_Enumeration": [],
+    "Esentutil_Copy_File": [],
+    "ETWHash_Dump": [],
+    "Failed_DefaultCredentials_Delegation": [],
+    "Failed_LSASS_Injection": [],
+    "IIS_Credential_Dumping": [],
+    "Intercept_Creds_From_MSTSC": [],
+    "KeePass_Keys_Extraction": [],
+    "Kekeo_Credentials_Relay_Via_NTLM": [],
+    "LAPS_Passwords_Access": [],
+    "LetMeowIn_LSASS_Dump": [],
+    "LSASS_DLL_Injection": [],
+    "LSASS_Dump_Via_RPC": [],
+    "LSASS_Dump_Via_SilentProcessExit": [],
+    "LSASS_Dump_Via_TaskManager": [],
+    "LSASS_Handle_Duplicate": [],
+    "LSASS_Memory_Access_SubRule": [],
+    "LSASS_Memory_Dump": [],
+    "LSASS_PSSCapture_Snapshot": [],
+    "LSASS_Shtinkering_Dump": [],
+    "LSA_SSP_Change": [],
+    "MalSecLogon_LSASS_Dump": [],
+    "Masky_Tool_Usage": [],
+    "MultiDump_LSASS_Dump": [],
+    "MultiDump_Registry_Dump": [],
+    "Multifactor_Bypass_Due_API_Unavailability": [],
+    "Multifactor_Bypass_From_Local_Network_Side": [],
+    "Multifactor_Bypass_MFA": [],
+    "Multifactor_Second_Factor_Verified_Without_Request": [],
+    "Netlogon_Activated": [],
+    "Netlogon_Auth": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "Passwork_Credential_Collection": [],
+    "Physmem2profit_LSASS_Dump": [],
+    "PPLdump_Usage": [],
+    "PPLFault_Process_Dump": [],
+    "PPLmedic_Process_Dump": [],
+    "ProcDump_Usage": [],
+    "PuntoSwitcher_Diary_Open": [],
+    "RdpStrike_Usage": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "Reading_Registry_Objects": [],
+    "Remote_Copy_Credential_Dump_Artifact": [],
+    "Remote_Credential_Theft_By_Masky": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "Remote_Password_Dump": [],
+    "SCF_Or_URL_File_Created": [],
+    "SCF_Or_URL_Forced_Authentication": [],
+    "Search_Stored_Credentials": [],
+    "Sessions_Hijacked": [],
+    "SharpSecretsdump_Usage": [],
+    "Subrule_Access_To_Protected_Storage_Share": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "Subrule_Coerce_Auth": [],
+    "Subrule_Egress_System": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "Subrule_LetMeowIn_LSASS_Dump": [],
+    "Subrule_LOLBins_LSASS_Dump": [],
+    "Subrule_LSASS_For_DragonCastle": [],
+    "Subrule_Multifactor_Bypass_From_Local_Network_Side": [],
+    "Subrule_NTLM_Logon": [],
+    "Subrule_PPLmedic_DllLoad": [],
+    "Subrule_PPLmedic_Svchost": [],
+    "Subrule_PPLmedic_WerFaultSecure": [],
+    "Subrule_Remote_Credential_Theft_By_Masky": [],
+    "Subrule_Shares_For_DragonCastle": [],
+    "Svchost_Memory_Dump": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "Symbolic_Link_To_Shadow_Copy_Created": [],
+    "Veeam_Credential_Recovery_Script": [],
+    "Abnormal_Directory_For_Process": [],
+    "Alternate_Data_Stream": [],
+    "AMSI_Bypass_Via_Powershell": [],
+    "Attribute_Changer_Usage": [],
+    "Audit_XP_Params_Change": [],
+    "BitsJob_Download_And_Run": [],
+    "Blackout_AV_Disabling": [],
+    "Browser_LOLBin": [],
+    "Changing_Restricted_Admin_Settings": [],
+    "Cmstp_AWL_Bypass": [],
+    "ControlPanel_AWL_Bypass": [],
+    "Copied_Or_Renamed_Executable": [],
+    "Csc_AWL_Bypass": [],
+    "Devinit_AWL_Bypass": [],
+    "DirtyVanity_Process_Injection": [],
+    "Disable_Credential_Guard": [],
+    "Disable_LSA_Protection": [],
+    "Disable_Sysmon": [],
+    "Disable_UAC_Remote_Restrictions": [],
+    "DLL_Side_Loading": [],
+    "Dnscmd_AWL_Bypass": [],
+    "DNS_Over_HTTPS_Enable": [],
+    "Double_File_Extension_Masquerading": [],
+    "EventLog_File_Substitute": [],
+    "Explicit_Recycle_Bin_Directory_Usage": [],
+    "ExtensionSpoofer_Usage": [],
+    "File_And_Directory_Permissions_Modification": [],
+    "Firewall_Modify": [],
+    "Hide_Account_From_Logon_Screen": [],
+    "Hijack_Load_Path_Library": [],
+    "IEExec_AWL_Bypass": [],
+    "InstallUtil_AWL_Bypass": [],
+    "LoLBas_VS_Nodejstools": [],
+    "LSASS_SilentProcessExit_Keys": [],
+    "Malicious_Activity_From_Office_Documents": [],
+    "Malicious_CHM_File": [],
+    "MalSecLogon_PPID_Spoofing": [],
+    "Masquerading_Microsoft_Signed_Library": [],
+    "Mavinject_AWL_Bypass": [],
+    "Microsoft_Teams_AWL_Bypass": [],
+    "MiniNT_Key_Created": [],
+    "MSBuild_AWL_Bypass": [],
+    "MSHTA_AWL_Bypass": [],
+    "Msiexec_AWL_Bypass": [],
+    "MSXSL_AWL_Bypass": [],
+    "NTLM_Downgrade": [],
+    "Obfuscated_Powershell": [],
+    "Odbcconf_AWL_Bypass": [],
+    "Office_Security_Params_Changed": [],
+    "ParentPid_Spoofing": [],
+    "Pcalua_AWL_Bypass": [],
+    "PowerShell_CLM_Bypass": [],
+    "Powershell_Execution_From_Image": [],
+    "Proccess_Tampering": [],
+    "Process_From_Mounted_Disk": [],
+    "Process_Herpaderping_Injection": [],
+    "Process_Injection_By_MSBuild": [],
+    "Proxy_Execution_Via_WorkFolders": [],
+    "RDP_Connection_History_Removal": [],
+    "RegAsm_Or_RegSvcs_AWL_Bypass": [],
+    "Regsvr32_AWL_Bypass": [],
+    "Remote_EventLog_Crashing": [],
+    "RTLO_Symbol_Usage": [],
+    "Rundll32_AWL_Bypass": [],
+    "Rundll32_Suspicious_System_DLL_Usage": [],
+    "Run_Executable_File_Without_Meta": [],
+    "Run_Masquerading_Executable_File": [],
+    "Safe_Mode_Boot": [],
+    "Self_Delete_Object": [],
+    "SharpEventPersist_Usage": [],
+    "SIP_And_Trust_Provider_Hijacking": [],
+    "Subrule_CSC_Start_And_File_Create": [],
+    "Subrule_DLL_Side_Loading": [],
+    "Subrule_ParentPid_Spoofing": [],
+    "Subrule_Possible_Process_From_Mounted_Disk": [],
+    "Suspicious_Execution_Via_Regsvr32": [],
+    "Suspicious_Execution_Via_Setup16": [],
+    "Suspicious_File_Created_By_Legal_Process": [],
+    "Suspicious_File_Created_In_Unusual_Directory": [],
+    "Suspicious_File_Creation_In_Sysvol": [],
+    "Suspicious_Registry_Value": [],
+    "Suspicious_XSLT_XML_PowerShell_Execution": [],
+    "SysmonQuiet_Usage": [],
+    "Sysmon_Blinding": [],
+    "Sysmon_Driver_Unload": [],
+    "Task_Manager_Disable": [],
+    "TikiTorch_Process_Injection": [],
+    "WDAC_Bypass_Via_Dbgsrv": [],
+    "WDigest_Enable": [],
+    "Windows_Defender_Disable": [],
+    "Windows_Eventlog_Cleaning": [],
+    "Wlrmdr_LOLBin": [],
+    "XSL_Script_WMIC_Execution": [],
+    "Account_Discovery": [],
+    "Account_Or_Group_Discovery_Via_SAM_R": [],
+    "ADIDNS_Dump": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "Always_Install_Elevated_Enable": [],
+    "AppLocker_Policies_Discovery": [],
+    "Audit_Policies_Discovery": [],
+    "Computer_Object_Ldap_Request": [],
+    "Delegated_Accounts_Recon": [],
+    "Dnszone_Export": [],
+    "Domain_Controllers_Discovery": [],
+    "Domain_Dump_Tools_Via_LDAP": [],
+    "Domain_Trust_Discovery": [],
+    "Dump_Bitlocker_Keys_From_AD": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "Enumerating_Delegated_Credentials": [],
+    "File_Directory_Discovery": [],
+    "LAPS_Enumeration": [],
+    "Ldapdomaindump_Queries": [],
+    "LocalGroupListMembers_From_Remote_Host": [],
+    "Multiple_Groups_Enum": [],
+    "Multiple_Shares_Enum_On_Single_Host": [],
+    "Multiple_SrvSvc_Share_Access": [],
+    "Multiple_Users_Enum": [],
+    "NetView_Recon": [],
+    "Network_Service_Discovery_From_Localnet": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "Network_Share_Discovery": [],
+    "Net_Tool_Usage": [],
+    "NullSession_System_Discovery": [],
+    "Password_Policy_Discovery": [],
+    "Permission_Groups_Discovery": [],
+    "Port_Scan_From_Localnet_To_Different_Hosts": [],
+    "Port_Scan_From_Localnet_To_Single_Host": [],
+    "PowerView_Recon": [],
+    "Process_Discovery": [],
+    "Query_Registry": [],
+    "Remote_Log_Read": [],
+    "Security_State_Discovery": [],
+    "Shares_Discovery": [],
+    "Software_Discovery": [],
+    "SPN_LDAP_Requests": [],
+    "Subrule_LocalGroupListMembers": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "Subrule_Net_Share_Access": [],
+    "Subrule_Whoami_Alternative": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "System_Information_Discovery": [],
+    "System_Network_Configuration_Discovery": [],
+    "System_Network_Connections_Discovery": [],
+    "System_Service_Discovery": [],
+    "USB_Tokens_Discovery": [],
+    "Users_Discovery_Via_Skype": [],
+    "User_Object_Ldap_Request": [],
+    "Whoami_Alternative": [],
+    "WiFi_Networks_Configuration_Discovery": [],
+    "WindowsTitle_Discovery": [],
+    "Windows_Mass_Recon": [],
+    "Code_Execution_Via_JDK_Tools": [],
+    "Dangerous_Command_Usage": [],
+    "DLL_Load_From_NET_Assembly": [],
+    "DotNetToJScript_Usage": [],
+    "Dump_Bitlocker_Keys_From_Host": [],
+    "Execute_Encoded_Powershell": [],
+    "Execute_File_From_Sysvol_Share": [],
+    "Execute_Malicious_Command": [],
+    "Execute_Malicious_Powershell_Cmdlet": [],
+    "Execute_Over_WER_Service": [],
+    "Execute_PSEXEC": [],
+    "Execute_Suspicious_Command_Via_Cmd": [],
+    "Execute_Via_Wmiprvse": [],
+    "Finger_AWL_Bypass": [],
+    "Fuegoshell_Oneliners_Execution": [],
+    "Fuegoshell_Remote_Shell": [],
+    "Hidden_Scheduled_Task": [],
+    "Hidden_Service_Create": [],
+    "Image_Loaded_From_External_Location": [],
+    "LOLBin_Copying": [],
+    "Malicious_Office_Document": [],
+    "MSDT_Remote_Code_Execution": [],
+    "NimPlant_Powershell_Activity": [],
+    "Office_File_With_Macros": [],
+    "Outlook_VBA_Addin_Load": [],
+    "Payload_Injection_Into_EventLog": [],
+    "PowerShdll_Usage": [],
+    "Powershell_Library_Loaded_Into_Process": [],
+    "PowerViewPy_Init_Connection": [],
+    "Recon_Via_Webserver_Process": [],
+    "Remote_Registry_Enable": [],
+    "Reverse_Shell_Via_Powershell": [],
+    "Run_Malicious_Msbuild_Project": [],
+    "Run_Whoami_As_System": [],
+    "Scheduled_Task_Execution": [],
+    "Scheduled_Task_Manipulation": [],
+    "Schtasks_Commandline": [],
+    "Script_Files_Execution": [],
+    "SCT_Scripts_Hidden_Execution": [],
+    "Subrule_Payload_Download_Via_WebClient": [],
+    "Subrule_PowerShell_CLM_Bypass_4103": [],
+    "Subrule_PowerShell_CLM_Bypass_4104": [],
+    "Subrule_Script_Files_Execution": [],
+    "Subrule_Suspicious_RPC_Server": [],
+    "Suspicious_Child_From_Messenger_Process": [],
+    "Suspicious_Child_From_Webserver_Process": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "Suspicious_Directory_For_Process": [],
+    "Suspicious_Office_Dll_Startup": [],
+    "Suspicious_Process_Execution_Sequence": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "Suspicious_RPC_Server": [],
+    "Suspicious_ShortHanded_Process_Started": [],
+    "Suspicious_Webscript": [],
+    "Suspicious_Wmic_Command": [],
+    "Tttracer_LOLBin": [],
+    "WinAPI_Access_From_Powershell": [],
+    "Windows_Path_Traversal": [],
+    "Windows_Service_Installed": [],
+    "Bluetooth_File_Transfer": [
+        {
+            "Critical_Files_List": "No_manual_changes"
+        }
+    ],
+    "Cloud_Client_Synchronization_Folder_Usage": [],
+    "DNSExfiltrator_Usage": [],
+    "Exfiltration_Over_Alternative_Protocol_Detection": [],
+    "Rclone_Usage": [],
+    "Web_Service_Interaction_Via_LOLBins": [
+        {
+            "Specific_Local_Networks": "No_manual_changes"
+        }
+    ],
+    "Creation_Of_Many_Identical_Files": [],
+    "Desktop_Wallpaper_Change": [],
+    "Disk_Wipe": [],
+    "Hosts_File_Modify": [],
+    "NGate_Account_Access_Removal": [],
+    "Remove_Access_To_Sensitive_Account": [
+        {
+            "Sensitive_Users": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Critical_Domain_Accounts": "No_manual_changes"
+        }
+    ],
+    "Remove_Account_From_Sensitive_Group": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Critical_Domain_Accounts": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Protected_Domain_Accounts": "No_manual_changes"
+        }
+    ],
+    "Shadow_Copies_Deletion_With_Builtin_Tools": [],
+    "Shutdown_Tool_Usage": [],
+    "SMB_Takeover": [],
+    "Stop_Important_Service": [],
+    "Stop_Important_Service_Registry": [],
+    "Subrule_SMB_Takeover": [],
+    "External_Link_Clicked": [
+        {
+            "External_Link_WhiteList": "No_manual_changes"
+        },
+        {
+            "External_Link_Phishing": "No_manual_changes"
+        }
+    ],
+    "HoneyAccount_Auth_Success": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        },
+        {
+            "HoneyAccounts": "No_manual_changes"
+        }
+    ],
+    "Logon_Via_Vuln_Scanner_Account": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "Server_Scan_Usernames": "No_manual_changes"
+        }
+    ],
+    "Potential_Rogue_RDP_Attack": [],
+    "Service_Account_Mail_Auth": [
+        {
+            "Service_Accounts": "No_manual_changes"
+        },
+        {
+            "Service_Accounts_Manual": "No_manual_changes"
+        }
+    ],
+    "Service_Account_VPN_Connect": [
+        {
+            "Service_Accounts": "No_manual_changes"
+        },
+        {
+            "Service_Accounts_Manual": "No_manual_changes"
+        }
+    ],
+    "Service_Logon_From_VPN_Network": [
+        {
+            "VPN_Networks": "No_manual_changes"
+        },
+        {
+            "Service_Accounts": "No_manual_changes"
+        },
+        {
+            "Service_Accounts_Manual": "No_manual_changes"
+        }
+    ],
+    "Start_Process_From_MOTW_Archive": [],
+    "Subrule_Binary_Start_From_Archive": [],
+    "Suspicious_File_Creation_From_Messenger_Or_Mail": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "Suspicious_Living_Off_Trusted_Sites_Usage": [],
+    "WMI_Execution_Via_VBA_Macro": [],
+    "Auth_Coerce_With_WebClient_Abuse": [],
+    "Client_Side_Execution_Via_DCOM": [],
+    "Creation_Suspicious_File": [],
+    "DCOMUploadExec": [],
+    "DCOM_Excel_Abuse": [],
+    "Disable_Smartcard": [],
+    "Downloading_Remote_File_Via_Lolbas": [],
+    "Evil_WinRM_Activity": [],
+    "Impacket_Like_Execution": [],
+    "Input_Remote_PowerShell_Via_WinRM": [],
+    "KRB_Relay_Auth_MITM6": [],
+    "Lateral_Movement_Via_WinRM": [],
+    "LiquidSnake_WMI_EventFilter": [],
+    "Modify_And_Start_Remote_Service": [],
+    "MSSQL_NTLM_Relay": [],
+    "Multiple_RDP_From_One_User_Or_Host": [],
+    "NTLM_Relay_Auth": [],
+    "Output_Remote_PowerShell_Via_WinRM": [],
+    "Pass_The_Hash": [],
+    "Powershell_Remoting": [],
+    "RDP_Session_Hijacking": [],
+    "RDP_Shadow_Session_Initiation": [],
+    "RDP_Shared_Mountpoint_Usage": [],
+    "Remote_Admin_Share_Access": [],
+    "Remote_Code_Execution_Via_AtSvc": [],
+    "Remote_Creation_Suspicious_File": [],
+    "Remote_Execution_Via_Custom_Impacket": [],
+    "Remote_SSP_Dump": [],
+    "Remoting_Impacket_PsExec": [],
+    "Remoting_SSH": [],
+    "Remoting_SysInternals_PsExec": [],
+    "Remoting_Windows_Shell": [],
+    "Remoting_WinExec": [],
+    "Remoting_WMI": [],
+    "Scheduled_Task_Was_Created_Or_Updated_Via_Schtasks": [],
+    "Service_From_Remote_File_Creation": [],
+    "Shadow_Key_Creation": [],
+    "SharpLateral_DCOM": [],
+    "Start_Browser_Pivoting": [],
+    "Subrule_Browser_Remote_Debugging": [],
+    "Subrule_MSSQL_NTLM_Relay": [],
+    "Subrule_Remoting_SSH": [],
+    "Subrule_Session_Changed": [],
+    "Subrule_SSH_Connect": [],
+    "Subrule_Task_Created_Via_Atsvc": [],
+    "Subrule_Windows_Logon": [],
+    "Subrule_Windows_Remote_Logon_With_Explicit_Credentials": [],
+    "SVCCTL_Connection": [],
+    "Abusing_Windows_Telemetry_Persist": [],
+    "Accessibility_Feature_Tool_Abuse": [],
+    "Account_Created_On_Local_System": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "Sensitive_Users": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Critical_Domain_Accounts": "No_manual_changes"
+        }
+    ],
+    "Add_New_User_In_Commandline": [],
+    "Add_User_To_Group": [],
+    "AppCert_DLLs_Persist": [],
+    "Browser_Extension_Install": [],
+    "Command_Processor_Autorun_Modify": [],
+    "COM_Object_Persistence": [],
+    "Created_User_On_Domain_Controller": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "Critical_Domain_Group_User_Add": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Critical_Domain_Accounts": "No_manual_changes"
+        }
+    ],
+    "Debugger_In_Image_File_Execution_Options": [],
+    "Default_File_Association_Modify": [],
+    "Deserialization_Payload_WMI_Subscription": [],
+    "EventViewer_Registry_Modify": [],
+    "Fast_Create_And_Delete_Account": [],
+    "GlobalFlags_In_Image_File_Execution_Options": [],
+    "Hidden_Account_Creation": [],
+    "Hiding_Already_Existing_Task": [],
+    "IIS_Module_Filter_Installation": [],
+    "KeePass_Persistence": [],
+    "KRBTGT_Delegation": [],
+    "Logon_Script_Execution": [],
+    "Machine_Account_Attribute_Manipulation": [],
+    "Network_Provider_Modification": [],
+    "NSSM_Service_Installed": [],
+    "Office_Template_Modification": [],
+    "Office_XLL_Modification": [],
+    "Outlook_Form_Creation": [],
+    "Outlook_Form_Exploitation": [],
+    "Outlook_Malicious_Actions": [],
+    "Outlook_VbaProjectOTM_Replace": [],
+    "Perf_Key_Modify": [],
+    "Persistence_Netsh_DLL": [],
+    "Registry_Winlogon_Helper": [],
+    "Remote_Creation_Of_Computer_Account_By_Local_User": [
+        {
+            "Sensitive_Users": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Critical_Domain_Accounts": "No_manual_changes"
+        }
+    ],
+    "RID_Hijacking_Persistence": [],
+    "Script_Path_Attribute_Changed": [],
+    "Service_Created_Or_Modified": [],
+    "Suspicious_Network_Provider_DLL_Loaded": [],
+    "Time_Providers_Persistence": [],
+    "Unauthorized_Reset_Password_For_Sensitive_Users": [
+        {
+            "Sensitive_Users": "No_manual_changes"
+        }
+    ],
+    "Universal_Windows_Platform_Apps_Modify": [],
+    "Userinitmprlogonscript_Modify": [],
+    "Windows_Accessibility_StickyKey_Modification": [],
+    "Windows_Autorun_Modification": [],
+    "Windows_Screensaver_Modification": [],
+    "Windows_Startup_Folder_Modification": [],
+    "Windows_Webshell_Created": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "WMI_Subscriptions": [],
+    "WMI_Subscription_Creation": [],
+    "WMI_Subscription_Execution": [],
+    "AutoElevate_UAC_Bypass": [],
+    "Byeintegrity_UAC_Bypass": [],
+    "Changing_UAC_Flags": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "CoercedPotato_PrivEsc": [],
+    "CVE_2022_38028_PrivEsc_Via_Spoolsv": [],
+    "DelegateExecute_UAC_Bypass": [],
+    "DiskCleanup_UAC_Bypass": [],
+    "DLL_Hijacking": [],
+    "EfsPotato_PrivEsc": [],
+    "GodPotato_PrivEsc": [],
+    "ICMLuaUtil_UAC_Bypass": [],
+    "IHxExec_Arbitrary_Code_Execution": [],
+    "Intel_ShaderCache_UAC_Bypass": [],
+    "JuicyPotato_PrivEsc": [],
+    "LocalPotato_PrivEsc": [],
+    "MultiPotato_PrivEsc": [],
+    "Named_Pipe_Impersonation_PrivEsc": [],
+    "PetitPotato_PrivEsc": [],
+    "PrintNotify_Potato": [],
+    "PrivEsc_Via_Comctl32": [],
+    "PrivEsc_Via_StorSvc": [],
+    "RasMan_Potato": [],
+    "Registry_Modification_For_UAC_Bypass": [],
+    "Remote_Potato_Capture_Hash": [],
+    "Remote_Potato_Relay_Hash": [],
+    "RoguePotato_PrivEsc": [],
+    "RPC_Abuse_UAC_Bypass": [],
+    "RunAs_Context_Menu": [],
+    "RunAs_Context_Menu_Subrule_Execute": [],
+    "RunAs_Subrule_Login": [],
+    "RunAs_System_Or_External_Tools": [],
+    "S4UTomato_PrivEsc": [],
+    "SilverPotato_PrivEsc": [],
+    "Spoolsv_Priv_Escalation": [],
+    "Subrule_Action_After_Pipe_Connected": [],
+    "Subrule_AutoElevate_Process_Parent_Run": [],
+    "Subrule_AutoElevate_Process_Run": [],
+    "Subrule_CVE_2022_38028_Creating_Artifacts": [],
+    "Subrule_Elevated_Process_Run": [],
+    "Subrule_Full_Elevation_Token_Steal": [],
+    "Subrule_HTTP_Request": [],
+    "Subrule_IMarshal_Interface": [],
+    "Subrule_Not_Self_Relay": [],
+    "Subrule_Pwned_Pipe": [],
+    "Subrule_RasMan_Pipe": [],
+    "Subrule_S4UTomato_IMarshal_Creation": [],
+    "Suspicious_Windows_Kernel_Creating": [],
+    "System_Process_By_Local_Or_Network_Service": [],
+    "Token_Manipulation": [],
+    "UAC_Bypass_Via_Registry_Hijacking": [],
+    "Unquoted_Service_Path_Abuse": [],
+    "MongoDB_Connect_Through_Pentest_OS": [],
+    "MongoDB_Create_High_Role_User": [],
+    "MongoDB_Create_Root_User": [],
+    "MongoDB_Drop_Database": [],
+    "MongoDB_Dump_Collection": [],
+    "MongoDB_Dump_Database": [],
+    "MongoDB_Grant_High_Role": [],
+    "MongoDB_Mass_Drop_Table": [],
+    "MongoDB_Mass_Drop_User": [],
+    "MongoDB_Revoke_High_Role": [],
+    "MongoDB_View_Users": [],
+    "MongoDB_View_User_Roles": [],
+    "MSSQL_Administrator_List_Query": [],
+    "MSSQL_Administrator_Role_Manipulation": [],
+    "MSSQL_Audit_Configuration_Change": [],
+    "MSSQL_Audit_Configuration_Discovery": [],
+    "MSSQL_Backup_Location_Discovery": [],
+    "MSSQL_Create_File_In_System": [],
+    "MSSQL_Db_Accounts_Discovery": [],
+    "MSSQL_Dedicated_Administrator_Connection": [],
+    "MSSQL_Dump_Credential_Hashes": [],
+    "MSSQL_Dump_Database": [],
+    "MSSQL_Dump_Key_Or_Certificate": [],
+    "MSSQL_Enable_Mixed_Authentication": [],
+    "MSSQL_Enable_Nonsecure_Parameter": [],
+    "MSSQL_Enable_Nonsecure_Property": [],
+    "MSSQL_Enable_Remote_Access": [],
+    "MSSQL_Enable_Remote_Admin_Connection": [],
+    "MSSQL_Encryption_Configuration_Discovery": [],
+    "MSSQL_File_System_Discovery": [],
+    "MSSQL_Login_Configuration_Change": [],
+    "MSSQL_Pattern_Search_Usage": [],
+    "MSSQL_Policy_Check_Off": [],
+    "MSSQL_Read_Registry_Value": [],
+    "MSSQL_Self_Permissions_Discovery": [],
+    "MSSQL_Send_Query_Results": [],
+    "MSSQL_Sql_Server_Users_Discovery": [],
+    "MSSQL_System_Command_Usage": [],
+    "MSSQL_Version_Detect": [],
+    "MSSQL_Windows_Accounts_Discovery": [],
+    "MSSQL_Windows_Service_Control": [],
+    "MSSQL_Windows_Service_Discovery": [],
+    "MSSQL_Write_Registry_Value": [],
+    "MySQL_Audit_Disable": [],
+    "MySQL_Audit_Table_Access": [],
+    "MySQL_Audit_Table_Modify": [],
+    "MySQL_Audit_Table_Rename": [],
+    "MySQL_Audit_Table_Truncate": [],
+    "MySQL_Code_Execution": [],
+    "MySQL_Disconnect_User": [],
+    "MySQL_Dump_Credential_Hashes": [],
+    "MySQL_File_System_Actions": [],
+    "MySQL_Host_Cache_Table_Truncate": [],
+    "MySQL_Permissions_Operation": [],
+    "MySQL_Server_Connections_Discovery": [],
+    "MySQL_Structure_Discovery": [],
+    "MySQL_Update_Configuration": [],
+    "MySQL_Users_Discovery": [],
+    "MySQL_User_Operation": [],
+    "Subrule_MySQL_Create_Process": [],
+    "Netflow_Flow_Deny": [],
+    "Netflow_Host_Scan": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "Netflow_ICMP_SCTP_Ping_Scan": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "Netflow_Large_File_Transfer": [],
+    "Netflow_NTP_Timeroasing": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "Netflow_Potential_Bruteforce": [],
+    "Netflow_SMB_Anomaly": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "Netflow_SYN_Flood": [],
+    "Netflow_TCP_Packet_Flood": [],
+    "Netflow_TCP_Reset_Flag": [],
+    "Netflow_TCP_Stealth_Port_Scan": [],
+    "Netflow_UDP_Flood": [],
+    "Netflow_UDP_Stealth_Port_Scan": [],
+    "Netflow_UDP_TCP_Network_Scan": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "External_Mail_Service_Usage": [],
+    "External_Mail_Service_Usage_SMTP": [],
+    "External_VPN_Service_Usage": [],
+    "Possible_Rogue_FHRP_Peer": [],
+    "Possible_SNMP_Bruteforce_Different_Hosts": [],
+    "Possible_SNMP_Bruteforce_Single_Host": [],
+    "Smart_Install_Usage": [
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "UDP_Fragments": [],
+    "Untrusted_DNS_Server_Usage": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "Checkpoint_Admin_Modification": [],
+    "CheckPoint_SmartConsole_Attempt_To_Connect": [],
+    "CheckPoint_SmartConsole_Connection": [],
+    "Cisco_ASA_Disable_Username_Hiding": [],
+    "Cisco_ASA_Logging_To_Untrusted_Host": [],
+    "Cisco_ASA_Logging_Usernames_Outside": [],
+    "Cisco_Execute_Suspicious_Command": [],
+    "Cisco_IOS_Change_Config_By_SNMP": [],
+    "Cumulus_Disable_Logging": [],
+    "Cumulus_Logging_To_Untrusted_Host": [],
+    "DHCP_Starvation": [],
+    "MikroTik_Winbox_Untrusted_Connection": [],
+    "Smart_Install_Exploitation_Tool_Usage": [],
+    "Suspicious_ICMP_Packet": [],
+    "S_Terra_Gate_Delete_Files": [],
+    "S_Terra_Gate_Disable_Logging": [],
+    "S_Terra_Gate_Erase_Config": [],
+    "S_Terra_Gate_Logging_To_Untrusted_Host": [],
+    "ViPNet_IDS_Alert_Detect": [],
+    "ViPNet_Policy_Manager_User_Privileges_Modify": [],
+    "Oracle_Audit_Disable": [],
+    "Oracle_Audit_Disable_for_sysdba": [],
+    "Oracle_Audit_Disable_via_disable_policy": [],
+    "Oracle_Audit_Disable_via_drop_policy": [],
+    "Oracle_Audit_Disable_via_noaudit": [],
+    "Oracle_Audit_Drop": [],
+    "Oracle_Audit_Entry_Delete": [],
+    "Oracle_Audit_Entry_Insert": [],
+    "Oracle_Audit_Entry_Update": [],
+    "Oracle_Audit_Truncate": [],
+    "Oracle_Listener_Instance_Guessing": [],
+    "Oracle_Listener_Version_Check": [],
+    "Oracle_Select_Table_With_Hash": [],
+    "Oracle_Unified_Audit_Clean": [],
+    "Passwork_Admin_Role_Assignment": [],
+    "Passwork_Critical_User_Manipulation": [],
+    "Passwork_Logon_Different_Users_on_Same_Terminal": [],
+    "Passwork_Logon_Same_User_from_Different_Terminals": [],
+    "Passwork_Mass_Deletion_Of_Resources": [],
+    "Passwork_Mass_Deletion_Of_Users": [],
+    "Passwork_Password_Export": [],
+    "Postfix_Message_From_Wrong_Username": [],
+    "Postfix_Message_To_Root": [],
+    "Postfix_Open_Relay_Scan": [],
+    "Postfix_Shellshock_On_Patched_Version": [],
+    "Postfix_Suspicious_Sender": [],
+    "Postfix_User_Enumeration": [],
+    "PostgreSQL_Assignment_Sensitive_Privilege": [],
+    "PostgreSQL_Code_Execution": [],
+    "PostgreSQL_Disable_Security_Options": [],
+    "PostgreSQL_Dump_Credentials": [],
+    "PostgreSQL_File_System_Actions": [],
+    "PostgreSQL_Func_Discovery": [],
+    "PostgreSQL_Port_Scan": [],
+    "PostgreSQL_SecDef_Function_PrivEsc": [],
+    "PostgreSQL_Structure_Discovery": [],
+    "PostgreSQL_Update_Configuration": [],
+    "PostgreSQL_Users_Discovery": [],
+    "Subrule_PostgreSQL_Create_Process": [],
+    "LSASS_Memory_Dump_Via_Migrated_Process": [],
+    "Suspicious_Kaspersky_Agent_Process_Chain": [],
+    "Suspicious_Messenger_Process_Chain": [],
+    "Suspicious_MSBuild_Process_Chain": [],
+    "Suspicious_Node_Process_Chain": [],
+    "Suspicious_Office_Process_Chain": [],
+    "Suspicious_SCCM_Agent_Process_Chain": [],
+    "Suspicious_Webserver_Process_Chain": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "ADFS_Abnormal_Access": [],
+    "Antivirus_Server_Abnormal_Access": [],
+    "Application_Abnormal_Access": [],
+    "App_1C_Enterprise_Abnormal_Access": [],
+    "App_1C_Enterprise_Object_Modify": [],
+    "App_1C_Server_Abnormal_Access": [],
+    "App_1C_User_PC_Abnormal_Access": [],
+    "Arista_EOS_Abnormal_Access": [],
+    "Checkpoint_Abnormal_Access": [],
+    "Cisco_Abnormal_Access": [],
+    "Citrix_NS_ADC_Abnormal_Access": [],
+    "Confluence_Abnormal_Access": [],
+    "Critical_File_Access": [
+        {
+            "Critical_Files_List": "No_manual_changes"
+        }
+    ],
+    "Critical_Server_Abnormal_Access": [],
+    "Developer_PC_Abnormal_Access": [],
+    "Domain_Controller_Abnormal_Access": [],
+    "Elasticsearch_TM_Abnormal_Access": [],
+    "Fortigate_Abnormal_Access": [],
+    "FreeIPA_Abnormal_Access": [],
+    "Gitlab_Abnormal_Access": [
+        {
+            "SupplyChain_Important_Branches_Registry": "No_manual_changes"
+        }
+    ],
+    "Grafana_Abnormal_Access": [],
+    "Hashicorp_Vault_Abnormal_Access": [],
+    "Infowatch_TM_Abnormal_Access": [],
+    "Keycloak_Abnormal_Access": [],
+    "Kontinent_Abnormal_Access": [],
+    "KSC_Console_Abnormal_Access": [],
+    "MECM_Abnormal_Access": [],
+    "MFA_Abnormal_Access": [],
+    "MSSQL_Abnormal_Access": [],
+    "Owa_Abnormal_Access": [],
+    "Passwork_Abnormal_Access": [],
+    "PostgreSQL_Abnormal_Access": [],
+    "PTAF_Abnormal_Access": [],
+    "PT_IAM_Abnormal_Access": [],
+    "Release_Build_Agent_Abnormal_Access": [],
+    "SecurityAdmin_Abnormal_Access": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "Sensitive_Users": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Critical_Domain_Accounts": "No_manual_changes"
+        }
+    ],
+    "Subrule_Teampass_Login_Successful": [],
+    "Subrule_Unix_Server_Abnormal_Access": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "Subrule_Windows_Host_Abnormal_Access": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "Teamcity_Abnormal_Access": [],
+    "Teamcity_Abnormal_BuildConfig_Modify": [],
+    "Teampass_Abnormal_Access": [],
+    "Teleport_Abnormal_Access": [
+        {
+            "Risk_User_Logon_Correlation_Profile_Manual": "No_manual_changes"
+        }
+    ],
+    "Top_Managers_Abnormal_Access": [],
+    "Update_Server_Abnormal_Access": [],
+    "UsWeb_Abnormal_Access": [],
+    "VCenter_Abnormal_Access": [],
+    "VCS_Server_Abnormal_Access": [],
+    "ViPNet_TIAS_Abnormal_Access": [],
+    "Wifi_Abnormal_Access": [],
+    "Zabbix_Abnormal_Access": [],
+    "ZVirt_Abnormal_Access": [],
+    "ProxMox_VE_Critical_Snapshot_Backup_Event": [
+        {
+            "ProxMox_Critical_VM_Container": "No_manual_changes"
+        }
+    ],
+    "ProxMox_VE_Critical_VM_Container_Manipulation": [
+        {
+            "ProxMox_Critical_VM_Container": "No_manual_changes"
+        }
+    ],
+    "ProxMox_VE_Download_Suspicious_File": [],
+    "ProxMox_VE_Multiple_Storage_Remove": [],
+    "ProxMox_VE_Multiple_VM_Container_Stop": [],
+    "ProxMox_VE_Suspicious_Trafic": [
+        {
+            "Specific_Local_Networks": "No_manual_changes"
+        }
+    ],
+    "PTAF_Alert_Detected": [],
+    "PTAF_BruteForce_Detected": [],
+    "PTAF_Bulk_Failed_Logins": [],
+    "PTAF_Command_Injection_Detected": [],
+    "PTAF_CVE_Detected": [],
+    "PTAF_Hacktool_Detected": [],
+    "PTAF_LFI_Detected": [],
+    "PTAF_Old_Or_Unknown_HTTP_Version": [],
+    "PTAF_Path_Traversal_Detected": [],
+    "PTAF_Reflected_File_Download_Detected": [
+        {
+            "Specific_Local_Networks": "No_manual_changes"
+        }
+    ],
+    "PTAF_Scanner_Detected": [],
+    "PTAF_SQL_Injection_Detected": [],
+    "PTAF_Webshell_Detected": [],
+    "PTAF_XSS_Attack_Detected": [],
+    "PTCS_Alert_Detected": [],
+    "PTCS_Container_Device_Mount": [],
+    "PTCS_Cryptominer_Run": [],
+    "PTCS_CVE_2022_0492": [],
+    "PTCS_Data_Destruction_Tools_Use": [],
+    "PTCS_Download_Tools_Use": [],
+    "PTCS_Execute_Encoded_Shell_Script": [],
+    "PTCS_Hacktool_Usage": [],
+    "PTCS_Kernel_Module_Load": [],
+    "PTCS_Kubernetes_SA_Token_Read": [],
+    "PTCS_LD_PRELOAD_Use": [],
+    "PTCS_Privilege_Escalation": [],
+    "PTCS_Ptrace_Code_Injection": [],
+    "PTCS_Raw_Sockets_Use": [],
+    "PTCS_Recon_Tools_Use": [],
+    "PTCS_Reverse_Shell": [],
+    "PTCS_Runtime_Utils_Use": [],
+    "PTCS_Run_Process_From_Memfd": [],
+    "PTCS_Scheduler_Task_Modification": [],
+    "PTCS_SSH_Tunnel_Create": [],
+    "PTCS_Suspicious_File_Read": [],
+    "PTCS_Suspicious_Shell_Create": [],
+    "ISIM_Event_To_Incident": [],
+    "NAD_Activity_Detected": [],
+    "NAD_CVE_On_Vulnerable_Host": [
+        {
+            "Vulnerable_Hosts": "No_manual_changes"
+        }
+    ],
+    "NAD_DCShadow_Attack": [],
+    "NAD_DCSync_Attack": [],
+    "NAD_DNS_Zone_Transfer": [],
+    "NAD_Enumerate": [],
+    "NAD_Hacktool_Usage": [],
+    "NAD_NTLM_To_External": [],
+    "NAD_SAM_Account_Name_Spoofing": [],
+    "NAD_Sharphound": [],
+    "NAD_Significant_Signature": [
+        {
+            "IOCs_Value": "No_manual_changes"
+        }
+    ],
+    "NAD_Suspicious_Network_Activity_From_Single_Host": [],
+    "NAD_Suspicious_Network_Activity_Many_To_Single_Host": [],
+    "NAD_Tunnel_Tool": [],
+    "NGFW_Antivirus_Alert": [],
+    "NGFW_DCShadow_Attack": [],
+    "NGFW_DCSync_Attack": [],
+    "NGFW_External_Syslog_Server": [],
+    "NGFW_SAM_Account_Name_Spoofing": [],
+    "NGFW_Significiant_Signatures": [
+        {
+            "IOCs_Value": "No_manual_changes"
+        }
+    ],
+    "NGFW_Suspicious_Security_Rule": [],
+    "NGFW_Suspicious_Url_Detection": [],
+    "Redis_Bruteforce": [],
+    "Redis_Config_Rewrite": [],
+    "Redis_Possible_Security_Attack_Or_Maxmemory_Setting": [],
+    "Connect_To_Significant_Hosts_From_VPN": [
+        {
+            "VPN_Networks": "No_manual_changes"
+        },
+        {
+            "Significant_Networks": "No_manual_changes"
+        }
+    ],
+    "Duplicate_Remote_Session": [],
+    "File_Copy_Via_RemoteAccess_Tool": [],
+    "LOLRMM_Tools_Usage": [],
+    "Mail_Abnormal_Access": [],
+    "Possible_Mail_Spoofing_Attack": [
+        {
+            "Mail_Domains": "No_manual_changes"
+        }
+    ],
+    "RDG_Abnormal_Access": [],
+    "RDP_Connect_After_RDG": [],
+    "RDP_Login_From_Internet": [],
+    "RDP_Login_From_Known_UNIX_Host": [
+        {
+            "UNIX_Hosts": "No_manual_changes"
+        },
+        {
+            "AssetGrid_UNIX_Hosts": "No_manual_changes"
+        }
+    ],
+    "RDP_Suspicious_Client": [],
+    "RDP_Tunneling": [],
+    "Remote_Administration_Tools_Usage": [],
+    "Remote_Login_From_Not_Allowed_Country": [],
+    "Remote_Session_Changed_Address_CheckPoint": [],
+    "SMB_RPC_Internet_Connection": [],
+    "TeamViewer_Activity": [],
+    "VNC_Connection": [
+        {
+            "Specific_Local_Networks": "No_manual_changes"
+        }
+    ],
+    "VPN_Abnormal_Access": [],
+    "VPN_Client_To_Client_Connection": [
+        {
+            "VPN_Networks": "No_manual_changes"
+        }
+    ],
+    "VPN_MultiUser_IP": [],
+    "VPN_User_Abnormal_Access": [],
+    "Windows_Firewall_Enable_Local_RDP": [],
+    "SaltStack_Exec_Cmd": [],
+    "SaltStack_Run_Get_Url_Dir_Command": [],
+    "SaltStack_Run_List_Master_Command": [],
+    "SambaDC_Account_Attribute_Manipulation": [],
+    "SambaDC_Active_Directory_Data_Collection": [],
+    "SambaDC_Active_Directory_Snapshot": [],
+    "SambaDC_Critical_Domain_Group_User_Add": [
+        {
+            "AssetGrid_Critical_Domain_Accounts": "No_manual_changes"
+        }
+    ],
+    "SambaDC_Critical_Files_Access": [],
+    "SambaDC_DCSync_Attack": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "SambaDC_Kerberoasting": [],
+    "SambaDC_LDAP_Discovery": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "AssetGrid_Servers": "No_manual_changes"
+        }
+    ],
+    "SambaDC_Multiple_User_Lock": [],
+    "SambaDC_Multiple_User_Password_Change": [],
+    "SambaDC_User_Locked_Too_Many_Logons": [],
+    "Subrule_SambaDC_Tickets_Requested": [],
+    "SAPASABAP_Account_Bruteforce": [],
+    "SAPASABAP_Bultin_Accounts_Probing": [],
+    "SAPASABAP_Client_Bruteforce": [],
+    "SAPASABAP_Delete_Sapstar_And_Login": [],
+    "SAPASABAP_Download_Critical_Info": [],
+    "SAPASABAP_Gathering_Info": [],
+    "SAPASABAP_Signature_Pentest_Tools": [],
+    "SAPASABAP_Start_Critical_Module": [],
+    "SAPASABAP_Start_Critical_Transaction": [],
+    "SAPASABAP_Trying_Get_Privileges": [],
+    "SAPASABAP_Using_Bultin_Accounts": [],
+    "SAPASABAP_Using_Various_Accounts_On_One_Terminal": [],
+    "SAPASABAP_View_Critical_Tables": [],
+    "SAPASABAP_Wrong_User_Type": [],
+    "SAPASJAVA_Assign_User_To_Admin_Group": [
+        {
+            "SAP_JAVA_Admin_Groups": "No_manual_changes"
+        }
+    ],
+    "SAPASJAVA_Authorization_Assignment_By_Non_Admin_User": [
+        {
+            "SAP_JAVA_Admin_Users": "No_manual_changes"
+        }
+    ],
+    "SAPASJAVA_Create_Account_And_Login": [],
+    "SAPASJAVA_Failed_Logon_Of_Same_User_From_Different_Terminals": [],
+    "SAPASJAVA_Failed_Logon_With_Locked_Expired_User": [],
+    "SAPASJAVA_Logon_Success_Same_User_From_Different_Terminals": [],
+    "SAPASJAVA_Password_Changed_For_SAP_Standard_Users_And_Logon": [],
+    "SAPASJAVA_User_Locked_After_Too_Many_Password_Logon_Attempts": [],
+    "SAPASJAVA_User_Password_Changed": [],
+    "SAPASABAP_Assigning_Yourself_Privileges": [],
+    "SAPASABAP_Create_Client_And_Login": [],
+    "SAPASABAP_Critical_Action_By_Non_Admin_User": [],
+    "SAPASABAP_Debug_Auth_Check": [],
+    "SAPASABAP_Debug_Mode_Usage": [],
+    "SAPASABAP_Development_Transaction_Usage": [],
+    "SAPASABAP_Download_Bytes": [],
+    "SAPASABAP_Download_Bytes_period": [],
+    "SAPASABAP_EARLYWATCH_Connect": [],
+    "SAPASABAP_Fast_Login_Logoff": [],
+    "SAPASABAP_GW_Audit_Disabled": [],
+    "SAPASABAP_GW_Call_Not_Allowed_Monitor_Command": [],
+    "SAPASABAP_GW_Check_Registered_Tp": [],
+    "SAPASABAP_GW_Gateway_Signature_Pentest_Tools": [],
+    "SAPASABAP_GW_Reginfo_Denied_Server": [],
+    "SAPASABAP_GW_Rfcexec_Call": [],
+    "SAPASABAP_GW_Sapxpg_Call": [],
+    "SAPASABAP_GW_Secinfo_Denied": [],
+    "SAPASABAP_GW_Security_Audit_Disabled": [],
+    "SAPASABAP_GW_Server_Registration_Anomaly": [],
+    "SAPASABAP_GW_Try_Monitor_Command": [],
+    "SAPASABAP_Lock_Many_Accounts": [],
+    "SAPASABAP_Login_Fired_Employee": [],
+    "SAPASABAP_Start_Critical_Report": [],
+    "SAPASABAP_Unlock_Login_And_Lock_User": [],
+    "Subrule_SAPASABAP_GW_Check_Registered_Tp": [],
+    "SecretNet_LSP_Apply_Backup": [],
+    "SecretNet_LSP_Disable_Rule": [],
+    "SecretNet_LSP_Export_Backup": [],
+    "SecretNet_LSP_FW_Rule_Without_Audit_Created": [],
+    "SecretNet_LSP_Manipulate_Critical_Data": [
+        {
+            "Applications_Critical_Data_Values": "No_manual_changes"
+        }
+    ],
+    "SecretNet_LSP_Manipulate_User_With_Critical_Roles": [],
+    "SecretNet_LSP_Multiple_Host_Lock": [],
+    "SecretNet_LSP_Multiple_Host_Unlock": [],
+    "SecretNet_LSP_Multiple_User_Password_Change": [],
+    "SecretNet_LSP_Policy_Change": [],
+    "SecretNet_LSP_Remove_Log_From_Database": [],
+    "SecretNet_LSP_User_Elevating": [
+        {
+            "Secretnet_Lsp_User_Elevate_Allowed": "No_manual_changes"
+        }
+    ],
+    "Solaris_Detect_Bind_Shell": [],
+    "Solaris_Detect_Local_Automatic_Recon_By_WWW_User": [],
+    "Solaris_Detect_Local_Manual_Recon_By_WWW_User": [],
+    "Solaris_Detect_Possible_Unix_Reverse_Tunneling_Via_SSH": [],
+    "Solaris_Detect_Possible_Unix_Tunneling_Via_SSH": [],
+    "Solaris_Detect_Raw_Socket": [],
+    "Solaris_Detect_Run_Bash_For_Reverse_Shell": [],
+    "Solaris_Detect_Run_Reverse_Shell_By_Something": [],
+    "SupplyChain_Branch_Protect": [
+        {
+            "SupplyChain_Important_Branches_Registry": "No_manual_changes"
+        }
+    ],
+    "SupplyChain_Branch_Unprotect": [],
+    "SupplyChain_Default_Account_Logon": [],
+    "SupplyChain_Dependency_Confusion": [
+        {
+            "SupplyChain_Private_Vendor_Libraries": "No_manual_changes"
+        }
+    ],
+    "SupplyChain_File_Upload_To_Important_Repository": [
+        {
+            "SupplyChain_Artifactory_Subnets_Whitelist": "No_manual_changes"
+        }
+    ],
+    "SupplyChain_Gitlab_Login_From_New_Address": [],
+    "SupplyChain_Important_Branch_Remove": [
+        {
+            "SupplyChain_Important_Branches_Registry": "No_manual_changes"
+        }
+    ],
+    "SupplyChain_Maintainer_Or_Owner_Role_Assign": [],
+    "SupplyChain_Mass_Maintainer_Or_Owner_Role_Assign": [],
+    "SupplyChain_Merge_Request_Apply_From_New_Assignee": [],
+    "SupplyChain_Merge_Request_Apply_Without_Approvers": [],
+    "SupplyChain_Merge_Request_Approve_By_Creator": [
+        {
+            "SupplyChain_Important_Branches_Registry": "No_manual_changes"
+        }
+    ],
+    "SupplyChain_Push_By_Non_Standard_User": [],
+    "SupplyChain_Push_Without_Merge_Request": [],
+    "SupplyChain_Sensitive_File_Access": [],
+    "SupplyChain_TeamCity_Execution_Via_Request": [],
+    "SupplyChain_TeamCity_Modify_Group": [
+        {
+            "SupplyChain_TeamCity_Important_Groups": "No_manual_changes"
+        }
+    ],
+    "SupplyChain_TeamCity_Plugin_Modify": [],
+    "SupplyChain_Web_UI_File_Operation": [
+        {
+            "SupplyChain_Important_Branches_Registry": "No_manual_changes"
+        }
+    ],
+    "Teleport_Critical_Lock_Created": [
+        {
+            "List_Servers": "No_manual_changes"
+        },
+        {
+            "Teleport_Critical_Roles": "No_manual_changes"
+        }
+    ],
+    "Teleport_Critical_Role_Manipulation": [
+        {
+            "Teleport_Critical_Roles": "No_manual_changes"
+        }
+    ],
+    "Teleport_Critical_User_Manipulation": [
+        {
+            "Teleport_Critical_Roles": "No_manual_changes"
+        }
+    ],
+    "Teleport_Multiple_User_Locks": [],
+    "Teleport_Multiple_User_Modification": [],
+    "SafeMobile_Critical_Event": [],
+    "SafeMobile_Delete_Monitor": [],
+    "Unix_Sensitive_File_Read": [],
+    "Unix_Suspicious_Home_Read": [],
+    "Subrule_Unix_Possible_GS_Netcat_Usage": [],
+    "Unix_Droppers_By_Daemons": [],
+    "Unix_Possible_GSocket_Usage": [],
+    "Unix_Possible_GS_Netcat_Usage": [],
+    "Unix_Proxy_Forwarding": [],
+    "Unix_Raw_Socket": [],
+    "Unix_Tunneling_Via_SSH": [],
+    "Unix_Tunneling_Via_SSHuttle": [],
+    "Unix_Tunnel_Process": [],
+    "Unix_Cred_Files_Read": [],
+    "Unix_Hashdump": [],
+    "Unix_History_File_Read": [],
+    "Unix_Mimipenguin_Cred_Dump": [],
+    "Unix_PAM_Modify": [],
+    "Unix_Private_Keys_Read": [],
+    "Unix_API_Calls_From_Home_Directory": [],
+    "Unix_API_Calls_From_Suspicious_Directory": [],
+    "Unix_Clear_Command_History": [],
+    "Unix_Disable_AppArmor": [],
+    "Unix_Disable_Auditd": [],
+    "Unix_Disable_SELinux": [],
+    "Unix_Disable_Syslog": [],
+    "Unix_Firewall_Disable_Config_Modify": [],
+    "Unix_Hidden_User": [],
+    "Unix_Impair_Command_Logging": [],
+    "Unix_Log_Config_Modify": [],
+    "Unix_Run_Process_From_Home_Directory": [],
+    "Unix_Run_Process_From_Suspicious_Directory": [],
+    "Unix_Shell_Command_Via_GTFOBINS": [],
+    "Unix_Suspicious_Emodji_Cmdline": [],
+    "Unix_Suspicious_Hidden_Files": [],
+    "Unix_Internet_Connection_Discovery": [],
+    "Unix_Local_Account_Discovery": [],
+    "Unix_Local_Mass_Recon": [],
+    "Unix_MsLDAPDump_Usage": [],
+    "Unix_Password_Policy_Discovery": [],
+    "Unix_Process_Discovery": [],
+    "Unix_Security_Software_Discovery": [],
+    "Unix_Software_Discovery": [],
+    "Unix_System_Information_Discovery": [],
+    "Unix_System_Network_Configuration_Discovery": [],
+    "Unix_System_Service_Discovery": [],
+    "Unix_System_User_Discovery": [],
+    "Unix_X_Windows_Properties_Discovery": [],
+    "LOLESXi_Usage": [],
+    "Unix_Bind_Shell": [],
+    "Unix_Connect_From_Home_Dir": [],
+    "Unix_Connect_From_Suspicious_Dir": [],
+    "Unix_File_Creation_By_Script": [],
+    "Unix_Hacktool_Usage": [],
+    "Unix_Inline_Reverse_Or_Bind_Shell": [],
+    "Unix_Recon_Tools_And_Commands": [],
+    "Unix_Reverse_Shell": [],
+    "Unix_Reverse_Shell_Via_Bash": [],
+    "Unix_Suspicious_Command": [],
+    "Unix_Suspicious_Process_Execution_Sequence": [],
+    "Cryptominer_Activity": [],
+    "Unix_Process_Started_Via_Office_Macros": [],
+    "Unix_Suspicious_Activity_By_Web_User": [],
+    "Subrule_Unix_Dump_SSH_Auth_Sock": [],
+    "Subrule_Unix_PortForwarding": [],
+    "Subrule_Unix_Suspicious_SO_Created_And_Opened": [],
+    "Unix_Exploiting_SambaCry": [],
+    "Unix_File_Download_Via_GTFOBINS": [],
+    "Unix_SSH_Agent_Hijacking": [],
+    "Unix_SSH_Login_By_Daemons": [],
+    "Unix_At_Job_Modify": [],
+    "Unix_Autostart_Modify": [],
+    "Unix_Bin_Modify": [],
+    "Unix_Boot_Modify": [],
+    "Unix_Init_Script_Modify": [],
+    "Unix_Lib_Modify": [],
+    "Unix_New_Cron_Job": [],
+    "Unix_OpenSSH_Binary_Modification": [],
+    "Unix_Sensitive_File_Modification": [],
+    "Unix_Shell_Config_Modify": [],
+    "Unix_SSH_Key_Modify": [],
+    "Unix_Suspicious_Etc_Modify": [],
+    "Unix_Suspicious_Home_Modify": [],
+    "Unix_Systemd_Service_Modify": [],
+    "Unix_Systemd_Timers": [],
+    "Unix_User_Creation": [],
+    "Unix_Webshell_Created": [],
+    "CVE_2024_1086_Linux_LPE": [],
+    "Unix_Exploiting_OverlayFS": [],
+    "Unix_PrivEsc_Via_PKexec": [],
+    "Unix_Privilege_Escalation_Via_GTFOBINS": [],
+    "Unix_Run_Process_Via_Ldso": [],
+    "Unix_TTY_Command_Injection": [],
+    "ViPNet_TIAS_Alert_Detect": [],
+    "ViPNet_TIAS_Critical_User_Manipulation": [],
+    "ViPNet_TIAS_Mass_Deletion_Of_Resources": [],
+    "ViPNet_TIAS_Mass_Deletion_Of_Users": [],
+    "VK_Cloud_Critical_DB_Operation": [
+        {
+            "VK_Cloud_Important_Objects": "No_manual_changes"
+        }
+    ],
+    "VK_Cloud_Critical_Objects_Clone": [],
+    "VK_Cloud_Critical_VM_Operation": [
+        {
+            "VK_Cloud_Important_Objects": "No_manual_changes"
+        }
+    ],
+    "VK_Cloud_Image_From_Marketplace_Creation": [],
+    "VK_Cloud_Insecure_Address_Pairs_Assign": [],
+    "VK_Cloud_Keypair_Operation": [],
+    "VK_Cloud_New_VM_From_Critical_Objects": [],
+    "VK_Cloud_Port_Security_Disabled": [],
+    "VK_Cloud_Port_Security_Group_Operation": [],
+    "VK_Cloud_Router_Public_Address_Assign": [],
+    "VK_Cloud_Security_Group_Rule_Operation": [],
+    "VK_Cloud_VM_Create_Operation_By_Suspicious_User": [],
+    "VK_Cloud_VM_Metadata_Contains_Sensitive_Value": [],
+    "VK_Cloud_VM_Public_Address_Assign": [],
+    "VK_Cloud_VM_Security_Group_Operation": [],
+    "VK_Workmail_App_Password_Create": [],
+    "VK_Workmail_Emails_Mark_Spam": [],
+    "VK_Workmail_Folder_Clear": [],
+    "VK_Workmail_Forward_Rule_Creation": [],
+    "VK_Workmail_Mailbox_Clear": [],
+    "VK_Workmail_User_Marked_As_Spammer": [],
+    "AOFL_Added_New_Log_Filter": [],
+    "AOFL_Change_Global_Agent_Config": [],
+    "AOFL_Cloud_Account_Added_Critical_Permission": [
+        {
+            "AOFL_Critical_Permissions": "No_manual_changes"
+        }
+    ],
+    "AOFL_Data_Partition_Remove": [],
+    "AOFL_Massive_Alerts_Remove": [],
+    "AOFL_Massive_Change_Agent_Groups": [],
+    "AOFL_Possible_Upgrade_Via_Malicious_Pak": [],
+    "AOFL_Role_Manage": [
+        {
+            "AOFL_Critical_Permissions": "No_manual_changes"
+        }
+    ],
+    "AOFL_User_Locked_Too_Many_Logons": [],
+    "AOFL_User_Manage": [],
+    "Aria_Operations_Admin_Panel_Admin_Locked_Too_Many_Logons": [],
+    "Aria_Operations_Change_Admin_Password_Via_CLI": [],
+    "Aria_Operations_Mass_Remove_Resources": [],
+    "Aria_Operations_Remove_Critical_Resource": [
+        {
+            "Aria_Operations_Critical_Resources": "No_manual_changes"
+        }
+    ],
+    "Aria_Operations_Request_Classified_As_Csrf_Attack": [],
+    "Aria_Operations_User_Manage": [],
+    "Cloning_Critical_VM": [
+        {
+            "VSphere_Critical_VMs_Custom": "No_manual_changes"
+        },
+        {
+            "VSphere_Critical_VMs_Assets": "No_manual_changes"
+        }
+    ],
+    "Disabling_Protective_VM": [
+        {
+            "VSphere_Protective_VMs_Custom": "No_manual_changes"
+        },
+        {
+            "VSphere_Protective_VMs_Assets": "No_manual_changes"
+        }
+    ],
+    "Downloading_Files_Of_Critical_VM": [
+        {
+            "VSphere_Critical_VMs_Custom": "No_manual_changes"
+        },
+        {
+            "VSphere_Critical_VMs_Assets": "No_manual_changes"
+        }
+    ],
+    "Mass_Cloning_Critical_VM": [],
+    "Mass_Disabling_Protective_VM": [],
+    "Mass_Downloading_Files_Of_Critical_VM": [],
+    "Mass_Reconfiguring_Protective_VM": [],
+    "Reconfiguring_Protective_VM": [
+        {
+            "VSphere_Protective_VMs_Custom": "No_manual_changes"
+        },
+        {
+            "VSphere_Protective_VMs_Assets": "No_manual_changes"
+        }
+    ],
+    "Certified_Priv_Esc_CVE_2022_26923": [],
+    "CMS_1C_Bitrix_Race_Landing_Exploit": [],
+    "CVE_2021_36934_HiveNightmare": [],
+    "CVE_2021_41379_Exploitation": [],
+    "CVE_2021_41379_Subrule_Elevation_Service_Chain": [],
+    "CVE_2021_41379_Subrule_Start_Elevation": [],
+    "CVE_2022_26134_Confluence_RCE": [],
+    "CVE_2022_26500_26501_Exploitation": [],
+    "CVE_2022_26503_Exploitation": [],
+    "CVE_2022_26503_Subrule_1": [],
+    "CVE_2022_26503_Subrule_2": [],
+    "CVE_2023_22515_Confluence": [],
+    "CVE_2023_27350_PaperCut_Authentication_Bypass": [],
+    "CVE_2023_38831_WinRar": [],
+    "CVE_2023_42793_Teamcity_Token_Manipulation": [],
+    "CVE_2023_46604_ActiveMQ_RCE": [],
+    "CVE_2023_4911_GLIBC_Buffer_Overflow": [],
+    "CVE_2023_7028_Gitlab_Password_Reset": [],
+    "CVE_2024_21378_Outlook_RCE": [],
+    "CVE_2024_21413_Outlook_MonikerLink": [],
+    "CVE_2024_21683_Confluence_RCE": [],
+    "CVE_2024_22116_Zabbix_Command_Injection": [],
+    "CVE_2024_23897_Jenkins_Arbitrary_File_Read": [],
+    "CVE_2024_24919_CheckPoint_Information_Disclosure": [],
+    "CVE_2024_26229_CSC_Service_PrivEsc": [],
+    "CVE_2024_27198_TeamCity_Authentication_Bypass": [],
+    "CVE_2024_29510_Ghostscript": [],
+    "CVE_2024_30085_PrivEsc_CldFlt": [],
+    "CVE_2024_30090_PrivEsc_Via_Microsoft_Streaming_Service": [],
+    "CVE_2024_32002_RCE_Via_Git_Clone": [],
+    "CVE_2024_38077_RCE_RDP_Licensing_Server": [],
+    "CVE_2024_38200_Office_NTLM_Relay": [],
+    "CVE_2024_4577_PHP_CGI_RCE": [],
+    "CVE_2024_47575_FortiJump_FortiManager_RCE": [],
+    "CVE_2024_49040_Exchange_Sender_Address_Spoffing": [],
+    "CVE_2024_49113_LDAPNightmare": [],
+    "CVE_2024_9474_PaloAlto_Command_Injection": [],
+    "CVE_2025_0411_7Zip_MotW_Bypass": [],
+    "CVE_2025_10230_Samba_WINS_Hook": [],
+    "CVE_2025_1974_Kubernetes_IngressNightmare": [],
+    "CVE_2025_24071_NTLM_Hash_Leak": [],
+    "CVE_2025_24813_Tomcat_RCE": [],
+    "CVE_2025_32433_Erlang_SSH_RCE": [],
+    "CVE_2025_33053_Internet_Shortcut_Files_RCE": [],
+    "CVE_2025_33073_SMB_Client_Elevation": [],
+    "CVE_2025_38001_Linux_HFSC_LPE": [],
+    "CVE_2025_47286_iTop_RCE": [],
+    "CVE_2025_48799_PrivEsc_Via_Windows_Update_Service": [],
+    "CVE_2025_53770_SharePoint_Unauthenticated_RCE": [],
+    "CVE_2025_55188_7Zip_Arbitrary_File_Write": [],
+    "CVE_2025_59287_WSUS_RCE": [],
+    "CVE_2025_6218_WinRAR_Directory_Traversal": [],
+    "CVE_on_Vulnerable_Host": [
+        {
+            "Vulnerable_Hosts": "No_manual_changes"
+        }
+    ],
+    "Export_KeePass_Credentials": [],
+    "Foxit_PDF_Reader_RCE": [],
+    "LPE_7zip_CVE_2022_29072": [],
+    "MS17_010_SMB_Code_Execution": [],
+    "MS17_010_SMB_Privellege_Escalation": [],
+    "MSDT_CVE_2022_30190": [],
+    "Possible_CVE_2019_1388": [],
+    "Possible_CVE_2020_1350": [],
+    "Possible_CVE_2021_1647": [],
+    "Possible_CVE_2022_0847_Dirty_Pipe": [],
+    "Possible_CVE_2023_20198_Cisco_IOS_XE": [],
+    "Possible_CVE_2025_21204_Windows_Update_Stack": [],
+    "PrinterPort_Backdoor": [],
+    "PrintSpooler_PrivEsc": [],
+    "PrintSpooler_PrivEsc_CVE_2022_30206": [],
+    "PrivEsc_Via_UAC_Elevated_Data": [],
+    "Sharepoint_Remote_Code_Execution": [],
+    "Subrule_ActiveMQ_Connect": [],
+    "Subrule_CVE_2023_4911_GLIBC_Buffer_Overflow": [],
+    "Subrule_CVE_2024_21683_Confluence_RCE": [],
+    "Subrule_CVE_2024_32002_RCE_Via_Git_Clone": [],
+    "Subrule_CVE_2025_0411_7Zip_MotW_Bypass": [],
+    "Subrule_CVE_2025_24071_NTLM_Hash_Leak": [],
+    "Subrule_CVE_2025_24813_Tomcat_RCE": [],
+    "Subrule_CVE_2025_48799_PrivEsc_Via_Windows_Update_Service": [],
+    "Subrule_StartProcess_And_Create_ConfigMsi": [],
+    "Symlink_Via_SpoolDirectory": [],
+    "Uptime_Kuma_RCE_Via_Fake_Chrome": [],
+    "Windows_Contacts_RCE": [],
+    "Windows_Roaming_Credential_Used": [],
+    "Wallarm_Attack_Detected": [],
+    "Wallarm_BruteForce_Detected": [],
+    "Wallarm_Path_Traversal_Detected": [],
+    "Wallarm_RCE_Attack_Detected": [],
+    "Wallarm_SQL_Injection_Detected": [],
+    "Wallarm_XSS_Attack_Detected": [],
+    "Web_Automation_Tool": [],
+    "Web_Bulk_Failed_URL_Access": [],
+    "Web_Headless_Browser_Detected": [],
+    "Web_Request_Missing_Useragent": [],
+    "Web_Searching_Non_Existent_Artifacts": [],
+    "Web_Servers_Abnormal_Activity_CaptivePortal_Custom_Page": [],
+    "Web_Servers_Abnormal_Activity_Defense_Evasion": [],
+    "Web_Servers_Abnormal_Activity_Many_Accounts_One_Host": [],
+    "Web_Servers_Abnormal_Activity_Many_Hosts_One_Account": [],
+    "Web_Servers_Abnormal_Activity_Modify_User_Privileges": [],
+    "Web_Servers_Abnormal_Activity_Persistence_Via_User_Creation": [],
+    "Yandex_360_Spam_Attack_By_Source": [],
+    "Yandex_360_Spam_Attack_By_Title": [],
+    "Yandex_Cloud_Access_Key_Manipulation": [],
+    "Yandex_Cloud_Admin_Role_Assign": [],
+    "Yandex_Cloud_API_Suspicious_Access": [],
+    "Yandex_Cloud_Bucket_Became_Public": [],
+    "Yandex_Cloud_Bucket_Became_Public_Using_ACL": [],
+    "Yandex_Cloud_Bucket_Suspicious_Activity": [],
+    "Yandex_Cloud_Cluster_Admin_Role_Assign": [],
+    "Yandex_Cloud_Cluster_Creation_By_Not_Admin": [
+        {
+            "Yandex_Cloud_Cluster_Admin_Roles": "No_manual_changes"
+        }
+    ],
+    "Yandex_Cloud_Cluster_Potentially_Dangerous_Setting_Enable": [],
+    "Yandex_Cloud_Cluster_User_Manage": [],
+    "Yandex_Cloud_Cluster_Without_Security_Group_Creation": [],
+    "Yandex_Cloud_Gitlab_Instance_Creation": [],
+    "Yandex_Cloud_Identity_Federation_Certificate_Creation": [],
+    "Yandex_Cloud_Identity_Federation_Change": [],
+    "Yandex_Cloud_Kubernetes_Cluster_Potentially_Dangerous_Setting_Enable": [],
+    "Yandex_Cloud_Kubernetes_Cluster_Without_Security_Group_Creation": [],
+    "Yandex_Cloud_Kubernetes_External_Address_Connection": [],
+    "Yandex_Cloud_Kubernetes_Nodes_Potentially_Dangerous_Setting_Enable": [],
+    "Yandex_Cloud_LoadBalancer_Without_Security_Group_Creation": [],
+    "Yandex_Cloud_Membership_Manage_Role_Assign": [],
+    "Yandex_Cloud_PostgreSQL_Cluster_Log_Statement_Disable": [],
+    "Yandex_Cloud_Privileged_Accounts_Activity": [
+        {
+            "Yandex_Cloud_Privileged_Accounts": "No_manual_changes"
+        }
+    ],
+    "Yandex_Cloud_Public_Address_Without_DDoS_Protection_Creation": [],
+    "Yandex_Cloud_Secret_Access_Manage": [],
+    "Yandex_Cloud_Security_Group_Insecure_ACL_Assign": [],
+    "Yandex_Cloud_Security_Group_Manipulation": [],
+    "Yandex_Cloud_Service_Account_Suspicious_Activity": [],
+    "Yandex_Cloud_Symmetric_Key_Access_Manage": [],
+    "Yandex_Cloud_Symmetric_Key_Removal": [],
+    "Yandex_Cloud_Virtual_Machine_AWS_Token_Enable": [],
+    "Yandex_Cloud_Virtual_Machine_Existing_Address_Assign": [],
+    "Yandex_Cloud_Virtual_Machine_Metadata_Contains_Sensitive_Value": [],
+    "Yandex_Cloud_Virtual_Machine_Multiple_Addresses_Assign": [],
+    "Yandex_Cloud_Virtual_Machine_Public_Address_Assign": [
+        {
+            "Yandex_Cloud_Specific_Local_Networks": "No_manual_changes"
+        }
+    ],
+    "Yandex_Cloud_Virtual_Machine_Serial_Port_Enable": [],
+    "Yandex_Cloud_Virtual_Machine_Suspicious_Service_Account_Assign": [
+        {
+            "Yandex_Cloud_Service_Accounts_With_Secret_Access": "No_manual_changes"
+        }
+    ],
+    "Yandex_Cloud_Virtual_Machine_Without_Security_Group_Creation": [],
+    "Yandex_Cloud_Virtual_Machine_With_Image_ID_From_Marketplace_Creation": [],
+    "Zabbix_Auth_Settings_Changed": [],
+    "Zabbix_Critical_Group_Manipulate": [
+        {
+            "Zabbix_Critical_Groups": "No_manual_changes"
+        }
+    ],
+    "Zabbix_Critical_Role_Manipulate": [],
+    "Zabbix_Critical_User_Manipulate": [],
+    "Zabbix_Logon_Different_Users_On_Same_Terminal": [],
+    "Zabbix_Logon_Same_User_From_Different_Terminals": [],
+    "Zabbix_Resource_Add": [],
+    "Zabbix_Resource_Delete": [],
+    "Zabbix_Resource_Disable": [],
+    "Zabbix_Resource_Update": [],
+    "Zabbix_Script_Executing": [],
+    "Zabbix_User_Multiple_Password_Change": [],
+    "Zabbix_User_Multiple_Unlock": [],
+    "ZVirt_Critical_Roles_Granted": [],
+    "ZVirt_Critical_VM_Backup_Snapshot": [
+        {
+            "Applications_Critical_VMs": "No_manual_changes"
+        }
+    ],
+    "ZVirt_Critical_VM_Operation": [
+        {
+            "Applications_Critical_VMs": "No_manual_changes"
+        }
+    ],
+    "ZVirt_Multiple_Storage_Remove": [],
+    "ZVirt_Multiple_VM_Stop_Or_Remove": [],
+    "ZVirt_User_Creation": []
+}

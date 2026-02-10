@@ -1,0 +1,13 @@
+requests==2.32.5
+xlsxwriter==3.2.9
+aiohttp==3.12.15
+tqdm==4.67.1
+pydantic==2.11.9
+pydantic-settings==2.11.0
+urllib3==2.4.0
+black==23.3.0
+flake8==5.0.4
+pytest==7.4.4
+isort==5.10.1
+PyYAML==6.0.2
+backoff

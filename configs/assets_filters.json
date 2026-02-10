@@ -12,6 +12,313 @@
         "specific_politics применяется поверх политик файла, они дополнительные",
         "техническую поддержку осуществляет @ping_localhost"
     ],
+    "networkdevices": {
+        "comment": [
+            "Сетевые устройства уровня маршрутизатор и файрволл должны сканироваться, в идеале также должны сканироваться коммутаторы ядра сети.",
+            "Необходимость сканирования сетевых устройств заключается в том, что на них живут NAT и ACL правила, а также все таблицы маршрутизации, ",
+            "следовательно именно информация из них дает представления о карте сети, а также позволяет найти периметр и оценить его доступность. "
+        ],
+        "PDQL": [
+            "select(@networkdevicehost, networkdevicehost.@id as asset_id, networkdevicehost.@description, ",
+            "networkdevicehost.@DeviceType, networkdevicehost.@iplist, ",
+            "networkdevicehost.vendor, networkdevicehost.modelNumber, ",
+            "networkdevicehost.isvirtual, networkdevicehost.@audittime) | ",
+            "filter(networkdevicehost.@DeviceType != 'Switch') | ",
+            "unique() ",
+            "| join(select(host.@id, host.@ScanningInfo.Type, host.@ScanningInfo.Status) | filter(host.@ScanningInfo.Type = 'Audit') as Sc, Sc.host.@id = asset_id) ",
+            "| select(@networkdevicehost, asset_id, networkdevicehost.@description, networkdevicehost.@DeviceType, networkdevicehost.@iplist, ",
+            "networkdevicehost.vendor, networkdevicehost.modelNumber, networkdevicehost.isvirtual, Sc.host.@ScanningInfo.Status, networkdevicehost.@audittime)",
+            "| calc(TotalDays(now() - networkdevicehost.@AuditTime) as dur_audit) | LIMIT(0)"
+        ],
+        "default_politics_blacklist": "n os "
+    },
+    "NATed": {
+        "comment": [
+            "Считывает все НАТ таблицы из сетевых устройств.",
+            "Фильтр строк: если  в NAT-правиле destination внешний адрес, source шировещательный 0.0.0.0 или внешний.",
+            "Значение фильтрации: ищутся только NAT правила, который для периметра, то есть преобразование внешних ",
+            "адресов во внутренние или отлов НАТ правилом известного внешнего адреса.",
+            "Далее из таких правил выбираются ntdst - IP адреса destination после преобразования и ищутся активы,",
+            "у которых имеется такой адрес (LEFT JOIN). Те адреса, которые обнаружены в НАТ, но не нашлось актива ",
+            "будут иметь статус no asset и отображаться в правой части таблицы, смотрите внимательно на колонку Q.ntdst, ",
+            "необходимо либо просканировать данные активы или удалить устаревшие NAT правила.",
+            "Все активы из данного файла можно считать первичным периметром  и отношение к ним должно быть соответствующее",
+            "Фильтр можно менять, описание как - указано после фильтра в asset_filters, читайте блок comment_filter."
+        ],
+        "PDQL": [
+            "filter(NetworkDeviceHost.NATTable.Name) | ",
+            "select(NetworkDeviceHost.@name,",
+            "    NetworkDeviceHost.@id as id,",
+            "    NetworkDeviceHost.NATTable.Name as name,",
+            "    NetworkDeviceHost.NATTable.Rules.Comment as comment,",
+            "    NetworkDeviceHost.NATTable.Rules.LineNumber as ln,",
+            "    NetworkDeviceHost.NATTable.Rules.Type as type,",
+            "    compactunique(NetworkDeviceHost.NATTable.Rules.NormalizedSource.Values.address) as source,",
+            "    compactunique(NetworkDeviceHost.NATTable.Rules.NormalizedTranslatedSourceAddress.Values.Address) as ntsrc,",
+            "    NetworkDeviceHost.NATTable.Rules.NormalizedProtocol.Protocol.Values as proto,",
+            "    NetworkDeviceHost.NATTable.Rules.NormalizedProtocol.TCPUDPOptions.DestinationPorts.Values as dst_port,",
+            "    compactunique(NetworkDeviceHost.NATTable.Rules.NormalizedDestination.Values.address) as destination) |",
+            "filter(source != null and source.item != ::) |",
+            "join(filter(NetworkDeviceHost.NATTable.Name) | select (NetworkDeviceHost.@id as id,",
+            "    NetworkDeviceHost.NATTable.Name as name,",
+            "    NetworkDeviceHost.NATTable.Rules.LineNumber as ln,",
+            "    NetworkDeviceHost.NATTable.Rules.NormalizedTranslatedDestinationAddress.Values.Address as ntdst,",
+            "    compactunique(NetworkDeviceHost.NATTable.Rules.NormalizedTranslatedDestinationAddress.Values.Prefix) as ntdst_pref,",
+            "    NetworkDeviceHost.NATTable.rules.NormalizedTranslatedProtocol.TCPUDPOptions.DestinationPorts.Values as ntpdst_port) |",
+            "filter(name != null) as Q, id = Q.id and Q.name= name and Q.ln = ln)",
+            "| filter(destination and destination not in [172.16.0.0/12, 10.0.0.0/8, 192.168.0.0/16, ::1/128, 100.64.0.0/10, 0.0.0.0] and (source = 0.0.0.0 or source not in [172.16.0.0/12, 10.0.0.0/8, 192.168.0.0/16, ::1/128, 100.64.0.0/10]))",
+            "| select(compactunique(NetworkDeviceHost.@name) as net_dev_names, Q.ntdst, comment, compactunique(dst_port) as dst_ports, compactunique(Q.ntpdst_port) as ntdst_ports, source, ntsrc, destination) | unique()",
+            "| join(select(@host, host.@id, host.@description, host.vmid, host.@audittime, host.@ipaddresses) as NATed, Q.ntdst = NATed.host.@ipaddresses) | calc(TotalDays(now() - NATed.host.@AuditTime) as dur_audit)",
+            "| join(select(host.@id, host.@ScanningInfo.Type, host.@ScanningInfo.Status) | filter(host.@ScanningInfo.Type = 'Audit') as Sc, Sc.host.@id = NATed.host.@id) ",
+            "| calc(if NATed.host.vmid then True else False as VM)",
+            "| select(net_dev_names, source, ntsrc, destination, dst_ports, Q.ntdst, ntdst_ports, NATed.@host, NATed.host.@id as asset_id, NATed.host.@description, NATed.host.@AuditTime, Sc.host.@ScanningInfo.Status, dur_audit, compactunique(comment), VM)"
+        ],
+        "default_politics_blacklist": [
+            "w os Win Ess",
+            "^u os ",
+            "w os Win sysmon",
+            "^p "
+        ],
+        "comment_filter": [
+            "вы можете получить список доступных из любой точки мира, а не по заготовленному списку адресов, просто замените `and (source = 0.0.0.0 or source not in [172.16.0.0/12, 10.0.0.0/8, 192.168.0.0/16, ::1/128, 100.64.0.0/10]))` на `and source = 0.0.0.0`",
+            "структура ответа: source - с какого адреса подключение, ntsrc - на какой адрес заменить (если пустой - не менять), destination + dst_ports - адрес и порт получателя в пакете до НАТ, ",
+            "Q.ntdst + ntdst_ports - адрес получателя после NAT, все что правее относится к активу, найденному по адресу из Q.ntdst"
+        ]
+    },
+    "EXTERNAL_NET_devices": {
+        "comment": [
+            "Устройства имеющие внешние адреса.",
+            "Для вывода наружу серверов (DMZ) можно указать адреса через NAT таблицы, так и выдать внешний адрес конечному устройству.",
+            "По хорошему этот запрос должен был быть золотой пулей для второго варианта, однако в реальности внешние адреса очень часто вяжутся на обычные хосты (например из-за ЕДР)",
+            "однако улучшить этот запрос можно только на конкретной инсталляции, поэтому применять его можно, но он нуждается в дополнительной фильтрации по месту."
+        ],
+        "PDQL": [
+            "select(@host, host.@id, Host.@ipaddresses, host.@audittime) |",
+            "filter(host.@ipaddresses.item not in [172.16.0.0/12, 10.0.0.0/8, 192.168.0.0/16, 0.0.0.0/32, 169.254.0.0/16,::1/0, 127.0.0.0/8, 100.64.0.0/10]) |",
+            "select(@host, host.@id, compactunique(Host.@ipaddresses) as ipaddresses, host.@audittime) |",
+            "join(select(host.@id, host.@description, host.@ScanningInfo.Type, host.@ScanningInfo.Status) | filter(host.@ScanningInfo.Type = 'Audit') as Sc, Sc.host.@id = host.@id) | ",
+            "select(@host, host.@id as asset_id, Sc.host.@description, ipaddresses, host.@audittime, Sc.host.@ScanningInfo.Status)  | calc(TotalDays(now() - host.@AuditTime) as dur_audit)"
+        ],
+        "default_politics_blacklist": [
+            "w os Win Ess",
+            "w os Win sysmon",
+            "^(u|n) os ",
+            "^p "
+        ]
+    },
+    "HAP_servers": {
+        "comment": [
+            "Выводит все узлы с найденным HAProxy",
+            "Фильтрации по статусу сервиса или ведет ли этот прокси наружу, а не только на localhost - нету, в данном случае она и не нужна",
+            "Для всех узлов с HAProxy должен быть настроен аудит и сбор событий согласно политике p haproxy (event_src.title = 'haproxy')"
+        ],
+        "PDQL": [
+            "filter(host.softs<HAProxy>)",
+            "| select(@host, host.@id as asset_id, host.softs<HAProxy>.Vendor as Vendor, host.softs<HAProxy>.Name as Name, host.softs<HAProxy>.InstallPath as InstallPath, host.softs<HAProxy>.Version as Version, host.softs<HAProxy>.Architecture as Architecture, host.softs<HAProxy>.OsFamily as OsFamily, compactunique(host.softs<HAProxy>.Ports) as Ports, host.softs<HAProxy>.UninstallKey as UninstallKey, compactunique(host.softs<HAProxy>.ConfFiles) as ConfFiles, compactunique(host.softs<HAProxy>.ConfDir) as ConfDir, host.softs<HAProxy>.Chroot as Chroot, host.softs<HAProxy>.User as User, host.softs<HAProxy>.Group as \"Group\", host.softs<HAProxy>.ExternalCheck as ExternalCheck, host.softs<HAProxy>.InsecureForkWanted as InsecureForkWanted, host.softs<HAProxy>.InsecureSetuidWanted as InsecureSetuidWanted, compactunique(host.softs<HAProxy>.LuaLoad) as LuaLoad, compactunique(host.softs<HAProxy>.LuaLoadPerThread) as LuaLoadPerThread, host.softs<HAProxy>.UnixBind as UnixBind)",
+            "| join(select(@host, host.@id as asset_id, host.@description, host.@ScanningInfo.Type, host.@ScanningInfo.Status) | filter(host.@ScanningInfo.Type = 'Audit') as A, A.asset_id = asset_id)",
+            "| select(@host, asset_id, A.host.@description, A.host.@ScanningInfo.Status, Vendor, Name, InstallPath, Version, Architecture, OsFamily, Ports, UninstallKey, ConfFiles, ConfDir, Chroot, User, \"Group\", ExternalCheck, InsecureForkWanted, InsecureSetuidWanted, LuaLoad, LuaLoadPerThread, UnixBind)",
+            "| sort(@host)"
+        ],
+        "default_politics_blacklist": "^(u os|p haproxy)"
+    },
+    "NAT_HAP": {
+        "comment": "Выводит только те HAProxy узлы, которые фигурировали в НАТ таблице, их важность максимальна",
+        "PDQL": [
+            "filter(host.softs<HAProxy>.Name != null)",
+            "| select(@host, host.@id as asset_id, host.endpoints<ipendpoint>.address as ip)",
+            "| filter(ip not in [127.0.0.1, ::1])",
+            "| join(select(@host, host.@id as asset_id, host.@description, host.@ScanningInfo.Type, host.@ScanningInfo.Status) | filter(host.@ScanningInfo.Type = 'Audit') as A, A.asset_id = asset_id) ",
+            "| select(@host, A.host.@description, A.host.@ScanningInfo.Status, asset_id, ip)",
+            "  | join(select(compactunique(NetworkDeviceHost.NATTable.Rules.NormalizedSource.Values.address) as source, ",
+            "      NetworkDeviceHost.NATTable.Rules.NormalizedTranslatedDestinationAddress.Values.address as address, ",
+            "      NetworkDeviceHost.NATTable.Rules.NormalizedTranslatedDestinationAddress.Values.prefix as pref, ",
+            "      compactunique(NetworkDeviceHost.NATTable.rules.NormalizedTranslatedProtocol.TCPUDPOptions.DestinationPorts.Values) as ntpdst_ports",
+            "  ) | filter(address and pref = 32) | unique() as NAT, NAT.address = ip)",
+            "| filter(NAT.address)",
+            "| unique() | sort(@host, ip, NAT.source)"
+        ],
+        "default_politics_blacklist": "^(u os|p haproxy)"
+    },
+    "HAP_Fr_Bck_bck": {
+        "comment": [
+            "В отличии от HAP_Listen_bcks тут собираются все сервера куда отправляются пакеты через директиву Backend.",
+            "Однако игнорирются Frontends, чтобы не повышать сложность запроса.",
+            "имена серверов HAProxy остаются, однако склеиваются в список (чтобы избежать дублирования backend-ов),",
+            "далее эти адреса склеиваются с активами и заодно полученные таким образом активы проверяются на наличие софта HAProxy,",
+            "чтобы подсветить последовательности цепочек проксирования."
+        ],
+        "PDQL": [
+            "filter(host.softs<HAProxy>.Frontends) |",
+            "select(host.@name, host.@id, host.softs<HAProxy>.Backends.Name as Name, host.softs<HAProxy>.Backends.Mode as Mode, host.softs<HAProxy>.Backends.Status as Status, host.softs<HAProxy>.Backends.Servers.IpAddress as IpAddress, host.softs<HAProxy>.Backends.Servers.Hostname as Hostname, host.softs<HAProxy>.Backends.Servers.Port as Port)",
+            "| filter(Status = True and (IpAddress or Hostname) and IpAddress != 127.0.0.1 and Hostname != 'localhost')| unique()",
+            "| select(compactunique(host.@name) as HAP_hosts, compactunique(Name) as back_names, Hostname, IpAddress, compactunique(Port) as ports)",
+            "| join(select(@host, host.hostname, host.@id as asset_id, host.fqdn, host.endpoints<ipendpoint>.address as address) as H, H.host.fqdn = Hostname or H.host.hostname = Hostname or H.address = IpAddress)",
+            "| join(select(host.@id as asset_id, host.@description, host.@ScanningInfo.Type, host.@ScanningInfo.Status, host.@Audittime) | filter(host.@ScanningInfo.Type = 'Audit') as A, A.asset_id = H.asset_id)",
+            "| join(filter(host.softs<HAProxy>) | select(host.@id as asset_id, compactunique(host.softs<HAProxy>) as HAP_loop)  as HAP, HAP.asset_id = H.asset_id)",
+            "| select(HAP_hosts, back_names, Hostname, IpAddress, ports, H.@host, A.host.@description, H.asset_id as asset_id, H.host.hostname, H.host.fqdn, HAP.HAP_loop, A.host.@ScanningInfo.Status, A.host.@Audittime)"
+        ],
+        "default_politics_blacklist": [
+            "w os Win Ess",
+            "^u os ",
+            "w os Win sysmon",
+            "^p "
+        ],
+        "comment_filter": [
+            "чтобы получить список Listen серверов только за HAP после NAT поставьте вместо первой строки:",
+            "filter(<dynamic!{\"filter_name\":\"NAT_HAP\",\"prefix\":\"<asset_id>\",\"need_dict\":true,\"dict_keys\":[\"asset_ids\"],\"filter\":\"host.@id in <asset_id>['asset_ids']\"}dynamic!>) | ",
+            "можно, конечно, объединить в единый PDQL NAT + LISTEN, но есть вероятность что БД треснет от такого уровня вложенности, к тому же зачем напрягать АМ, если информация уже есть",
+            "поэтому дергаем asset_id из NAT_HAP и пользуем его (технически можно дергать и из NATed, но тогда мы пропускаем назначенные внутри",
+            "Сам запрос показывает все сервера, которые стоят за серверами HAProxy через директиву Listen",
+            "дефолтная строка, которая смотрит на все HAProxy: filter(host.softs<HAProxy>) | "
+        ]
+    },
+    "nginx_servers": {
+        "comment": [
+            "показывает все активы с ПО nginx. Этот запрос не покажет вам какие nginx указаны в NAT таблице, однако вы можете добавить такой фильтр или найти активы вручную",
+            "После проверки страницы \"simple\" обязательно посмотрите не страницу \"FULL\", на ней указаны все сайты найденные на nginx-ах",
+            "если сайты встречаются несколько раз - это означает последовательное проксирование, для того чтобы понять ее необходимо посмотреть куда ссылаются активы,",
+            "скорее всего будут ссылаться друг на друга, и только последний на итоговый backend",
+            "для всех активов должна выполняться политика p nginx, то есть события попадающие под фильтр: event_src.title = 'nginx'"
+        ],
+        "PDQL": [
+            "filter(Host.Softs<Nginx>.Instances) | ",
+            "select(@host, host.@id as asset_id, host.@audittime, host.@description, host.@ScanningInfo.Type, host.@ScanningInfo.Status) | filter(host.@ScanningInfo.Type = 'Audit')",
+            "| join(select(host.@id, Host.Softs<Nginx>.Instances.RootConfFile as RootConfFile, ",
+            "    Host.Softs<Nginx>.Instances.Handlers<HTTPHandler>.Type as Type, ",
+            "    Host.Softs<Nginx>.Instances.Handlers<HTTPHandler>.ServerNames as ServerNames, ",
+            "    compactunique(Host.Softs<Nginx>.Instances.Handlers<HTTPHandler>.Listens.Port) as Port, ",
+            "    compactunique(Host.Softs<Nginx>.Instances.Handlers<HTTPHandler>.Listens.Address) as Address, ",
+            "    Host.Softs<Nginx>.Instances.Handlers<HTTPHandler>.SSLSettings.SSL as SSLSettings, ",
+            "    compactunique(Host.Softs<Nginx>.Instances.Handlers<HTTPHandler>.Locations.HTTPProxy.ProxyPass) as ProxyPass, ",
+            "    compactunique(Host.Softs<Nginx>.Instances.Handlers<HTTPHandler>.ErrorLogs) as ErrorLogs, ",
+            "    compactunique(Host.Softs<Nginx>.Instances.Handlers<HTTPHandler>.AccessLogs) as AccessLogs) ",
+            "as Ng, Ng.host.@id = asset_id) |",
+            "select(@host, asset_id, host.@description, host.@ScanningInfo.Status, Ng.RootConfFile, Ng.Type, Ng.ServerNames, Ng.Port, Ng.Address, Ng.SSLSettings, Ng.ProxyPass, Ng.ErrorLogs, Ng.AccessLogs)",
+            "| sort(@host, Ng.ServerNames)"
+        ],
+        "default_politics_blacklist": "^(u os|p nginx)",
+        "mandatory_policies": "p nginx"
+    },
+    "nginx_backends_to_hosts": {
+        "comment": [
+            "это уникальный запрос, который основывается на данных предыдущего запроса, так как поле ProxyPass невозможно попилить PDQL-ем,",
+            "так как нет функций strip / split, а значения могут быть от http://10.125.139.12:8080 до http://unix:/var/opt/gitlab/gitlab-workhorse/sockets/socket",
+            "а join в PDQL для склейки использует только бинарные сравнения",
+            "<dynamic!{}dynamic!> старался сделать понятным и минимально прибивать функции в коде, если надо понять его структуру, то распакуйте JSON.",
+            "",
+            "Результаты запроса - те бэкенд сервера, куда ссылаются nginx-ы из запроса nginx_servers, к сожалению добавить какой сайт смотрит на эти бэкенды - невозможно."
+        ],
+        "PDQL": [
+            "select(@host, host.@id, host.@description, host.hostname, host.fqdn, Host.endpoints<ipendpoint>.address as addr, host.@audittime) |",
+            "filter(<dynamic!{\"filter_name\": \"nginx_backends\", \"prefix\": \"<ProxyPass>.lstrip('htps').lstrip(':/').split(':')[0]\", \"need_dict\": true, \"dict_keys\": [\"hostnames\", \"FQDNs\", \"IPs\"], \"filter\": \"host.hostname in <ProxyPass>['hostnames'] or host.fqdn in <ProxyPass>['FQDNs'] or addr in <ProxyPass>['IPs']\"}dynamic!>) |",
+            "join(select(host.@id, host.@ScanningInfo.Type, host.@ScanningInfo.Status) | filter(host.@ScanningInfo.Type = 'Audit') as Sc, Sc.host.@id = host.@id) | ",
+            "select(@host, host.@description, host.@id as asset_id, host.hostname, host.fqdn, addr, host.@audittime, Sc.host.@ScanningInfo.Status)  | calc(TotalDays(now() - host.@AuditTime) as dur_audit)"
+        ],
+        "default_politics_blacklist": [
+            "w os Win Ess",
+            "^u os ",
+            "w os Win sysmon",
+            "^p "
+        ]
+    },
+    "PTAF_servers": {
+        "comment": [
+            "Выводит все узлы с найденным PT AF",
+            "Для всех узлов с PT AF должен быть настроен аудит и сбор событий согласно политике p ptaf (event_src.title = 'application_firewall')"
+        ],
+        "PDQL": [
+            "filter(host.softs<ApplicationFirewall>)",
+            "| select(@host, host.@id as asset_id, host.softs<ApplicationFirewall>.Vendor as Vendor, host.softs<ApplicationFirewall>.Name as Name, host.softs<ApplicationFirewall>.Version as Version, host.softs<ApplicationFirewall>.License.ExpiryDate as lic_exp, compactunique(host.softs<ApplicationFirewall>.Tenants) as Tenants, compactunique(host.softs<ApplicationFirewall>.ADSettings.Domain) as Domain, host.softs<ApplicationFirewall>.IAMSettings.Address as IAM)",
+            "| join(select(@host, host.@id as asset_id, host.@description, host.@ScanningInfo.Type, host.@ScanningInfo.Status) | filter(host.@ScanningInfo.Type = 'Audit') as A, A.asset_id = asset_id)",
+            "| select(@host, asset_id, Vendor, Name, Version, lic_exp, Tenants, Domain, IAM, A.host.@description, A.host.@ScanningInfo.Status)"
+        ],
+        "default_politics_blacklist": "^(u os|p ptaf)",
+        "mandatory_policies": "p ptaf"
+    },
+    "PTAF_backs": {
+        "comment": [
+            "Соединение Backend-ов описанных на PT AF с активами инфраструктуры",
+            "имена серверов PT AF остаются, однако склеиваются в список (чтобы избежать дублирования backend-ов),"
+        ],
+        "PDQL": [
+            "filter(host.softs<ApplicationFirewall>) | select(host.@name, host.softs<ApplicationFirewall>.Tenants.WebApps.name as WebApp_name, host.softs<ApplicationFirewall>.Tenants.WebApps.Hosts as hosts, host.softs<ApplicationFirewall>.Tenants.WebApps.TrafficProfiles as TrafficProfiles, host.softs<ApplicationFirewall>.Tenants.WebApps.TrafficProfiles.Backends.Address as Address, host.softs<ApplicationFirewall>.Tenants.WebApps.TrafficProfiles.Backends.NormalizedAddress as NormalizedAddress, Host.Softs<ApplicationFirewall>.Tenants.WebApps.TrafficProfiles.Backends.Port as Port)",
+            "| filter(Address)",
+            "| select(compactunique(host.@name) as PTAF_hosts, compactunique(WebApp_name) as WebApp_names, compactunique(hosts) as sites, TrafficProfiles as listen, Address, NormalizedAddress, compactunique(Port) as Ports)",
+            "| join(select(@host, host.hostname, host.@id as asset_id, host.fqdn, host.endpoints<ipendpoint>.address as address) as H, H.host.fqdn = Address or H.host.hostname = Address or H.address = NormalizedAddress)",
+            "| join(select(host.@id as asset_id, host.@description, host.@ScanningInfo.Type, host.@ScanningInfo.Status, host.@Audittime) | filter(host.@ScanningInfo.Type = 'Audit') as A, A.asset_id = H.asset_id)",
+            "| select(PTAF_hosts, WebApp_names, sites, listen, Address, NormalizedAddress, Ports, H.@host, A.host.@description, H.asset_id as asset_id, H.host.hostname, H.host.fqdn, H.address, A.host.@ScanningInfo.Status, A.host.@Audittime)"
+        ],
+        "default_politics_blacklist": [
+            "w os Win Ess",
+            "^u os ",
+            "w os Win sysmon",
+            "^p "
+        ]
+    },
+    "DC_AUDIT_DC_ports_unknown_domain": {
+        "comment": [
+            "Попытка поиска контроллеров домена по типичным для ДК портам.",
+            "Запрос выводит только активы с проблемами: нет аудита, не выставилась роль, домен не сканируется.",
+            "Если такие ДК найдены, то необходимо провести их аудит и аудит домена через LDAP",
+            "После настроек сканирования этот запрос не должен возвращать информации и создавать Excel файл"
+        ],
+        "PDQL": [
+            "select(@host, host.@id as asset_id, host.@audittime, Host.Endpoints<TransportEndpoint>.Port as Port, Host.Endpoints<TransportEndpoint>.Protocol as Protocol, Host.Endpoints<TransportEndpoint>.Status as Status, Host.Endpoints<TransportEndpoint>.IpAddress as IpAddress) | limit (0) | ",
+            "filter(IpAddress not in [::/0, 127.0.0.0/8] and Port in [53, 88, 135, 389, 445, 636, 3268, 3269] and Protocol = 'tcp' and Status = 'Open') | ",
+            "select(@host, asset_id, countunique(Port) as cnt_ports, compactunique(Port) as ports, host.@audittime) | ",
+            "filter(cnt_ports > 4) |",
+            "join(select(host.@id, host.@description, host.@ScanningInfo.Type, host.@ScanningInfo.Status) | filter(host.@ScanningInfo.Type = 'Audit') as Sc, Sc.host.@id = asset_id) | ",
+            "join(select(windowshost.@id, compactunique(windowshost.hostroles.role) as roles, windowshost.domain as domain)  as DC, DC.windowshost.@id = asset_id) | ",
+            "join(select(activedirectory.@name, activedirectory.domains.name as name, activedirectory.domains.shortName as shortname) as D, D.name = DC.domain or D.shortname = DC.domain) | ",
+            "filter(not DC.roles contains 'Domain Controller' or host.@audittime = null or Sc.host.@ScanningInfo.Status != 'UpToDate' or D.name = null) | ",
+            "select(@host, Sc.host.@description, asset_id, cnt_ports, ports, host.@audittime, Sc.host.@ScanningInfo.Status, DC.roles, DC.domain, D.activedirectory.@name, D.name)"
+        ],
+        "mandatory_policies": "^(sw AD |w os Win (Ess|sys))"
+    },
+    "DC_AUDIT_DC_role_unknown_domain": {
+        "comment": [
+            "Попытка поиска контроллеров домена по роли Domain Controller, данная роль может выставиться на основе событий или сканирования домена",
+            "Запрос выводит только активы с проблемами: нет аудита, домен не сканируется.",
+            "Если такие ДК найдены, то необходимо провести их аудит и аудит домена через LDAP",
+            "После настроек сканирования этот запрос не должен возвращать информации и создавать Excel файл"
+        ],
+        "PDQL": [
+            "filter(host.hostroles.role = \"Domain Controller\") | select(@host, host.@description, host.@id as asset_id, host.hostroles.role as role, host.@audittime) | filter(role = \"Domain Controller\") |",
+            "join(select(host.@id, host.@ScanningInfo.Type, host.@ScanningInfo.Status) | filter(host.@ScanningInfo.Type = 'Audit') as Sc, Sc.host.@id = asset_id) | ",
+            "join(select(windowshost.@id, windowshost.domain as domain)  as DC, DC.windowshost.@id = asset_id) |",
+            "join(select(activedirectory.@name, activedirectory.domains.name as name, activedirectory.domains.shortName as shortname) as D, D.name = DC.domain or D.shortname = DC.domain) |",
+            "filter(host.@audittime = null or Sc.host.@ScanningInfo.Status != 'UpToDate' or D.name = null)|",
+            "select(@host, host.@description, asset_id, host.@audittime, Sc.host.@ScanningInfo.Status, role, DC.domain, D.activedirectory.@name, D.name)"
+        ],
+        "mandatory_policies": "^(sw AD |w os Win (Ess|sys))"
+    },
+    "AD_from_hosts": {
+        "comment": [
+            "Запрос всех известных доменов на активах и соединение их с известными доменами.",
+            "Если домен не найден в известных активах лесов ActiveDirectory, то его необходимо просканировать через LDAP,",
+            "для No asset ищите справа колонку domain_from_winhosts"
+        ],
+        "PDQL": [
+            "select(windowshost.domain as domain, WindowsHost.PrimaryDNSSuffix as DNSSuf) | filter(domain and domain != 'WORKGROUP' and domain != '' OR DNSSuf) | unique()",
+            "| calc(if domain and domain != 'WORKGROUP' and domain != '' then \"domain\" else if DNSSuf then \"DNSSuf\" as domain_from_winhosts)",
+            "| select(domain_from_winhosts) | unique() | ",
+            "join(select(@activedirectory, activedirectory.@updatetime, activedirectory.@description, activedirectory.@id, activedirectory.domains.name as name, activedirectory.domains.shortName as shortname) as D, D.name = domain_from_winhosts or D.shortname = domain_from_winhosts) |",
+            "join(select(activedirectory.@id, activedirectory.@ScanningInfo.Type as type, activedirectory.@ScanningInfo.Status) | filter(type = 'Audit') as DA, DA.activedirectory.@id = D.activedirectory.@id)",
+            "| select(domain_from_winhosts, D.@activedirectory, D.activedirectory.@updatetime, D.activedirectory.@description, D.name, DA.activedirectory.@ScanningInfo.Status)"
+        ],
+        "default_politics_whitelist": ".*"
+    },
+    "AD_audit": {
+        "comment": [
+            "Проверка своевременности аудита известных лесов ActiveDirectory"
+        ],
+        "PDQL": [
+            "select(@activedirectory, activedirectory.@updatetime, activedirectory.@description, activedirectory.@id, compactunique(activedirectory.domains.name) as names) |",
+            "join(select(activedirectory.@id, activedirectory.@ScanningInfo.Type as type, activedirectory.@ScanningInfo.Status) | filter(type = 'Audit') as DA, DA.activedirectory.@id = activedirectory.@id)",
+            "| select(@activedirectory, activedirectory.@description, activedirectory.@updatetime, names, DA.activedirectory.@ScanningInfo.Status)"
+        ],
+        "default_politics_whitelist": ".*"
+    },
     "AD_DC_by_domain": {
         "comment": [
             "Поиск доменных контроллеров указанных в доменах.",
@@ -31,7 +338,126 @@
             "select(name, DnsHostName, H.@host, H.host.@description, H.host.@audittime, H.host.@ScanningInfo.Status) | ",
             "calc(TotalDays(now() - H.host.@AuditTime) as dur_audit)"
         ],
-        "default_politics_blacklist": "^(sw AD |w os Win (Ess|sys)|sa )"
+        "mandatory_policies": "^(sw AD |w os Win (Ess|sys)|sa )"
+    },
+    "AD_SCCM_by_domain": {
+        "comment": [
+            "Поиск SCCM (MECM) по известным доменам.",
+            "Как правило SCCM (MECM) сервера указаны в группе SCCM.*Servers или SMS, если в этой группе находится запись компьютера, то она воспринимается как SCCM,",
+            "далее ищется актив с таким FQDN.",
+            "На активе должны быть логи согласно политике sw AD mecm (event_src.title = 'mecm')"
+        ],
+        "PDQL": [
+            "select(",
+            "    ActiveDirectory.domains.name as dname, ActiveDirectory.domains.groups.objectsid as gr_sid, ",
+            "    ActiveDirectory.domains.groups.SamAccountName as gr_name, ",
+            "    ActiveDirectory.domains.groups.allmembers.SamAccountName as mem_name, ",
+            "    ActiveDirectory.domains.groups.allmembers.ObjectSid as mem_id) | ",
+            "filter(",
+            "    gr_name match \"^(SMS( |_)|SCCM.*Servers)\" ",
+            "    and mem_name like \"%$\") | UNIQUE() | ",
+            "join(",
+            "    select(",
+            "      ActiveDirectory.domains.Name as name, ",
+            "      ActiveDirectory.domains.shortname, ",
+            "      ActiveDirectory.domains.computers.objectSid as hostSID, ",
+            "      ActiveDirectory.domains.computers.dnsHostName as dnsHostName",
+            "    ) as gr, ",
+            "    gr.hostSID = mem_id) | ",
+            "select (dname, mem_name, gr_name, gr.dnsHostName) | ",
+            "join(select (@host, host.@description, host.fqdn, host.@audittime, host.@ScanningInfo.Type, host.@ScanningInfo.Status) | filter(host.@ScanningInfo.Type = 'Audit') as H, ",
+            "    H.host.fqdn = gr.dnsHostName) | ",
+            "calc(TotalDays(now() - H.host.@AuditTime) as dur_audit) "
+        ],
+        "mandatory_policies": "^(sw AD mecm|w os Win (Ess|sys)|sa )"
+    },
+    "AD_Exchange_by_domain": {
+        "comment": [
+            "Поиск Exchange по известным доменам.",
+            "Как правило Exchange сервера указаны в группе Exchange Servers, если в этой группе находится запись компьютера, то она воспринимается как Exchange,",
+            "далее ищется актив с таким FQDN.",
+            "На активе должны быть логи согласно политикам sw AD exchange (event_src.title = 'exchange') и sw AD iis (event_src.title = 'internet_information_services')"
+        ],
+        "PDQL": [
+            "select(",
+            "    ActiveDirectory.domains.name as dname, ActiveDirectory.domains.groups.objectsid as gr_sid, ",
+            "    ActiveDirectory.domains.groups.SamAccountName as gr_name, ",
+            "    ActiveDirectory.domains.groups.allmembers.objectSid as mem_id, ",
+            "    ActiveDirectory.domains.groups.allmembers.SamAccountName as mem_name) | ",
+            "filter(gr_name like \"Exchange Servers\" and mem_name like \"%$\") | ",
+            "UNIQUE() | ",
+            "join(",
+            "    select(",
+            "      ActiveDirectory.domains.Name as name, ",
+            "      ActiveDirectory.domains.shortname, ",
+            "      ActiveDirectory.domains.computers.objectSid as hostSID, ",
+            "      ActiveDirectory.domains.computers.dnsHostName as dnsHostName) ",
+            "as gr, gr.hostSID = mem_id) | ",
+            "select (dname, mem_name, gr_name, gr.dnsHostName) | ",
+            "join(select(@host, host.@description, host.fqdn, host.@audittime, host.@ScanningInfo.Type, host.@ScanningInfo.Status) | filter(host.@ScanningInfo.Type = 'Audit') as H, ",
+            "    H.host.fqdn = gr.dnsHostName) | ",
+            "calc(TotalDays(now() - H.host.@AuditTime) as dur_audit)"
+        ],
+        "mandatory_policies": "^(sw (AD exchange|iis)|w os Win (Ess|sys)|sa )"
+    },
+    "AD_RDS_RDG_by_domain": {
+        "comment": [
+            "Поиск RDS и RDG по известным доменам.",
+            "RDS и RDG сервера указаны в стандартных группах [\"S-1-5-32-561\", \"S-1-5-32-575\", \"S-1-5-32-577\"],",
+            "если в любой из этих групп находится запись компьютера, то она воспринимается как RDS или RDG,",
+            "далее ищется актив с таким FQDN.",
+            "На активе должны быть логи согласно политике sw rds (события из журналов terminalservices)"
+        ],
+        "PDQL": [
+            "select(",
+            "    ActiveDirectory.domains.name as dname, ActiveDirectory.domains.groups.objectsid as ",
+            "    gr_sid, ActiveDirectory.domains.groups.SamAccountName as ",
+            "    gr_name, ActiveDirectory.domains.groups.allmembers.objectSid as ",
+            "    mem_id, ActiveDirectory.domains.groups.allmembers.SamAccountName",
+            "     as mem_name) | ",
+            "filter(gr_sid in [\"S-1-5-32-561\", \"S-1-5-32-575\", \"S-1-5-32-577\"] and mem_name like \"%$\") | UNIQUE() | ",
+            "join(select(",
+            "      ActiveDirectory.domains.Name as name, ",
+            "      ActiveDirectory.domains.shortname, ",
+            "      ActiveDirectory.domains.computers.objectSid as hostSID, ",
+            "      ActiveDirectory.domains.computers.dnsHostName as dnsHostName",
+            "    ) as gr, gr.hostSID = mem_id) | ",
+            "select(dname, mem_name, gr.name, gr.dnsHostName) | ",
+            "join(",
+            "    select (@host, host.@description, host.fqdn, host.@audittime, host.@ScanningInfo.Type, host.@ScanningInfo.Status) | filter(host.@ScanningInfo.Type = 'Audit') as H, ",
+            "    H.host.fqdn = gr.dnsHostName) | ",
+            "calc(TotalDays(now() - H.host.@AuditTime) as dur_audit)"
+        ],
+        "mandatory_policies": "^(sw rds|w os Win (Ess|sys)|sa )"
+    },
+    "AD_CS_by_domain": {
+        "comment": [
+            "Поиск AD CS по известным доменам.",
+            "AD CS сервера указаны в группе S-1-5-21-%domain SID%-517,",
+            "если в любой из этих групп находится запись компьютера, то она воспринимается как AD CS сервер,",
+            "далее ищется актив с таким FQDN.",
+            "На активе должны быть логи согласно политике sw AD CS (события из журнала certification_authority - event_src.subsys = 'certification_authority')"
+        ],
+        "PDQL": [
+            "select(",
+            "    ActiveDirectory.domains.name as dname, ActiveDirectory.domains.objectSid as domain_sid, ",
+            "    ActiveDirectory.domains.groups.objectsid as gr_sid, ",
+            "    ActiveDirectory.domains.groups.SamAccountName as gr_name, ",
+            "    ActiveDirectory.domains.groups.allmembers.objectSid as mem_id, ",
+            "    ActiveDirectory.domains.groups.allmembers.SamAccountName as mem_name) | ",
+            "calc(domain_sid+'-517' as sid_cert_pub) | ",
+            "filter(gr_sid = sid_cert_pub and mem_name like '%$') | UNIQUE() | ",
+            "join(select(",
+            "      ActiveDirectory.domains.Name as name, ",
+            "      ActiveDirectory.domains.shortname, ",
+            "      ActiveDirectory.domains.computers.objectSid as hostSID,",
+            "      ActiveDirectory.domains.computers.dnsHostName as dnsHostName) as gr, gr.hostSID = mem_id) | ",
+            "select(dname, mem_name, gr_name, gr.dnsHostName) | ",
+            "join(select(@host, host.@description, host.fqdn, host.@audittime, host.@ScanningInfo.Type, host.@ScanningInfo.Status) | filter(host.@ScanningInfo.Type = 'Audit') as H, ",
+            "H.host.fqdn = gr.dnsHostName) | ",
+            "calc(TotalDays(now() - H.host.@AuditTime) as dur_audit)"
+        ],
+        "mandatory_policies": "^(sw AD CS|w os Win (Ess|sys)|sa )"
     },
     "AD_Domain_Servers_by_domain": {
         "comment": [
@@ -57,7 +483,7 @@
             "select(name, DnsHostName, compactunique(gr.gr_name) as groups, H.@host, H.host.@description, H.host.fqdn, H.host.osname, H.host.osversion, H.host.@audittime, H.host.@ScanningInfo.Status) | ",
             "calc(TotalDays(now() - H.host.@AuditTime) as dur_audit) "
         ],
-        "default_politics_blacklist": "^(sw |w os Win (Ess|sys)|sa )"
+        "mandatory_policies": "^(sw |w os Win (Ess|sys)|sa )"
     },
     "AD_WorkStation": {
         "comment": [
@@ -83,7 +509,7 @@
             "select(name, DnsHostName, compactunique(gr.gr_name) as groups, H.@host, H.host.@description, H.host.@audittime, H.host.@ScanningInfo.Status) | ",
             "calc(TotalDays(now() - H.host.@AuditTime) as dur_audit) "
         ],
-        "default_politics_blacklist": [
+        "mandatory_policies": [
             "w os Win (Ess|sysmon)",
             "^sa"
         ]
@@ -101,7 +527,7 @@
             "| filter(AD.DnsHostName = null) |",
             "select(@windowshost, windowshost.@description, windowshost.fqdn, windowshost.@audittime, windowshost.@ScanningInfo.Status, dur_audit, AD.name) "
         ],
-        "default_politics_blacklist": [
+        "mandatory_policies": [
             "w os Win (Ess|sysmon)",
             "^sa"
         ]
@@ -114,5 +540,477 @@
             "filter(unixhost) | select(@unixhost, unixhost.@description, unixhost.@id as asset_id, unixhost.@audittime, unixhost.@ScanningInfo.Type, unixhost.@ScanningInfo.Status) | filter(unixhost.@ScanningInfo.Type = 'Audit')"
         ],
         "default_politics_blacklist": "^(u os |sa? )"
+    },
+    "vCenters_ports": {
+        "comment": [
+            "Поиск узлов с установленным ПО vSphere vCenter по портам (после проведения HostDiscovery по широкому списку портов",
+            "Типичные порты для vCenter указаны в документации, если таких открытых портов обнаружено более 5 (именно такие узлы выводятся),",
+            "то следует обратить внимание на актив и провести его аудит, а уже потом разбираться есть ли там на самом vCenter.",
+            "Если vCenter есть, то необходимо провести аудит ОС и аудит через Web API"
+        ],
+        "PDQL": [
+            "select(@host, host.@id as asset_id, host.endpoints<transportendpoint>.port as port, host.endpoints<transportendpoint>.status as status, host.osName, host.SystemID, host.@audittime) | ",
+            "filter(status = \"Open\" and port in [22, 80, 389, 443, 902, 2014, 5480, 7090, 8010, 8084, 9084, 9087, 9097, 15007, 15008, 16666, 16667]) | ",
+            "select(@host, asset_id, compactunique(port) as ports, countunique(port) as p_cnt, host.osName, host.SystemID, host.@audittime) | ",
+            "filter(p_cnt > 5) | unique() | calc(TotalDays(now() - host.@AuditTime) as dur_audit) ",
+            "| join(filter(host.softs<VCenterInstance>.vCenterUUID) | select(host.@id, host.softs<VCenterInstance>.vCenterUUID as uuid, compactunique(host.softs<VCenterInstance>.Datacenters) as Datacenters) as vC, vC.host.@id = asset_id)",
+            "| join(select(host.@id, host.@description, host.@ScanningInfo.Type, host.@ScanningInfo.Status) | filter(host.@ScanningInfo.Type = 'Audit') as Sc, Sc.host.@id = asset_id)",
+            "| calc(if (host.SystemID and vC.host.@id) then \"Sc.host.@ScanningInfo.Status\" else if host.SystemID = null then \"No OS Audit\" else \"No Web API audit\" as \"real.host.@ScanningInfo.Status\")",
+            "| select(@host, Sc.host.@description, asset_id, ports, p_cnt, host.osName, host.SystemID, vC.uuid, vC.Datacenters, host.@audittime, \"real.host.@ScanningInfo.Status\")",
+            "| sort(p_cnt DESC)"
+        ],
+        "default_politics_blacklist": [
+            "w os Win Ess",
+            "^u os ",
+            "w os Win sysmon"
+        ],
+        "mandatory_policies": "s VMware vCenter"
+    },
+    "vCenters_softs": {
+        "comment": [
+            "Поиск узлов с установленным ПО vSphere vCenter по наличию этого софта на активе.",
+            "для таких активов необходимо проводить 2 разных аудита: аудит ОС (windows/unix audit) и vSphere API audit",
+            "скрипт не умеет проверять задачи, но однако если не найдутся поля выставляемые одним из аудитом, то статус аудита будет об этом говорить"
+        ],
+        "PDQL": [
+            "filter(Host.Softs<VCenterInstance>) | ",
+            "select(@host, host.@id as asset_id, host.@audittime, host.osName, host.SystemID, host.softs<VCenterInstance>.vCenterUUID as vC_uuid, compactunique(Host.Softs<VCenterInstance>.datacenters) as Datacenters) | ",
+            "calc(TotalDays(now() - host.@AuditTime) as dur_audit)",
+            "| join(select(host.@id, host.@description, host.@ScanningInfo.Type, host.@ScanningInfo.Status) | filter(host.@ScanningInfo.Type = 'Audit') as Sc, Sc.host.@id = asset_id)",
+            "| calc(if (host.SystemID and vC_uuid) then \"Sc.host.@ScanningInfo.Status\" else if host.SystemID = null then \"No OS Audit\" else \"No Web API audit\" as \"real.host.@ScanningInfo.Status\")",
+            "| select(@host, Sc.host.@description, asset_id, host.osName, host.SystemID, vC_uuid, Datacenters, host.@audittime, \"real.host.@ScanningInfo.Status\")"
+        ],
+        "default_politics_blacklist": [
+            "w os Win Ess",
+            "^u os ",
+            "w os Win sysmon"
+        ],
+        "mandatory_policies": "s VMware vCenter"
+    },
+    "vCenters_ESXi_cluster": {
+        "comment": [
+            "Внутри vCenter есть описание известных ему гипервизоров на базе ОС ESXi, их можно указать внутри всего датастора,",
+            "или внутри кластера, запрос достает гипервизоры из кластера.",
+            "Сначала проверяем гипервизоры указанные в vCenter, а уже потом ищем оторванных от центра.",
+            "Вообще аудит по АПи устроен таким образом, что активы гиперов создаются сразу вместе с активом с ПО vCenter,",
+            "и по-хорошему проверять гипервизоры не надо, однако, сбор событий можно проверить только так."
+        ],
+        "PDQL": [
+            "filter(host.softs<VCenterInstance>.vCenterUUID) |",
+            "select(@host, host.@name, host.softs<VCenterInstance>.vCenterUUID as v_uuid, host.softs<VCenterInstance>.Datacenters.Name as dc_name, host.softs<VCenterInstance>.Datacenters.Clusters.name as CL_name, host.softs<VCenterInstance>.Datacenters.Clusters.ESXiHosts as esxi) |",
+            "select(host.@name, v_uuid, dc_name, CL_name, esxi) |",
+            "filter(esxi) |",
+            "join(filter(EsxiHost.HostMobId != null) |",
+            "select(@EsxiHost, EsxiHost.@id, EsxiHost.@audittime, EsxiHost.HostMobId as MobId, EsxiHost.vCenterUUID as vC_uuid) as ESXi, esxi = ESXi.MobId and ESXi.vC_uuid = v_uuid) |",
+            "calc(TotalDays(now() - ESXi.EsxiHost.@AuditTime) as dur_audit) |",
+            "join(select(host.@id as asset_id, host.@description, host.@ScanningInfo.Type, host.@ScanningInfo.Status) | filter(host.@ScanningInfo.Type = 'Audit') as A, A.asset_id = ESXi.EsxiHost.@id) | ",
+            "select(host.@name, dc_name, CL_name, v_uuid, esxi, ESXi.@EsxiHost, dur_audit, ESXi.EsxiHost.@audittime, A.host.@ScanningInfo.Status) | sort(host.@name, dc_name, CL_name, esxi)"
+        ],
+        "default_politics_blacklist": [
+            "u os esxi"
+        ],
+        "mandatory_policies": "u os auditd"
+    },
+    "vCenters_ESXi_no_cluster": {
+        "comment": [
+            "В отличии от предыдущего, этот запрос тянет гипервизоры из датастора (откидывая те, которые указаны и в датасторе, и в кластере)",
+            "Сначала проверяем гипервизоры указанные в vCenter, а уже потом ищем оторванных от центра.",
+            "Вообще аудит по АПи устроен таким образом, что активы гиперов создаются сразу вместе с активом с ПО vCenter,",
+            "и по-хорошему проверять гипервизоры не надо, однако, сбор событий можно проверить только так."
+        ],
+        "PDQL": [
+            "filter(host.softs<VCenterInstance>.vCenterUUID) |",
+            "select(@host, host.@name, host.softs<VCenterInstance>.vCenterUUID as v_uuid, host.softs<VCenterInstance>.Datacenters.Name as dc_name, host.softs<VCenterInstance>.Datacenters.ESXiHosts as esxi) |",
+            "select(host.@name, v_uuid, dc_name, esxi) |",
+            "filter(esxi) |",
+            "join(select(host.softs<VCenterInstance>.vCenterUUID as v_uuid, host.softs<VCenterInstance>.Datacenters.Name as dc_name, host.softs<VCenterInstance>.Datacenters.Clusters.name as cl_name, host.softs<VCenterInstance>.Datacenters.Clusters.ESXiHosts as esxi) | filter(esxi) as CL, CL.v_uuid = v_uuid and CL.dc_name = dc_name and CL.esxi = esxi)",
+            "| filter(CL.esxi = null) |",
+            "join(filter(EsxiHost.HostMobId != null) | select(@EsxiHost, EsxiHost.@id, EsxiHost.@audittime, EsxiHost.HostMobId as MobId, EsxiHost.vCenterUUID as vC_uuid) as ESXi, esxi = ESXi.MobId and ESXi.vC_uuid = v_uuid) |",
+            "calc(TotalDays(now() - ESXi.EsxiHost.@AuditTime) as dur_audit) |",
+            "join(select(host.@id as asset_id, host.@description, host.@ScanningInfo.Type, host.@ScanningInfo.Status) | filter(host.@ScanningInfo.Type = 'Audit') as A, A.asset_id = ESXi.EsxiHost.@id) | ",
+            "select(host.@name, dc_name, v_uuid, esxi, ESXi.@EsxiHost, dur_audit, ESXi.EsxiHost.@audittime, A.host.@ScanningInfo.Status) | sort(host.@name, dc_name, esxi)"
+        ],
+        "default_politics_blacklist": [
+            "u os esxi"
+        ],
+        "mandatory_policies": "u os auditd"
+    },
+    "ESXi_no_vCenters": {
+        "comment": [
+            "Этот запрос ищет гипервизоры на базе ОС ESXi, которые не привязаны ни к одному из vCenter-ов"
+        ],
+        "PDQL": [
+            "filter(esxihost.ipaddress)",
+            "| select(@esxihost, esxihost.@id, esxihost.hostMobId as hostMobId, esxihost.vCenterUUID as e_vUUID, esxihost.@audittime)",
+            "| join(filter(host.softs<VCenterInstance>.vCenterUUID) |",
+            "select(@host, host.@name, host.softs<VCenterInstance>.vCenterUUID as v_uuid, host.softs<VCenterInstance>.Datacenters.Name as dc_name, host.softs<VCenterInstance>.Datacenters.ESXiHosts as esxi) |",
+            "select(host.@name, v_uuid, dc_name, esxi) as VCD, VCD.esxi = hostMobId and e_vUUID = VCD.v_uuid)",
+            "| filter(VCD.dc_name = null)",
+            "| join(filter(host.softs<VCenterInstance>.vCenterUUID) |",
+            "select(@host, host.@name, host.softs<VCenterInstance>.vCenterUUID as v_uuid, host.softs<VCenterInstance>.Datacenters.Name as dc_name, host.softs<VCenterInstance>.Datacenters.Clusters.name as L_name, host.softs<VCenterInstance>.Datacenters.Clusters.ESXiHosts as esxi) as VCC, VCC.esxi = hostMobId and e_vUUID = VCC.v_uuid)",
+            "| filter(VCC.dc_name = null)",
+            "| join(select(host.@id as asset_id, host.@description, host.@ScanningInfo.Type, host.@ScanningInfo.Status) | filter(host.@ScanningInfo.Type = 'Audit') as A, A.asset_id = esxihost.@id) ",
+            "| select(@esxihost, A.host.@description, hostMobId, e_vUUID, esxihost.@audittime, A.host.@ScanningInfo.Status) | calc(TotalDays(now() - EsxiHost.@AuditTime) as dur_audit)"
+        ],
+        "default_politics_blacklist": [
+            "u os esxi"
+        ],
+        "mandatory_policies": "u os auditd"
+    },
+    "VMs_by_vCenter": {
+        "comment": [
+            "Этот запрос проверяет все виртуальные машины указанные на vCenter.",
+            "Если у вас есть информация на каком из vCenter есть важные виртуальные машины, а на каком не очень важные,",
+            "то можно отфильтровать как в запросе, так и на готовой документе"
+        ],
+        "PDQL": [
+            "filter(host.softs<VCenterInstance>.vCenterUUID) |",
+            "select(@host, host.@Name, host.softs<VCenterInstance>.vCenterUUID as v_uuid, host.softs<VCenterInstance>.datacenters.name as dc_name, host.softs<VCenterInstance>.datacenters.VMs.id as vm_id, host.softs<VCenterInstance>.datacenters.VMs.fqdn as vm_fqdn, host.softs<VCenterInstance>.datacenters.VMs.hostname as vm_hostname, host.softs<VCenterInstance>.datacenters.VMs.NetworkInterfaces<VmNetInterface>.pg as pg, host.softs<VCenterInstance>.datacenters.VMs.NetworkInterfaces<VmNetInterface>.MacAddress as vm_macs, host.softs<VCenterInstance>.datacenters.VMs.NetworkInterfaces<VmNetInterface>.ipaddress.address as vm_ips, host.softs<VCenterInstance>.datacenters.VMs.state as state) |",
+            "filter(state = 'poweredOn') |",
+            "join(select(@host, host.@id, host.@audittime, host.fqdn, host.hostname, host.vmid, host.@macaddresses, host.@ipaddresses) as H, H.host.vmid = vm_id) |",
+            "join(select(host.@id as asset_id, host.@description, host.@ScanningInfo.Type, host.@ScanningInfo.Status) | filter(host.@ScanningInfo.Type = 'Audit') as A, A.asset_id = H.host.@id) |",
+            "select(host.@name, dc_name, vm_fqdn, vm_hostname, pg, compactunique(vm_ips), compactunique(vm_macs), vm_id, H.@host, A.host.@description, A.host.@ScanningInfo.Status, H.host.@audittime) |",
+            "calc( TotalDays(now() - H.host.@AuditTime) as dur_audit)"
+        ],
+        "default_politics_blacklist": [
+            "w os Win Ess",
+            "^u os ",
+            "w os Win sysmon",
+            "^p "
+        ]
+    },
+    "HyperV_ports": {
+        "comment": [
+            "Поиск активов с ПО Windows Hyper-V по стандартному порту 2179"
+        ],
+        "PDQL": [
+            "filter(Host.Endpoints<TransportEndpoint>[Port = 2179 and Protocol = 'tcp' and status = 'Open' and IpAddress not in [::/0, 127.0.0.0/8]])",
+            "| select(@host, host.@id, host.@description, compactunique(host.hypervisors) as hypers, compactunique(host.softs<HyperV>) as soft, host.@audittime) | calc(TotalDays(now() - host.@AuditTime) as dur_audit)",
+            "| join(select(host.@id, host.@ScanningInfo.Type, host.@ScanningInfo.Status) | filter(host.@ScanningInfo.Type = 'Audit') as Sc, Sc.host.@id = host.@id)",
+            "| select(@host, host.@description, hypers, soft, Sc.host.@ScanningInfo.Status, host.@audittime, dur_audit)"
+        ],
+        "default_politics_blacklist": [
+            "w os Win Ess",
+            "w os Win sysmon"
+        ]
+    },
+    "HyperV_soft": {
+        "comment": [
+            "Поиск активов с ПО Windows Hyper-V."
+        ],
+        "PDQL": [
+            "filter(host.softs<HyperV>)",
+            "| select(@host, host.@id, host.@description, compactunique(host.hypervisors) as hypers, compactunique(host.softs<HyperV>) as soft, host.@audittime) | calc(TotalDays(now() - host.@AuditTime) as dur_audit)",
+            "| join(select(host.@id, host.@ScanningInfo.Type, host.@ScanningInfo.Status) | filter(host.@ScanningInfo.Type = 'Audit') as Sc, Sc.host.@id = host.@id)",
+            "| select(@host, host.@description, hypers, soft, Sc.host.@ScanningInfo.Status, host.@audittime, dur_audit)"
+        ],
+        "default_politics_blacklist": [
+            "w os Win Ess",
+            "w os Win sysmon"
+        ]
+    },
+    "HyperV_VMs": {
+        "comment": [
+            "Поиск активов виртуальных машин указанных на Hyper-V серверах"
+        ],
+        "PDQL": [
+            "select(",
+            "    host.@name, Host.Hypervisors.VirtType as VirtType,",
+            "    host.hypervisors.VMs.id as vm_id,",
+            "    host.hypervisors.VMs.name as vm_name,",
+            "    host.hypervisors.VMs.fqdn as vm_fqdn,",
+            "    host.hypervisors.VMs.hostname as vm_hostname,",
+            "    compactunique(host.hypervisors.VMs.NetworkInterfaces.ipaddress.address) as vm_ips,",
+            "    host.hypervisors.VMs.state as state) |",
+            "filter(VirtType = 'Hyper-V' and state in ['poweredOn', 'Running']) |",
+            "join(select(@host, host.@id, host.@description, host.@audittime, host.vmid) |",
+            "filter(host.vmid) as H, H.host.vmid = vm_id) |",
+            "join(select(host.@id, host.@ScanningInfo.Type, host.@ScanningInfo.Status) | filter(host.@ScanningInfo.Type = 'Audit') as Sc, Sc.host.@id = H.host.@id) | ",
+            "select(host.@name, vm_name, vm_fqdn, vm_hostname,",
+            "    vm_ips, H.@host, H.host.@description, Sc.host.@ScanningInfo.Status, H.host.@audittime) |",
+            "calc(TotalDays(now() - H.host.@AuditTime) as dur_audit)"
+        ],
+        "default_politics_blacklist": [
+            "w os Win Ess",
+            "^u os ",
+            "w os Win sysmon",
+            "^p "
+        ]
+    },
+    "Gitlab_by_pentest": {
+        "comment": [
+            "Поиск активов с ПО Gitlab по выставляемом Header в ответном пакете. для того, чтобы найти Header необходимо",
+            "провести ServiceDiscovery всей инфраструктуры по 80 и 443 портам",
+            "Для всех найденных активов необходим Unix Audit, а также кроме системных события, должны собираться события",
+            "s gitlab (event_src.title = 'gitlab' and event_src.subsys = 'security')"
+        ],
+        "PDQL": [
+            "filter(host.endpoints<transportendpoint>[port in [443, 80] and status = 'Open' and IpAddress not in [::/0, 127.0.0.0/8] and Service.Checks.Arguments<GetHTTPHeadersArgument>.Headers.Header = 'X-GITLAB-META']) | ",
+            "select(@host, host.@id as asset_id, host.@description, host.@PentestTime, host.@audittime) | calc(TotalDays(now() - host.@AuditTime) as dur_audit)  | calc(TotalDays(now() - host.@PentestTime) as dur_pentest)",
+            "| join(select(host.@id, host.@ScanningInfo.Type, host.@ScanningInfo.Status) | filter(host.@ScanningInfo.Type = 'Audit') as Sc, Sc.host.@id = asset_id) ",
+            "| select(@host, host.@description, asset_id, host.@audittime, Sc.host.@ScanningInfo.Status, host.@PentestTime)"
+        ],
+        "default_politics_blacklist": [
+            "^u os "
+        ],
+        "mandatory_policies": "^s gitlab"
+    },
+    "Gitlab_by_soft": {
+        "comment": [
+            "Поиск активов с ПО Gitlab по софту на активе",
+            "Для всех найденных активов необходим Unix Audit, а также кроме системных события, должны собираться события",
+            "s gitlab (event_src.title = 'gitlab' and event_src.subsys = 'security')"
+        ],
+        "PDQL": [
+            "filter(host.softs<gitlab>) | ",
+            "select(@host, host.@id as asset_id, host.@description, host.@audittime)",
+            "| join(filter(Host.Softs<Gitlab>.Users) | select(host.@id) as U, U.host.@id = asset_id)",
+            "| calc(if U.host.@id then True else False as users)",
+            "| join(filter(Host.Softs<Gitlab>.Projects) | select(host.@id) as P, P.host.@id = asset_id)",
+            "| calc(if P.host.@id then True else False as projects)",
+            "| join(filter(host.softs<gitlab>) | select(host.@id, host.@ScanningInfo.Type, host.@ScanningInfo.Status) | filter(host.@ScanningInfo.Type = 'Audit') as Sc, Sc.host.@id = asset_id) ",
+            "| join(filter(host.softs<gitlab>) | select(host.@id, compactunique(host.softs<gitlab>.openports.address) as Listen_addresses, compactunique(host.softs<gitlab>.openports.Port) as Listen_ports, ",
+            "compactunique(host.endpoints<ipendpoint>.address) as Host_addresses) | filter(Listen_addresses) as G, G.host.@id = asset_id) ",
+            "| calc(if (users and projects) then 'Sc.host.@ScanningInfo.Status' else 'No users or Projects' as 'REAL.host.@ScanningInfo.Status')",
+            "| select(@host, host.@description, G.Listen_addresses, G.Listen_ports, G.Host_addresses, users, projects, asset_id, host.@audittime, REAL.host.@ScanningInfo.Status)"
+        ],
+        "default_politics_blacklist": [
+            "^u os "
+        ],
+        "mandatory_policies": "^s gitlab"
+    },
+    "Gitlab_runners_to_hosts": {
+        "comment": [
+            "Поиск активов, указанных как агенты на сервера Gitlab, если в вашей инфраструктуры агенты статичны, ",
+            "то лучше проводить их аудит и сбор событий, так как их захват может привести атаке на цепочку поставок."
+        ],
+        "PDQL": [
+            "filter(host.softs<gitlab>) |",
+            "select(@host, host.@name, host.softs<gitlab>, host.softs<gitlab>.runners.ID as ID, host.softs<gitlab>.runners.Token as Token, host.softs<gitlab>.runners.Type as Type, ",
+            "host.softs<gitlab>.runners.Platform as Platform, host.softs<gitlab>.runners.ExecutorType as ExecutorType, host.softs<gitlab>.runners.State as State, ",
+            "host.softs<gitlab>.runners.Active as Active, host.softs<gitlab>.runners.AccessLevel as AccessLevel, host.softs<gitlab>.runners.IPAddress as IPAddress, ",
+            "host.softs<gitlab>.runners.RunUntaggedJobs as RunUntaggedJobs) |",
+            "filter(host.softs<gitlab> and State = 'online') |",
+            "join(select(@host, host.@id, host.@audittime, host.ipaddress) as H, H.host.ipaddress = IPAddress) | calc(totaldays(now() - H.host.@audittime) as dur_audit)",
+            "| join(select(host.@id, host.@Description, host.@ScanningInfo.Type, host.@ScanningInfo.Status) | filter(host.@ScanningInfo.Type = 'Audit') as Sc, Sc.host.@id = H.host.@id) ",
+            "| select(host.@name, IPAddress, H.@host, Sc.host.@Description, H.host.@id as asset_id, H.host.@audittime, dur_audit, Sc.host.@ScanningInfo.Status)"
+        ],
+        "default_politics_blacklist": [
+            "w os Win Ess",
+            "^u os ",
+            "w os Win sysmon"
+        ]
+    },
+    "Arti_by_pentest": {
+        "comment": [
+            "Поиск активов с ПО Jfrog Artifactory по выставляемом Header в ответном пакете. для того, чтобы найти Header необходимо",
+            "провести ServiceDiscovery всей инфраструктуры по 80 и 443 портам",
+            "Для всех найденных активов необходим Unix Audit, а также кроме системных события, должны собираться события",
+            "s arti (event_src.title = 'artifactory')"
+        ],
+        "PDQL": [
+            "filter(host.endpoints<transportendpoint>[port in [443, 80] and status = 'Open' and IpAddress not in [::/0, 127.0.0.0/8] and service.checks<GetHTTPHeaders>.Headers.Header = 'X-ARTIFACTORY-ID']) |",
+            "select(@host, host.@id as asset_id, host.@description, host.@PentestTime, host.@audittime) | calc(TotalDays(now() - host.@AuditTime) as dur_audit)  | calc(TotalDays(now() - host.@PentestTime) as dur_pentest)",
+            "| join(select(host.@id, host.@ScanningInfo.Type, host.@ScanningInfo.Status) | filter(host.@ScanningInfo.Type = 'Audit') as Sc, Sc.host.@id = asset_id) ",
+            "| select(@host, host.@description, asset_id, host.@audittime, Sc.host.@ScanningInfo.Status, host.@PentestTime)"
+        ],
+        "default_politics_blacklist": [
+            "^u os "
+        ],
+        "mandatory_policies": "^s arti"
+    },
+    "Arti_by_soft": {
+        "comment": [
+            "Поиск активов с ПО Jfrog Artifactory по софту на активе",
+            "Для всех найденных активов необходим Unix Audit, а также кроме системных события, должны собираться события",
+            "s arti (event_src.title = 'artifactory')"
+        ],
+        "PDQL": [
+            "filter(host.softs<Artifactory>) | ",
+            "select(@host, host.@id as asset_id, host.@description, host.@audittime)",
+            "| join(filter(Host.Softs<Artifactory>.Users) | select(host.@id) as U, U.host.@id = asset_id)",
+            "| calc(if U.host.@id then True else False as users)",
+            "| join(filter(Host.Softs<Artifactory>.Repositories) | select(host.@id) as R, R.host.@id = asset_id)",
+            "| calc(if R.host.@id then True else False as repositories)",
+            "| join(filter(host.softs<Artifactory>) | select(host.@id, host.@ScanningInfo.Type, host.@ScanningInfo.Status) | filter(host.@ScanningInfo.Type = 'Audit') as Sc, Sc.host.@id = asset_id) ",
+            "| join(filter(host.softs<Artifactory>) | select(host.@id, compactunique(host.softs<Artifactory>.openports.address) as Listen_addresses, compactunique(host.softs<Artifactory>.openports.Port) as Listen_ports, ",
+            "compactunique(host.endpoints<ipendpoint>.address) as Host_addresses) | filter(Listen_addresses) as G, G.host.@id = asset_id) ",
+            "| calc(if (users and repositories) then 'Sc.host.@ScanningInfo.Status' else 'No users or Projects' as 'REAL.host.@ScanningInfo.Status')",
+            "| select(@host, host.@description, G.Listen_addresses, G.Listen_ports, G.Host_addresses, users, repositories, asset_id, host.@audittime, REAL.host.@ScanningInfo.Status)"
+        ],
+        "default_politics_blacklist": [
+            "^u os "
+        ],
+        "mandatory_policies": "^s arti"
+    },
+    "OpenVPN": {
+        "comment": [
+            "Фактически найти сервера OpenVPN без аудита на активе почти невозможно, поэтому чтобы не давать рекомендаций по правильному размешиванию кофейной гущи,",
+            "рекомендуется найти в НАД все сервера OpenVPN и поставить их на аудит, данные же запросы нужны для проверки событий и цикличности аудита уже после.",
+            "в PT NAD:",
+            "Применить условие фильтрации app_proto == \"openvpn\"",
+            "На странице Дашборды экспортировать данные виджета Серверы по сессиям и трафику, нажав ↓",
+            "Если среди перечисленных серверов есть серверы OpenVPN с внешними IP-адресами, то имеется исходящий трафик. В этом случае вы можете убедиться, что все сессии легитимны.",
+            "Если среди перечисленных серверов есть серверы OpenVPN с внутренними IP-адресами, то имеется входящий трафик, который преобразуется правилами NAT. В этом случае вы можете просмотреть правила NAT и определить, к каким внутренним устройствам или сервисам направляется трафик.",
+            "чтобы увидеть только сервера, необходимо после второй строки добавить | filter(mode = 'server')",
+            "с данных активов должны собираться события s openvpn (event_src.title = 'openvpn' and event_src.subsys = 'vpn-gateway')"
+        ],
+        "PDQL": [
+            "filter(host.softs<OpenVPN>.configs)",
+            "| select(@host, host.@id as asset_id, host.@audittime, host.softs<OpenVPN>.Vendor as Vendor, host.softs<OpenVPN>.Name as Name, host.softs<OpenVPN>.Version as Version, host.softs<OpenVPN>.configs.ConfigPath as ConfFile, host.softs<OpenVPN>.configs.Mode as mode, compactunique(host.softs<OpenVPN>.configs.routes) as routes)",
+            "| join(select(host.@id, host.@ScanningInfo.Type, host.@ScanningInfo.Status) | filter(host.@ScanningInfo.Type = 'Audit') as Sc, Sc.host.@id = asset_id) ",
+            "| calc(TotalDays(now() - host.@AuditTime) as dur_audit)",
+            "| join(filter(host.softs<OpenVPN>.configs.ConfigPath) | select(host.@id, host.softs<OpenVPN>.configs.ConfigPath,  count(host.softs<OpenVPN>.configs.clients.clientName) as clients) | filter(clients) as Cl, Cl.host.@id = asset_id and Cl.host.softs<OpenVPN>.configs.ConfigPath = ConfFile)",
+            "| join(filter(host.softs<OpenVPN>.Configs) | select(@host, host.@id, host.softs<OpenVPN>.Configs.ConfigPath as ConfigPath, host.softs<OpenVPN>.Configs.LoggingSettings.LogPath as LogPath, host.softs<OpenVPN>.Configs.LoggingSettings.AppendLogPath as AppendLogPath) | filter(LogPath and LogPath != '') | calc(LogPath + ' | ' + AppendLogPath  as logging_temp) | calc(if (AppendLogPath and AppendLogPath != '') then 'logging_temp' else 'LogPath' as logging) as Log, Log.host.@id = asset_id and Log.ConfigPath = ConfFile)",
+            "| join(filter(host.softs<OpenVPN>.configs) | select(host.@id, compactunique(host.softs<OpenVPN>.openports.address) as Listen_addresses, compactunique(host.softs<Artifactory>.openports.Port) as Listen_ports, ",
+            "compactunique(host.endpoints<ipendpoint>.address) as Host_addresses) | filter(Listen_addresses) as G, G.host.@id = asset_id) ",
+            "| select(@host, asset_id, host.@audittime, dur_audit, Sc.host.@ScanningInfo.Status, Vendor, Name, Version, ConfFile, mode, G.Listen_addresses, G.Listen_ports, G.Host_addresses, routes, Cl.clients, Log.logging)"
+        ],
+        "default_politics_blacklist": "^(u os)",
+        "mandatory_policies": "s openvpn"
+    },
+    "KSC_by_ports": {
+        "comment": [
+            "Поиск KSC по портам, стандартными являются 8060, 8061, 8080, 13000, 13291, 13299, 14000, 17000. ",
+            "Хотя и не всегда все они доступны в инфраструктуре (особенно 8080), однако 13000 должен быть открыть всегда.",
+            "Однако это метод первичного анализа."
+        ],
+        "PDQL": [
+            "select(@Host, host.@id as asset_id, host.@audittime, Host.Endpoints<TransportEndpoint>, Host.Endpoints<TransportEndpoint>.Port as Port, Host.Endpoints<TransportEndpoint>.Protocol as Protocol, Host.Endpoints<TransportEndpoint>.Status as Status, Host.Endpoints<TransportEndpoint>.IpAddress as IpAddress)",
+            "| filter(IpAddress not in [::/0, 127.0.0.0/8] and Status = 'Open' and Port in [8060, 8061, 8080, 13000, 13291, 13299, 14000, 17000])",
+            "| select(@host, asset_id, host.@audittime, countunique(Port) as cnt, compactunique(Port) as ports)",
+            "| filter(cnt > 3) | calc(TotalDays(now() - host.@AuditTime) as dur_audit)",
+            "| join(select(host.@id, host.@ScanningInfo.Type, host.@ScanningInfo.Status) | filter(host.@ScanningInfo.Type = 'Audit') as Sc, Sc.host.@id = asset_id) ",
+            "| join(filter(host.softs<KasperskySecurityCenter>) | select(host.@id, compactunique(host.softs<KasperskySecurityCenter>) as ksc) as S, S.host.@id = asset_id) ",
+            "| select(@host, asset_id, cnt, ports, S.ksc, Sc.host.@ScanningInfo.Status, host.@audittime, dur_audit)",
+            "| sort(cnt DESC)"
+        ],
+        "default_politics_blacklist": [
+            "w os Win Ess",
+            "^u os ",
+            "w os Win sysmon"
+        ],
+        "mandatory_policies": "^s ksc"
+    },
+    "KSC_by_softs": {
+        "comment": [
+            "Вывод всех хостов, где обнаружен Kaspersky Security Center как софт.",
+            "Также поиск БД на этих хостах, идея в том, что для полного скана KSC нужно также сканировать БД.",
+            "с данных активов должны собираться события s ksc (event_src.title = 'security_center')"
+        ],
+        "PDQL": [
+            "filter(host.softs<KasperskySecurityCenter>)",
+            "| select(@Host, host.@id as asset_id, host.softs<KasperskySecurityCenter> as ksc, host.@audittime) | calc(TotalDays(now() - host.@AuditTime) as dur_audit)",
+            "| join(select(host.@id, host.@ScanningInfo.Type, host.@ScanningInfo.Status) | filter(host.@ScanningInfo.Type = 'Audit') as Sc, Sc.host.@id = asset_id)  ",
+            "| join(filter(host.softs<KasperskySecurityCenter> and host.softs<SQLInstance>) | select(host.@id, Host.Softs<SQLInstance>.@fulltype as fulltype, Host.Softs<SQLInstance>.Databases.DBName as DBName) | filter(DBName = null or DBName = 'KAV') | unique()  as MSSQL, MSSQL.host.@id = asset_id)",
+            "| join(filter(host.softs<KasperskySecurityCenter> and host.softs<PostgreSQL>) | select(host.@id, Host.Softs<PostgreSQL>.@fulltype as fulltype, Host.Softs<PostgreSQL>.Databases.Name as DBName) | filter(DBName = null or DBName = 'KAV') | unique()  as PG, PG.host.@id = asset_id)",
+            "| join(filter(host.softs<KasperskySecurityCenter> and host.softs<Software:MySQLCore:Server>) | select(host.@id, Host.Softs<Software:MySQLCore:Server>.@fulltype as fulltype, Host.Softs<Software:MySQLCore:Server>.Databases.DBName as DBName) | filter(DBName = null or DBName = 'KAV') | unique() as MySQL, MySQL.host.@id = asset_id)",
+            "| calc(MSSQL.fulltype + ' | ' + PG.fulltype + ' | ' + MySQL.fulltype as DB_fulltype)",
+            "| calc(MSSQL.DBName + ' | ' + PG.DBName + ' | ' + MySQL.DBName as DBName)",
+            "| select(@host, asset_id, ksc, Sc.host.@ScanningInfo.Status, host.@audittime, dur_audit, DB_fulltype, DBName)"
+        ],
+        "default_politics_blacklist": [
+            "w os Win Ess",
+            "^u os ",
+            "w os Win sysmon"
+        ],
+        "mandatory_policies": "^s ksc"
+    },
+    "1C_by_ports": {
+        "comment": [
+            "Поиск серверов 1C по портам указанным на сайте вендора.",
+            "Если среди перечисленных есть сервера с 1С, то необходимо провести их аудит и настроить сбор событий."
+        ],
+        "PDQL": [
+            "select(@Host, host.@id as asset_id, host.@audittime, Host.Endpoints<TransportEndpoint>, Host.Endpoints<TransportEndpoint>.Port as Port, Host.Endpoints<TransportEndpoint>.Protocol as Protocol, Host.Endpoints<TransportEndpoint>.Status as Status, Host.Endpoints<TransportEndpoint>.IpAddress as IpAddress)",
+            "| filter(IpAddress not in [::/0, 127.0.0.0/8] and Status = 'Open' and (Port in [1540, 1541, 1542, 1545] or (port > 1559 and port < 1592)))",
+            "| select(@host, asset_id, host.@audittime, countunique(Port) as cnt, compactunique(Port) as ports)",
+            "| filter(cnt > 2) | calc(TotalDays(now() - host.@AuditTime) as dur_audit)",
+            "| join(select(host.@id, host.@ScanningInfo.Type, host.@ScanningInfo.Status) | filter(host.@ScanningInfo.Type = 'Audit') as Sc, Sc.host.@id = asset_id) ",
+            "| join(filter(host.softs<ServerOneC>) | select(host.@id, compactunique(host.softs<ServerOneC>) as one_c) as S, S.host.@id = asset_id) ",
+            "| select(@host, asset_id, cnt, ports, S.one_c, Sc.host.@ScanningInfo.Status, host.@audittime, dur_audit)",
+            "| sort(cnt DESC)"
+        ],
+        "default_politics_blacklist": [
+            "w os Win Ess",
+            "^u os ",
+            "w os Win sysmon"
+        ],
+        "mandatory_policies": "s 1c"
+    },
+    "1C_by_pentest": {
+        "comment": [
+            "Вывод всех хостов, где обнаружен специфический для 1C сервис.",
+            "Если среди перечисленных есть сервера с 1С, то необходимо провести их аудит и настроить сбор событий."
+        ],
+        "PDQL": [
+            "filter(host.@pentesttime and Host.Endpoints<TransportEndpoint>.service<Enterprise1CManagementService>)",
+            "| select(@host, host.@id as asset_id, host.@audittime)",
+            "| calc(TotalDays(now() - host.@AuditTime) as dur_audit)",
+            "| join(select(host.@id, host.@ScanningInfo.Type, host.@ScanningInfo.Status) | filter(host.@ScanningInfo.Type = 'Audit') as Sc, Sc.host.@id = asset_id) ",
+            "| join(filter(host.softs<ServerOneC>) | select(host.@id, compactunique(host.softs<ServerOneC>) as one_c) as S, S.host.@id = asset_id) ",
+            "| select(@host, asset_id, S.one_c, Sc.host.@ScanningInfo.Status, host.@audittime, dur_audit)"
+        ],
+        "default_politics_blacklist": [
+            "w os Win Ess",
+            "^u os ",
+            "w os Win sysmon"
+        ],
+        "mandatory_policies": "s 1c"
+    },
+    "1C_by_softs": {
+        "comment": [
+            "Вывод всех хостов, где обнаружен сервер 1С как софт.",
+            "Вручную задайте важность для тех активов с 1С, которые относятся к бизнес рискам, а также на всех настройте свеовременный аудит.",
+            "С данных активов должны собираться события s 1c (event_src.title = '1c_enterprise')"
+        ],
+        "PDQL": [
+            "filter(host.softs<ServerOneC>)",
+            "| select(@Host, host.@id as asset_id, compactunique(host.softs<ServerOneC>) as One_C, compactunique(Host.Softs<ServerOneC>.Clusters.Name) as cl_names, host.@audittime) | calc(TotalDays(now() - host.@AuditTime) as dur_audit)",
+            "| join(select(host.@id, host.@ScanningInfo.Type, host.@ScanningInfo.Status) | filter(host.@ScanningInfo.Type = 'Audit') as Sc, Sc.host.@id = asset_id)  ",
+            "| select(@host, asset_id, One_C, cl_names, Sc.host.@ScanningInfo.Status, host.@audittime, dur_audit)"
+        ],
+        "default_politics_blacklist": [
+            "w os Win Ess",
+            "^u os ",
+            "w os Win sysmon"
+        ],
+        "mandatory_policies": "s 1c"
+    },
+    "1C_servers_to_hosts": {
+        "comment": [
+            "Внутри кластера 1С указываются хосты, которые являются частью этого кластера, запрос соединяет эти данные с активами"
+        ],
+        "PDQL": [
+            "filter(Host.Softs<ServerOneC>)",
+            "| select(@host, host.@Name, host.fqdn, host.@id, Host.Softs<ServerOneC>.Clusters.Name as cl_name, Host.Softs<ServerOneC>.Clusters.Servers as Server, Host.Softs<ServerOneC>)",
+            "| filter(Server) | calc(if Server = 'localhost' then 'host.fqdn' else 'Server' as Res_Server)",
+            "| join(filter(Host.Softs<ServerOneC>)|select(@host, host.@id, host.hostname, host.FQDN, compactunique(Host.Softs<ServerOneC>) as onec, host.@audittime) as H, H.host.hostname = Res_Server or H.host.FQDN = Res_Server)",
+            "| calc(totaldays(now() - H.host.@audittime) as dur_audit)",
+            "| join(select(host.@id, host.@Description, host.@ScanningInfo.Type, host.@ScanningInfo.Status) | filter(host.@ScanningInfo.Type = 'Audit') as Sc, Sc.host.@id = H.host.@id) ",
+            "| select(host.@name, Res_Server, H.@host, Sc.host.@Description, H.host.@id as asset_id, H.host.@audittime, dur_audit, Sc.host.@ScanningInfo.Status)"
+        ],
+        "default_politics_blacklist": [
+            "w os Win Ess",
+            "^u os ",
+            "w os Win sysmon"
+        ],
+        "mandatory_policies": "^s 1c"
+    },
+    "1C_servers_no_cluster": {
+        "comment": [
+            "Запрос является информационным, он показывает все активы с ПО ServerOneC, но не привязанных ни к одному из кластеров 1С"
+        ],
+        "PDQL": [
+            "filter(Host.Softs<ServerOneC>)",
+            "| select(@host, host.@id, host.hostname, host.fqdn, compactunique(Host.Softs<ServerOneC>) as onec, host.@audittime)",
+            "| join(select(host.@id, host.@Description, host.@ScanningInfo.Type, host.@ScanningInfo.Status) | filter(host.@ScanningInfo.Type = 'Audit') as Sc, Sc.host.@id = host.@id) ",
+            "| join(filter(Host.Softs<ServerOneC>) | select(@host, host.@Name, host.@id, Host.Softs<ServerOneC>.Clusters.Name as name) | filter(name)  as TL, TL.host.@id = host.@id)",
+            "| filter(TL.host.@id = null)",
+            "| join(filter(Host.Softs<ServerOneC>) | select(@host, host.@Name, host.@id, Host.Softs<ServerOneC>.Clusters.Name as name, Host.Softs<ServerOneC>.Clusters.Servers as Server) | filter(Server) as Cl, Cl.Server = host.hostname or Cl.Server = host.fqdn) | calc(TotalDays(now() - host.@AuditTime) as dur_audit)",
+            "| filter(Cl.Server = null)",
+            "| select(@host, host.@audittime, dur_audit, onec, Cl.name, Cl.Server)"
+        ],
+        "default_politics_whitelist": ".*"
     }
 }

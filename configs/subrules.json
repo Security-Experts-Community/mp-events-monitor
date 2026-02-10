@@ -1,0 +1,1386 @@
+{
+    "Subrule_Asreproast_Auth": {
+        "active_directory_attacks": [
+            "Asreproasting"
+        ]
+    },
+    "Subrule_BadSuccessor_Attack": {
+        "active_directory_attacks": [
+            "BadSuccessor_Attack"
+        ]
+    },
+    "Cert_Allowed_Alt_SAN": {
+        "active_directory_attacks": [
+            "DC_Auth_With_Pfx"
+        ],
+        "active_directory_certificate_services_attacks": [
+            "ADCSync_Attack"
+        ]
+    },
+    "CA_Cert_Export": {
+        "active_directory_attacks": [
+            "Golden_Cert"
+        ]
+    },
+    "Subrule_MSA_LDAP_Query": {
+        "active_directory_attacks": [
+            "KDS_Root_Key_Access",
+            "MSA_Password_Access"
+        ]
+    },
+    "Subrule_Tickets_Requested": {
+        "active_directory_attacks": [
+            "Kerberoasting"
+        ]
+    },
+    "Subrule_IMarshal_Interface": {
+        "active_directory_attacks": [
+            "KrbRelay_Usage"
+        ],
+        "hacking_tools": [
+            "Cobalt_Strike_Browserpivot",
+            "PhantomCore_Tools_Usage"
+        ],
+        "mitre_attck_exfiltration": [
+            "Exfiltration_Over_Alternative_Protocol_Detection"
+        ]
+    },
+    "Subrule_PowerView_Objects_Actions": {
+        "active_directory_attacks": [
+            "Remote_Actions_With_Domain_Objects"
+        ]
+    },
+    "Bulk_Certs_Allowed_To_One_User": {
+        "active_directory_certificate_services_attacks": [
+            "ADCSync_Attack"
+        ]
+    },
+    "Subrule_Hostname_Mismatch": {
+        "active_directory_certificate_services_attacks": [
+            "Cert_Compromise_Via_NTLM_Relay"
+        ]
+    },
+    "Subrule_Sandbox_Mail_Attachment": {
+        "antimalware": [
+            "Sandbox_Different_Sender_Info",
+            "Sandbox_Full_Scan_Malware",
+            "Sandbox_Spam_Attack_By_Attachment",
+            "Sandbox_Spam_Attack_By_Source",
+            "Sandbox_Spam_Attack_By_Title"
+        ]
+    },
+    "Subrule_Sandbox_File_Verdict": {
+        "antimalware": [
+            "Sandbox_Full_Scan_Malware"
+        ]
+    },
+    "Subrule_Sandbox_Count_Mail_Attachments": {
+        "antimalware": [
+            "Subrule_Sandbox_Mail_Attachment"
+        ]
+    },
+    "Subrule_Sandbox_Mail_IP": {
+        "antimalware": [
+            "Subrule_Sandbox_Mail_Attachment"
+        ]
+    },
+    "Bitbucket_Login_From_New_Address": {
+        "bitbucket": [
+            "Bitbucket_Pull_Request_Merge_From_New_Address"
+        ]
+    },
+    "Subrule_SSHGuard": {
+        "bruteforce": [
+            "SSHGuard_Bruteforce",
+            "SSHGuard_Spraying"
+        ]
+    },
+    "Subrule_Teampass_Login_Successful": {
+        "bruteforce": [
+            "TeamPass_Password_Brute"
+        ],
+        "profiling": [
+            "Teampass_Abnormal_Access"
+        ],
+        "remote_work": [
+            "VPN_User_Abnormal_Access"
+        ]
+    },
+    "Subrule_FreeIPA_CVE_2024_3183_Kerberoasting": {
+        "freeipa": [
+            "FreeIPA_CVE_2024_3183_Kerberoasting"
+        ]
+    },
+    "Unix_Sensitive_File_Read": {
+        "freeipa": [
+            "FreeIPA_Id2entry_Dump"
+        ],
+        "vulnerabilities": [
+            "CVE_2025_32433_Erlang_SSH_RCE"
+        ]
+    },
+    "FreeIPA_User_Locked_Too_Many_Logons": {
+        "freeipa": [
+            "FreeIPA_Multiple_User_Lock"
+        ]
+    },
+    "Remote_Execution_Via_Custom_Impacket": {
+        "hacking_tools": [
+            "Atexec_Activity"
+        ]
+    },
+    "Remote_Code_Execution_Via_AtSvc": {
+        "hacking_tools": [
+            "Atexec_Activity"
+        ]
+    },
+    "Scheduled_Task_Was_Created_Or_Updated_Via_Schtasks": {
+        "hacking_tools": [
+            "Atexec_Activity"
+        ]
+    },
+    "Execute_Encoded_Powershell": {
+        "hacking_tools": [
+            "Atexec_Activity",
+            "Cobalt_Strike_Powershell_Payload_Delivery"
+        ],
+        "microsoft_hyperv": [
+            "HyperV_VM_Enumeration"
+        ],
+        "mitre_attck_command_and_control": [
+            "Download_Via_Encoded_Powershell"
+        ],
+        "mitre_attck_lateral_movement": [
+            "Remote_SSP_Dump"
+        ]
+    },
+    "Subrule_Possible_Proxy_Usage": {
+        "hacking_tools": [
+            "Cobalt_Strike_Browserpivot"
+        ],
+        "mitre_attck_command_and_control": [
+            "Possible_Proxy_Usage"
+        ]
+    },
+    "Subrule_Cobalt_Strike_RunDLL32": {
+        "hacking_tools": [
+            "Cobalt_Strike_Elevate",
+            "Cobalt_Strike_SpawnAs"
+        ]
+    },
+    "Subrule_Cobalt_Strike_Service_Creation": {
+        "hacking_tools": [
+            "Cobalt_Strike_Elevate",
+            "Cobalt_Strike_Psexec_Jump"
+        ]
+    },
+    "Subrule_Duplex_Powershell_Connect": {
+        "hacking_tools": [
+            "Cobalt_Strike_Powershell_Payload_Delivery"
+        ]
+    },
+    "Cobalt_Strike_Stager": {
+        "hacking_tools": [
+            "Cobalt_Strike_RunAs_Escalate"
+        ]
+    },
+    "Token_Manipulation": {
+        "hacking_tools": [
+            "Cobalt_Strike_SpawnAs",
+            "SharpToken_Usage"
+        ]
+    },
+    "Suspicious_Connection": {
+        "hacking_tools": [
+            "Covenant_Launcher_Start"
+        ],
+        "mitre_attck_initial_access": [
+            "Suspicious_Living_Off_Trusted_Sites_Usage"
+        ]
+    },
+    "Windows_Autorun_Modification": {
+        "hacking_tools": [
+            "Covenant_Persistence"
+        ],
+        "mitre_attck_execution": [
+            "Script_Files_Execution"
+        ],
+        "mitre_attck_persistence": [
+            "Windows_Startup_Folder_Modification"
+        ]
+    },
+    "Remote_Password_Dump": {
+        "hacking_tools": [
+            "Impacket_Secretsdump"
+        ]
+    },
+    "Execute_Suspicious_Command_Via_Cmd": {
+        "hacking_tools": [
+            "Impacket_SMBEXEC"
+        ]
+    },
+    "Remote_Admin_Share_Access": {
+        "hacking_tools": [
+            "Impacket_SMBEXEC"
+        ]
+    },
+    "Windows_Service_Installed": {
+        "hacking_tools": [
+            "Impacket_SMBEXEC"
+        ],
+        "vulnerabilities": [
+            "MS17_010_SMB_Code_Execution"
+        ]
+    },
+    "LDAP_Discovery": {
+        "hacking_tools": [
+            "Invoke_Rubeus_Usage"
+        ]
+    },
+    "Subrule_Invoke_Rubeus_Usage": {
+        "hacking_tools": [
+            "Invoke_Rubeus_Usage"
+        ]
+    },
+    "Kerberoasting": {
+        "hacking_tools": [
+            "Invoke_Rubeus_Usage"
+        ]
+    },
+    "Rundll32_AWL_Bypass": {
+        "hacking_tools": [
+            "Koadic_Bitsadmin_Stager",
+            "Koadic_MSHTA_Stager",
+            "Koadic_Rundll32_Stager"
+        ],
+        "mitre_attck_defense_evasion": [
+            "ControlPanel_AWL_Bypass"
+        ]
+    },
+    "BitsJob_Download_And_Run": {
+        "hacking_tools": [
+            "Koadic_Bitsadmin_Stager"
+        ]
+    },
+    "Subrule_Script_Files_Execution": {
+        "hacking_tools": [
+            "Koadic_Bitsadmin_Stager"
+        ],
+        "mitre_attck_execution": [
+            "Execute_File_From_Sysvol_Share",
+            "Script_Files_Execution",
+            "Suspicious_Directory_For_Process"
+        ],
+        "mitre_attck_persistence": [
+            "Logon_Script_Execution"
+        ]
+    },
+    "MSHTA_AWL_Bypass": {
+        "hacking_tools": [
+            "Koadic_MSHTA_Stager"
+        ]
+    },
+    "Regsvr32_AWL_Bypass": {
+        "hacking_tools": [
+            "Koadic_REGSVR32_Stager"
+        ],
+        "mitre_attck_defense_evasion": [
+            "Suspicious_Execution_Via_Regsvr32"
+        ]
+    },
+    "XSL_Script_WMIC_Execution": {
+        "hacking_tools": [
+            "Koadic_WMIC_Stager"
+        ]
+    },
+    "Machine_Account_Attribute_Manipulation": {
+        "hacking_tools": [
+            "Powermad_Usage"
+        ]
+    },
+    "Subrule_PVE_Find_AD_User_Usage": {
+        "hacking_tools": [
+            "PVE_Find_AD_User_Usage"
+        ]
+    },
+    "Rubeus_Usage": {
+        "hacking_tools": [
+            "Rubeus_Non_Cmdline_Usage"
+        ]
+    },
+    "Subrule_Sharphound_Client_Side": {
+        "hacking_tools": [
+            "Sharphound_Client_Side"
+        ]
+    },
+    "Subrule_SharpHound_Access_To_Samr_Srvsvc": {
+        "hacking_tools": [
+            "SharpHound_Groups_Collection"
+        ]
+    },
+    "Subrule_SharpHound_LoggedOn": {
+        "hacking_tools": [
+            "SharpHound_LoggedOn"
+        ]
+    },
+    "Subrule_Sharphound_Server_Side": {
+        "hacking_tools": [
+            "Sharphound_Server_Side"
+        ]
+    },
+    "Subrule_SharpHound_Access_To_Wkssvc_Srvsvc": {
+        "hacking_tools": [
+            "SharpHound_Session"
+        ]
+    },
+    "Subrule_MSTSC_SharpRDPThief_Usage": {
+        "hacking_tools": [
+            "SharpRDPThief_Usage"
+        ]
+    },
+    "Subrule_Thread_SharpRDPThief_Usage": {
+        "hacking_tools": [
+            "SharpRDPThief_Usage"
+        ]
+    },
+    "Named_Pipe_Impersonation_PrivEsc": {
+        "hacking_tools": [
+            "SharpToken_Usage"
+        ]
+    },
+    "Execute_Malicious_Command": {
+        "hacking_tools": [
+            "Subrule_Invoke_Rubeus_Usage"
+        ]
+    },
+    "DLL_Side_Loading": {
+        "hacking_tools": [
+            "Subrule_WannaMine_Usage"
+        ]
+    },
+    "Creation_Suspicious_File": {
+        "hacking_tools": [
+            "Subrule_WannaMine_Usage"
+        ],
+        "mitre_attck_lateral_movement": [
+            "Remote_Creation_Suspicious_File"
+        ],
+        "remote_work": [
+            "File_Copy_Via_RemoteAccess_Tool"
+        ]
+    },
+    "Schtasks_Commandline": {
+        "hacking_tools": [
+            "ToxicEye_Usage"
+        ]
+    },
+    "Credential_Access_To_Passwords_Storage": {
+        "hacking_tools": [
+            "ToxicEye_Usage"
+        ]
+    },
+    "Wintun_Network_Driver_Usage": {
+        "hacking_tools": [
+            "VNT_Usage"
+        ]
+    },
+    "Subrule_WannaMine_Usage": {
+        "hacking_tools": [
+            "WannaMine_Usage"
+        ]
+    },
+    "Remoting_WMI": {
+        "hacking_tools": [
+            "WMEye_Event_Filter_Creation"
+        ]
+    },
+    "WMEye_Event_Filter_Creation": {
+        "hacking_tools": [
+            "WMEye_Execution"
+        ]
+    },
+    "Indeed_Important_Policy_Parameter_Change": {
+        "indeed_pam": [
+            "Indeed_Credentials_Check_After_Policy_Change"
+        ]
+    },
+    "Subrule_Kaspersky_Create_Package_And_Task": {
+        "kaspersky": [
+            "Kaspersky_Install_Malicious_App"
+        ]
+    },
+    "Subrule_Kaspersky_Run_Task_Install_App": {
+        "kaspersky": [
+            "Kaspersky_Install_Malicious_App"
+        ]
+    },
+    "MECM_Created_Modified_Program": {
+        "microsoft_mecm": [
+            "MECM_Deploy_Program"
+        ]
+    },
+    "MECM_SharpSCCM": {
+        "microsoft_mecm": [
+            "MECM_NTLM_Relay_Via_SharpSCCM"
+        ]
+    },
+    "NTLM_Relay_Auth": {
+        "microsoft_mecm": [
+            "MECM_NTLM_Relay_Via_SharpSCCM"
+        ],
+        "vulnerabilities": [
+            "CVE_2024_38200_Office_NTLM_Relay"
+        ]
+    },
+    "Subrule_DoublePulsar_Process_Access": {
+        "mitre_attck_command_and_control": [
+            "DoublePulsar_Activity"
+        ]
+    },
+    "Subrule_DoublePulsar_IPC_Access": {
+        "mitre_attck_command_and_control": [
+            "DoublePulsar_Activity"
+        ]
+    },
+    "Subrule_Possible_Network_Local_Tunnel": {
+        "mitre_attck_command_and_control": [
+            "Possible_Network_Local_Tunnel",
+            "Possible_Proxy_Usage",
+            "Subrule_Possible_Proxy_Usage"
+        ]
+    },
+    "Tunnel_Process_Windows": {
+        "mitre_attck_command_and_control": [
+            "Possible_Network_Local_Tunnel"
+        ]
+    },
+    "Proxy_Tools_Usage": {
+        "mitre_attck_command_and_control": [
+            "Possible_Network_Local_Tunnel"
+        ]
+    },
+    "Port_Scan_from_Localnet_to_Single_Host": {
+        "mitre_attck_command_and_control": [
+            "Possible_Network_Local_Tunnel"
+        ],
+        "unix_mitre_attck_command_and_control": [
+            "Unix_Possible_GS_Netcat_Usage"
+        ]
+    },
+    "Port_Scan_from_Localnet_to_Different_Hosts": {
+        "mitre_attck_command_and_control": [
+            "Possible_Network_Local_Tunnel"
+        ],
+        "unix_mitre_attck_command_and_control": [
+            "Unix_Possible_GS_Netcat_Usage"
+        ]
+    },
+    "Subrule_SlothfulMedia_Execute_Request": {
+        "mitre_attck_command_and_control": [
+            "SlothfulMedia_Trojan"
+        ]
+    },
+    "Subrule_Connection_System_Process": {
+        "mitre_attck_command_and_control": [
+            "Subrule_Suspicious_Connection_System_Process"
+        ],
+        "mitre_attck_execution": [
+            "Fuegoshell_Oneliners_Execution"
+        ]
+    },
+    "Subrule_Suspicious_Connection_System_Process": {
+        "mitre_attck_command_and_control": [
+            "Suspicious_Connection_System_Process"
+        ]
+    },
+    "Subrule_Access_To_Protected_Storage_Share": {
+        "mitre_attck_cred_access": [
+            "Access_To_User_Secrets_Via_DPAPI"
+        ]
+    },
+    "Subrule_Coerce_Auth": {
+        "mitre_attck_cred_access": [
+            "Coerce_Auth"
+        ]
+    },
+    "Subrule_Egress_System": {
+        "mitre_attck_cred_access": [
+            "Coerce_Auth",
+            "SCF_Or_URL_File_Created",
+            "SCF_Or_URL_Forced_Authentication"
+        ]
+    },
+    "LSASS_Memory_Access_SubRule": {
+        "mitre_attck_cred_access": [
+            "Comsvcs_Minidump_Usage",
+            "LSASS_Dump_Via_RPC",
+            "LSASS_Dump_Via_TaskManager",
+            "LSASS_Memory_Dump",
+            "ProcDump_Usage"
+        ],
+        "process_chains_and_logons": [
+            "LSASS_Memory_Dump_Via_Migrated_Process"
+        ]
+    },
+    "Subrule_LSASS_For_DragonCastle": {
+        "mitre_attck_cred_access": [
+            "DragonCastle_LSASS_Dump"
+        ]
+    },
+    "Subrule_Shares_For_DragonCastle": {
+        "mitre_attck_cred_access": [
+            "DragonCastle_LSASS_Dump"
+        ]
+    },
+    "Subrule_NTLM_Logon": {
+        "mitre_attck_cred_access": [
+            "Kekeo_Credentials_Relay_Via_NTLM"
+        ],
+        "mitre_attck_execution": [
+            "Fuegoshell_Remote_Shell"
+        ]
+    },
+    "Subrule_LetMeowIn_LSASS_Dump": {
+        "mitre_attck_cred_access": [
+            "LetMeowIn_LSASS_Dump"
+        ]
+    },
+    "Suspicious_RPC_Server": {
+        "mitre_attck_cred_access": [
+            "LSASS_Dump_Via_RPC"
+        ]
+    },
+    "LSASS_PSSCapture_Snapshot": {
+        "mitre_attck_cred_access": [
+            "MalSecLogon_LSASS_Dump",
+            "Subrule_LetMeowIn_LSASS_Dump"
+        ]
+    },
+    "Subrule_LOLBins_LSASS_Dump": {
+        "mitre_attck_cred_access": [
+            "MultiDump_LSASS_Dump"
+        ]
+    },
+    "Subrule_Multifactor_Bypass_From_Local_Network_Side": {
+        "mitre_attck_cred_access": [
+            "Multifactor_Bypass_From_Local_Network_Side"
+        ]
+    },
+    "Subrule_PPLmedic_Svchost": {
+        "mitre_attck_cred_access": [
+            "PPLmedic_Process_Dump"
+        ]
+    },
+    "Subrule_PPLmedic_DllLoad": {
+        "mitre_attck_cred_access": [
+            "PPLmedic_Process_Dump"
+        ]
+    },
+    "Subrule_Remote_Credential_Theft_By_Masky": {
+        "mitre_attck_cred_access": [
+            "Remote_Credential_Theft_By_Masky"
+        ]
+    },
+    "LSASS_Handle_Duplicate": {
+        "mitre_attck_cred_access": [
+            "Subrule_LetMeowIn_LSASS_Dump"
+        ]
+    },
+    "LSASS_Memory_Dump": {
+        "mitre_attck_cred_access": [
+            "Subrule_LOLBins_LSASS_Dump"
+        ],
+        "mitre_attck_execution": [
+            "Tttracer_LOLBin"
+        ]
+    },
+    "Subrule_PPLmedic_WerFaultSecure": {
+        "mitre_attck_cred_access": [
+            "Subrule_PPLmedic_DllLoad"
+        ]
+    },
+    "Copied_Or_Renamed_Executable": {
+        "mitre_attck_defense_evasion": [
+            "AMSI_Bypass_Via_Powershell"
+        ]
+    },
+    "Powershell_Library_Loaded_Into_Process": {
+        "mitre_attck_defense_evasion": [
+            "AMSI_Bypass_Via_Powershell"
+        ],
+        "mitre_attck_execution": [
+            "PowerShdll_Usage"
+        ]
+    },
+    "Subrule_CSC_Start_And_File_Create": {
+        "mitre_attck_defense_evasion": [
+            "AMSI_Bypass_Via_Powershell"
+        ]
+    },
+    "Subrule_DLL_Side_Loading": {
+        "mitre_attck_defense_evasion": [
+            "DLL_Side_Loading"
+        ]
+    },
+    "Copying_Files": {
+        "mitre_attck_defense_evasion": [
+            "Explicit_Recycle_Bin_Directory_Usage"
+        ]
+    },
+    "Subrule_ParentPid_Spoofing": {
+        "mitre_attck_defense_evasion": [
+            "ParentPid_Spoofing"
+        ]
+    },
+    "Subrule_PowerShell_CLM_Bypass_4103": {
+        "mitre_attck_defense_evasion": [
+            "PowerShell_CLM_Bypass"
+        ]
+    },
+    "Subrule_PowerShell_CLM_Bypass_4104": {
+        "mitre_attck_defense_evasion": [
+            "PowerShell_CLM_Bypass"
+        ]
+    },
+    "Subrule_Possible_Process_From_Mounted_Disk": {
+        "mitre_attck_defense_evasion": [
+            "Process_From_Mounted_Disk"
+        ]
+    },
+    "CAP_High_Frequency_DNS_Requests_From_Host": {
+        "mitre_attck_discovery": [
+            "ADIDNS_Dump"
+        ]
+    },
+    "Subrule_LocalGroupListMembers": {
+        "mitre_attck_discovery": [
+            "LocalGroupListMembers_From_Remote_Host"
+        ]
+    },
+    "Subrule_Net_Share_Access": {
+        "mitre_attck_discovery": [
+            "Net_Tool_Usage"
+        ]
+    },
+    "Port_Scan_From_Localnet_To_Single_Host": {
+        "mitre_attck_discovery": [
+            "Port_Scan_From_Localnet_To_Different_Hosts"
+        ]
+    },
+    "Subrule_Whoami_Alternative": {
+        "mitre_attck_discovery": [
+            "Whoami_Alternative"
+        ]
+    },
+    "Delegated_Accounts_Recon": {
+        "mitre_attck_discovery": [
+            "Windows_Mass_Recon"
+        ]
+    },
+    "Enumerating_Delegated_Credentials": {
+        "mitre_attck_discovery": [
+            "Windows_Mass_Recon"
+        ]
+    },
+    "Shares_Discovery": {
+        "mitre_attck_discovery": [
+            "Windows_Mass_Recon"
+        ]
+    },
+    "PowerView_Recon": {
+        "mitre_attck_discovery": [
+            "Windows_Mass_Recon"
+        ]
+    },
+    "AppLocker_Policies_Discovery": {
+        "mitre_attck_discovery": [
+            "Windows_Mass_Recon"
+        ]
+    },
+    "LAPS_Enumeration": {
+        "mitre_attck_discovery": [
+            "Windows_Mass_Recon"
+        ]
+    },
+    "Search_Stored_Credentials": {
+        "mitre_attck_discovery": [
+            "Windows_Mass_Recon"
+        ]
+    },
+    "Account_Discovery": {
+        "mitre_attck_discovery": [
+            "Windows_Mass_Recon"
+        ]
+    },
+    "Domain_Controllers_Discovery": {
+        "mitre_attck_discovery": [
+            "Windows_Mass_Recon"
+        ]
+    },
+    "File_Directory_Discovery": {
+        "mitre_attck_discovery": [
+            "Windows_Mass_Recon"
+        ]
+    },
+    "Network_Share_Discovery": {
+        "mitre_attck_discovery": [
+            "Windows_Mass_Recon"
+        ]
+    },
+    "Password_Policy_Discovery": {
+        "mitre_attck_discovery": [
+            "Windows_Mass_Recon"
+        ]
+    },
+    "Permission_Groups_Discovery": {
+        "mitre_attck_discovery": [
+            "Windows_Mass_Recon"
+        ]
+    },
+    "Process_Discovery": {
+        "mitre_attck_discovery": [
+            "Windows_Mass_Recon"
+        ]
+    },
+    "Security_State_Discovery": {
+        "mitre_attck_discovery": [
+            "Windows_Mass_Recon"
+        ]
+    },
+    "Software_Discovery": {
+        "mitre_attck_discovery": [
+            "Windows_Mass_Recon"
+        ]
+    },
+    "System_Network_Configuration_Discovery": {
+        "mitre_attck_discovery": [
+            "Windows_Mass_Recon"
+        ]
+    },
+    "System_Network_Connections_Discovery": {
+        "mitre_attck_discovery": [
+            "Windows_Mass_Recon"
+        ]
+    },
+    "System_Service_Discovery": {
+        "mitre_attck_discovery": [
+            "Windows_Mass_Recon"
+        ]
+    },
+    "Domain_Trust_Discovery": {
+        "mitre_attck_discovery": [
+            "Windows_Mass_Recon"
+        ]
+    },
+    "Account_Created_On_Local_System": {
+        "mitre_attck_execution": [
+            "Execute_Over_WER_Service"
+        ]
+    },
+    "Abnormal_Directory_For_Process": {
+        "mitre_attck_execution": [
+            "Execute_Over_WER_Service"
+        ]
+    },
+    "Process_Herpaderping_Injection": {
+        "mitre_attck_execution": [
+            "Execute_Over_WER_Service"
+        ]
+    },
+    "Fuegoshell_Oneliners_Execution": {
+        "mitre_attck_execution": [
+            "Fuegoshell_Remote_Shell"
+        ]
+    },
+    "Subrule_Payload_Download_Via_WebClient": {
+        "mitre_attck_execution": [
+            "MSDT_Remote_Code_Execution"
+        ]
+    },
+    "RTLO_Symbol_Usage": {
+        "mitre_attck_execution": [
+            "Suspicious_Process_Execution_Sequence"
+        ],
+        "mitre_attck_initial_access": [
+            "Suspicious_File_Creation_From_Messenger_Or_Mail"
+        ]
+    },
+    "Subrule_Suspicious_RPC_Server": {
+        "mitre_attck_execution": [
+            "Suspicious_RPC_Server"
+        ]
+    },
+    "Subrule_SMB_Takeover": {
+        "mitre_attck_impact": [
+            "SMB_Takeover"
+        ]
+    },
+    "Suspicious_File_Creation_From_Messenger_Or_Mail": {
+        "mitre_attck_initial_access": [
+            "Start_Process_From_MOTW_Archive"
+        ]
+    },
+    "Subrule_Binary_Start_From_Archive": {
+        "mitre_attck_initial_access": [
+            "Start_Process_From_MOTW_Archive"
+        ]
+    },
+    "Execute_Via_Wmiprvse": {
+        "mitre_attck_initial_access": [
+            "WMI_Execution_Via_VBA_Macro"
+        ]
+    },
+    "Office_File_With_Macros": {
+        "mitre_attck_initial_access": [
+            "WMI_Execution_Via_VBA_Macro"
+        ]
+    },
+    "Client_Side_Execution_Via_DCOM": {
+        "mitre_attck_lateral_movement": [
+            "DCOM_Excel_Abuse"
+        ]
+    },
+    "Malicious_Office_Document": {
+        "mitre_attck_lateral_movement": [
+            "DCOM_Excel_Abuse"
+        ],
+        "mitre_attck_persistence": [
+            "Outlook_Form_Exploitation"
+        ]
+    },
+    "Powershell_Remoting": {
+        "mitre_attck_lateral_movement": [
+            "Input_Remote_PowerShell_Via_WinRM"
+        ]
+    },
+    "Input_Remote_PowerShell_Via_WinRM": {
+        "mitre_attck_lateral_movement": [
+            "Lateral_Movement_Via_WinRM"
+        ]
+    },
+    "Output_Remote_PowerShell_Via_WinRM": {
+        "mitre_attck_lateral_movement": [
+            "Lateral_Movement_Via_WinRM"
+        ]
+    },
+    "Subrule_MSSQL_NTLM_Relay": {
+        "mitre_attck_lateral_movement": [
+            "MSSQL_NTLM_Relay"
+        ]
+    },
+    "Subrule_Windows_Remote_Logon_With_Explicit_Credentials": {
+        "mitre_attck_lateral_movement": [
+            "Pass_The_Hash"
+        ]
+    },
+    "Subrule_Task_Created_Via_Atsvc": {
+        "mitre_attck_lateral_movement": [
+            "Remote_Code_Execution_Via_AtSvc"
+        ]
+    },
+    "Impacket_Like_Execution": {
+        "mitre_attck_lateral_movement": [
+            "Remote_Execution_Via_Custom_Impacket"
+        ]
+    },
+    "Suspicious_Registry_Value": {
+        "mitre_attck_lateral_movement": [
+            "Remote_SSP_Dump"
+        ]
+    },
+    "Subrule_Remoting_SSH": {
+        "mitre_attck_lateral_movement": [
+            "Remoting_SSH"
+        ]
+    },
+    "Subrule_SSH_Connect": {
+        "mitre_attck_lateral_movement": [
+            "Remoting_SSH"
+        ]
+    },
+    "Subrule_Browser_Remote_Debugging": {
+        "mitre_attck_lateral_movement": [
+            "Start_Browser_Pivoting"
+        ]
+    },
+    "Port_Forwarding_Or_Tunneling": {
+        "mitre_attck_lateral_movement": [
+            "Start_Browser_Pivoting"
+        ]
+    },
+    "Subrule_Session_Changed": {
+        "mitre_attck_lateral_movement": [
+            "Subrule_Task_Created_Via_Atsvc"
+        ]
+    },
+    "Scheduled_Task_Manipulation": {
+        "mitre_attck_lateral_movement": [
+            "Subrule_Task_Created_Via_Atsvc"
+        ]
+    },
+    "RID_Hijacking_Persistence": {
+        "mitre_attck_persistence": [
+            "Hidden_Account_Creation"
+        ]
+    },
+    "Outlook_Form_Creation": {
+        "mitre_attck_persistence": [
+            "Outlook_Form_Exploitation"
+        ]
+    },
+    "MySQL_Audit_Table_Rename": {
+        "mysql_database": [
+            "MySQL_Audit_Table_Modify"
+        ]
+    },
+    "Subrule_MySQL_Create_Process": {
+        "mysql_database": [
+            "MySQL_Code_Execution"
+        ]
+    },
+    "CheckPoint_SmartConsole_Attempt_To_Connect": {
+        "network_devices_compromise": [
+            "CheckPoint_SmartConsole_Connection"
+        ]
+    },
+    "Cisco_ASA_Disable_Username_Hiding": {
+        "network_devices_compromise": [
+            "Cisco_ASA_Logging_Usernames_Outside"
+        ]
+    },
+    "Cisco_ASA_Logging_To_Untrusted_Host": {
+        "network_devices_compromise": [
+            "Cisco_ASA_Logging_Usernames_Outside"
+        ]
+    },
+    "Subrule_PostgreSQL_Create_Process": {
+        "postgresql_database": [
+            "PostgreSQL_Code_Execution"
+        ]
+    },
+    "Subrule_Unix_Server_Abnormal_Access": {
+        "profiling": [
+            "Antivirus_Server_Abnormal_Access",
+            "App_1C_Server_Abnormal_Access",
+            "App_1C_User_PC_Abnormal_Access",
+            "Critical_Server_Abnormal_Access",
+            "Developer_PC_Abnormal_Access",
+            "Domain_Controller_Abnormal_Access",
+            "Release_Build_Agent_Abnormal_Access",
+            "Top_Managers_Abnormal_Access",
+            "Update_Server_Abnormal_Access",
+            "VCS_Server_Abnormal_Access"
+        ]
+    },
+    "Subrule_Windows_Host_Abnormal_Access": {
+        "profiling": [
+            "Antivirus_Server_Abnormal_Access",
+            "App_1C_Server_Abnormal_Access",
+            "App_1C_User_PC_Abnormal_Access",
+            "Critical_Server_Abnormal_Access",
+            "Developer_PC_Abnormal_Access",
+            "Domain_Controller_Abnormal_Access",
+            "Release_Build_Agent_Abnormal_Access",
+            "Top_Managers_Abnormal_Access",
+            "Update_Server_Abnormal_Access",
+            "VCS_Server_Abnormal_Access"
+        ]
+    },
+    "App_1C_Enterprise_Abnormal_Access": {
+        "profiling": [
+            "App_1C_Enterprise_Object_Modify"
+        ]
+    },
+    "Teamcity_Abnormal_Access": {
+        "profiling": [
+            "Teamcity_Abnormal_BuildConfig_Modify"
+        ]
+    },
+    "DCShadow_Attack": {
+        "pt_nad": [
+            "NAD_DCShadow_Attack"
+        ],
+        "pt_ngfw": [
+            "NGFW_DCShadow_Attack"
+        ]
+    },
+    "DCSync_Attack": {
+        "pt_nad": [
+            "NAD_DCSync_Attack"
+        ],
+        "pt_ngfw": [
+            "NGFW_DCSync_Attack"
+        ]
+    },
+    "DNS_Zone_Transfer_To_Untrusted_Host": {
+        "pt_nad": [
+            "NAD_DNS_Zone_Transfer"
+        ]
+    },
+    "SAM_Account_Name_Spoofing": {
+        "pt_nad": [
+            "NAD_SAM_Account_Name_Spoofing"
+        ],
+        "pt_ngfw": [
+            "NGFW_SAM_Account_Name_Spoofing"
+        ]
+    },
+    "Sharphound_Server_Side": {
+        "pt_nad": [
+            "NAD_Sharphound"
+        ]
+    },
+    "NAD_Enumerate": {
+        "pt_nad": [
+            "NAD_Sharphound"
+        ]
+    },
+    "NAD_Hacktool_Usage": {
+        "pt_nad": [
+            "NAD_Tunnel_Tool"
+        ]
+    },
+    "Duplicate_Remote_Session": {
+        "remote_work": [
+            "RDP_Connect_After_RDG"
+        ]
+    },
+    "VNC_Connection": {
+        "remote_work": [
+            "Remote_Administration_Tools_Usage"
+        ]
+    },
+    "File_Copy_Via_RemoteAccess_Tool": {
+        "remote_work": [
+            "Remote_Administration_Tools_Usage"
+        ]
+    },
+    "TeamViewer_Activity": {
+        "remote_work": [
+            "Remote_Administration_Tools_Usage"
+        ]
+    },
+    "Subrule_SambaDC_Tickets_Requested": {
+        "samba_active_directory_attacks": [
+            "SambaDC_Kerberoasting"
+        ]
+    },
+    "Subrule_SAPASABAP_GW_Check_Registered_Tp": {
+        "sap_suspicious_user_activity": [
+            "SAPASABAP_GW_Check_Registered_Tp"
+        ]
+    },
+    "SupplyChain_Maintainer_Or_Owner_Role_Assign": {
+        "supply_chain": [
+            "SupplyChain_Mass_Maintainer_Or_Owner_Role_Assign"
+        ]
+    },
+    "SupplyChain_Gitlab_Login_From_New_Address": {
+        "supply_chain": [
+            "SupplyChain_Merge_Request_Apply_From_New_Assignee"
+        ]
+    },
+    "Unix_Suspicious_Command": {
+        "unix_mitre_attck_command_and_control": [
+            "Unix_Possible_GSocket_Usage"
+        ],
+        "unix_mitre_attck_discovery": [
+            "Unix_Local_Mass_Recon"
+        ],
+        "unix_mitre_attck_initial_access": [
+            "Unix_Suspicious_Activity_By_Web_User"
+        ]
+    },
+    "Subrule_Unix_Possible_GS_Netcat_Usage": {
+        "unix_mitre_attck_command_and_control": [
+            "Unix_Possible_GSocket_Usage",
+            "Unix_Possible_GS_Netcat_Usage"
+        ]
+    },
+    "Unix_Run_Process_From_Suspicious_Directory": {
+        "unix_mitre_attck_command_and_control": [
+            "Unix_Possible_GSocket_Usage"
+        ],
+        "unix_mitre_attck_initial_access": [
+            "Unix_Suspicious_Activity_By_Web_User"
+        ]
+    },
+    "Unix_Tunnel_Process": {
+        "unix_mitre_attck_command_and_control": [
+            "Unix_Possible_GS_Netcat_Usage"
+        ]
+    },
+    "Network_Service_Discovery_from_Localnet": {
+        "unix_mitre_attck_command_and_control": [
+            "Unix_Possible_GS_Netcat_Usage"
+        ]
+    },
+    "Subrule_Windows_Logon": {
+        "unix_mitre_attck_command_and_control": [
+            "Unix_Proxy_Forwarding"
+        ]
+    },
+    "Subrule_Unix_PortForwarding": {
+        "unix_mitre_attck_command_and_control": [
+            "Unix_Proxy_Forwarding"
+        ]
+    },
+    "Unix_Recon_Tools_And_Commands": {
+        "unix_mitre_attck_discovery": [
+            "Unix_Local_Mass_Recon"
+        ]
+    },
+    "Unix_Software_Discovery": {
+        "unix_mitre_attck_discovery": [
+            "Unix_Local_Mass_Recon"
+        ],
+        "unix_mitre_attck_initial_access": [
+            "Unix_Suspicious_Activity_By_Web_User"
+        ]
+    },
+    "Unix_Password_Policy_Discovery": {
+        "unix_mitre_attck_discovery": [
+            "Unix_Local_Mass_Recon"
+        ],
+        "unix_mitre_attck_initial_access": [
+            "Unix_Suspicious_Activity_By_Web_User"
+        ]
+    },
+    "Unix_System_User_Discovery": {
+        "unix_mitre_attck_discovery": [
+            "Unix_Local_Mass_Recon"
+        ],
+        "unix_mitre_attck_initial_access": [
+            "Unix_Suspicious_Activity_By_Web_User"
+        ]
+    },
+    "Unix_System_Network_Configuration_Discovery": {
+        "unix_mitre_attck_discovery": [
+            "Unix_Local_Mass_Recon"
+        ],
+        "unix_mitre_attck_initial_access": [
+            "Unix_Suspicious_Activity_By_Web_User"
+        ]
+    },
+    "Unix_System_Service_Discovery": {
+        "unix_mitre_attck_discovery": [
+            "Unix_Local_Mass_Recon"
+        ],
+        "unix_mitre_attck_initial_access": [
+            "Unix_Suspicious_Activity_By_Web_User"
+        ]
+    },
+    "Unix_Local_Account_Discovery": {
+        "unix_mitre_attck_discovery": [
+            "Unix_Local_Mass_Recon"
+        ],
+        "unix_mitre_attck_initial_access": [
+            "Unix_Suspicious_Activity_By_Web_User"
+        ]
+    },
+    "Unix_Internet_Connection_Discovery": {
+        "unix_mitre_attck_discovery": [
+            "Unix_Local_Mass_Recon"
+        ],
+        "unix_mitre_attck_initial_access": [
+            "Unix_Suspicious_Activity_By_Web_User"
+        ]
+    },
+    "Unix_Process_Discovery": {
+        "unix_mitre_attck_discovery": [
+            "Unix_Local_Mass_Recon"
+        ],
+        "unix_mitre_attck_initial_access": [
+            "Unix_Suspicious_Activity_By_Web_User"
+        ]
+    },
+    "Unix_Security_Software_Discovery": {
+        "unix_mitre_attck_discovery": [
+            "Unix_Local_Mass_Recon"
+        ],
+        "unix_mitre_attck_initial_access": [
+            "Unix_Suspicious_Activity_By_Web_User"
+        ]
+    },
+    "Unix_System_Information_Discovery": {
+        "unix_mitre_attck_discovery": [
+            "Unix_Local_Mass_Recon"
+        ],
+        "unix_mitre_attck_initial_access": [
+            "Unix_Suspicious_Activity_By_Web_User"
+        ]
+    },
+    "Unix_Hacktool_Usage": {
+        "unix_mitre_attck_initial_access": [
+            "Unix_Suspicious_Activity_By_Web_User"
+        ]
+    },
+    "Unix_Suspicious_Emodji_Cmdline": {
+        "unix_mitre_attck_initial_access": [
+            "Unix_Suspicious_Activity_By_Web_User"
+        ]
+    },
+    "Unix_Inline_Reverse_Or_Bind_Shell": {
+        "unix_mitre_attck_initial_access": [
+            "Unix_Suspicious_Activity_By_Web_User"
+        ],
+        "vulnerabilities": [
+            "CVE_2025_32433_Erlang_SSH_RCE"
+        ]
+    },
+    "Subrule_Unix_Suspicious_SO_Created_And_Opened": {
+        "unix_mitre_attck_lateral_movement": [
+            "Unix_Exploiting_SambaCry"
+        ]
+    },
+    "Subrule_Unix_Dump_SSH_Auth_Sock": {
+        "unix_mitre_attck_lateral_movement": [
+            "Unix_SSH_Agent_Hijacking"
+        ]
+    },
+    "VK_Cloud_Critical_Objects_Clone": {
+        "vk_cloud": [
+            "VK_Cloud_New_VM_From_Critical_Objects"
+        ]
+    },
+    "Cloning_Critical_VM": {
+        "vsphere_suspicious_user_activity": [
+            "Mass_Cloning_Critical_VM"
+        ]
+    },
+    "Disabling_Protective_VM": {
+        "vsphere_suspicious_user_activity": [
+            "Mass_Disabling_Protective_VM"
+        ]
+    },
+    "Downloading_Files_Of_Critical_VM": {
+        "vsphere_suspicious_user_activity": [
+            "Mass_Downloading_Files_Of_Critical_VM"
+        ]
+    },
+    "Reconfiguring_Protective_VM": {
+        "vsphere_suspicious_user_activity": [
+            "Mass_Reconfiguring_Protective_VM"
+        ]
+    },
+    "CVE_2021_41379_Subrule_Elevation_Service_Chain": {
+        "vulnerabilities": [
+            "CVE_2021_41379_Exploitation"
+        ]
+    },
+    "CVE_2021_41379_Subrule_Start_Elevation": {
+        "vulnerabilities": [
+            "CVE_2021_41379_Subrule_Elevation_Service_Chain"
+        ]
+    },
+    "CVE_2022_26503_Subrule_1": {
+        "vulnerabilities": [
+            "CVE_2022_26503_Exploitation"
+        ]
+    },
+    "CVE_2022_26503_Subrule_2": {
+        "vulnerabilities": [
+            "CVE_2022_26503_Exploitation"
+        ]
+    },
+    "Unix_Connect_From_Suspicious_Dir": {
+        "vulnerabilities": [
+            "CVE_2023_22515_Confluence"
+        ]
+    },
+    "Subrule_ActiveMQ_Connect": {
+        "vulnerabilities": [
+            "CVE_2023_46604_ActiveMQ_RCE"
+        ]
+    },
+    "Subrule_CVE_2023_4911_GLIBC_Buffer_Overflow": {
+        "vulnerabilities": [
+            "CVE_2023_4911_GLIBC_Buffer_Overflow"
+        ]
+    },
+    "COM_Object_Persistence": {
+        "vulnerabilities": [
+            "CVE_2024_21378_Outlook_RCE"
+        ]
+    },
+    "Subrule_CVE_2024_21683_Confluence_RCE": {
+        "vulnerabilities": [
+            "CVE_2024_21683_Confluence_RCE"
+        ]
+    },
+    "Subrule_Elevated_Process_Run": {
+        "vulnerabilities": [
+            "CVE_2024_30085_PrivEsc_CldFlt"
+        ]
+    },
+    "Subrule_CVE_2024_32002_RCE_Via_Git_Clone": {
+        "vulnerabilities": [
+            "CVE_2024_32002_RCE_Via_Git_Clone"
+        ]
+    },
+    "External_Link_Clicked": {
+        "vulnerabilities": [
+            "CVE_2024_38200_Office_NTLM_Relay"
+        ]
+    },
+    "Suspicious_Child_From_Webserver_Process": {
+        "vulnerabilities": [
+            "CVE_2024_4577_PHP_CGI_RCE"
+        ]
+    },
+    "Subrule_CVE_2025_0411_7Zip_MotW_Bypass": {
+        "vulnerabilities": [
+            "CVE_2025_0411_7Zip_MotW_Bypass"
+        ]
+    },
+    "Rundll32_Suspicious_System_DLL_Usage": {
+        "vulnerabilities": [
+            "CVE_2025_24071_NTLM_Hash_Leak"
+        ]
+    },
+    "Subrule_External_SMB_Connect": {
+        "vulnerabilities": [
+            "CVE_2025_24071_NTLM_Hash_Leak"
+        ]
+    },
+    "Subrule_CVE_2025_24071_NTLM_Hash_Leak": {
+        "vulnerabilities": [
+            "CVE_2025_24071_NTLM_Hash_Leak"
+        ]
+    },
+    "Subrule_CVE_2025_24813_Tomcat_RCE": {
+        "vulnerabilities": [
+            "CVE_2025_24813_Tomcat_RCE"
+        ]
+    },
+    "Unix_Sensitive_File_Modification": {
+        "vulnerabilities": [
+            "CVE_2025_32433_Erlang_SSH_RCE"
+        ]
+    },
+    "Subrule_CVE_2025_48799_PrivEsc_Via_Windows_Update_Service": {
+        "vulnerabilities": [
+            "CVE_2025_48799_PrivEsc_Via_Windows_Update_Service"
+        ]
+    },
+    "MS17_010_SMB_Privellege_Escalation": {
+        "vulnerabilities": [
+            "MS17_010_SMB_Code_Execution"
+        ]
+    },
+    "Symlink_Via_SpoolDirectory": {
+        "vulnerabilities": [
+            "PrintSpooler_PrivEsc"
+        ]
+    },
+    "Subrule_StartProcess_And_Create_ConfigMsi": {
+        "vulnerabilities": [
+            "PrintSpooler_PrivEsc_CVE_2022_30206"
+        ]
+    },
+    "ZVirt_User_Creation": {
+        "zvirt": [
+            "ZVirt_Critical_Roles_Granted"
+        ]
+    }
+}
