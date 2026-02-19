@@ -1,0 +1,337 @@
+{
+    "comments": [
+        "имя модуля - имя папки куда оно будет складывать результат",
+        "запрос должен отдавать в конце как минимум поле asset_id с *host.@id, это необходимо для дальнейшей обработки событий",
+        "specific_politics соответствуют формату event_policies.json",
+        "default_politics_blacklist - политики из event_policies, которые НУЖНО применить (re2)",
+        "default_politics_whitelist - политики из event_policies, которые НЕ НУЖНО применять (re2)",
+        "если вам нужно чтобы применились все дефолтные политики, то просто не пишите полей: specific_politics, default_politics_blacklist и default_politics_whitelist",
+        "если нужно выкинуть какие-то дефолтные политики - заполните default_politics_whitelist",
+        "если нужно наоборот явно указать определенные дефолтные политики - заполните default_politics_blacklist",
+        "технически можно указать оба варианта, но black стоит выше в условии и это не будет работать",
+        "specific_politics применяется поверх политик файла, они дополнительные",
+        "техническую поддержку осуществляет @ping_localhost"
+    ],    
+    "NATed": {
+        "comment": [
+            "Считывает все НАТ таблицы из сетевых устройств.",
+            "Фильтрация строк: если  в NAT-правиле destination внешний адрес, source шировещательный 0.0.0.0 или внешний.",
+            "Значение фильтрации: ищутся только NAT правила, который для периметра, то есть преобразование внешних адресов во внутренние или отлов НАТ правилом известного внешнего адреса.",
+            "Далее из таких правил выбираются ntdst - IP адреса destination после преобразования и ищутся активы у которых имеется такой адрес (LEFT JOIN).",
+            "Те адреса, которые обнаружены в НАТ, но не нашлось актива будут иметь статус no asset и отображаться в правой части таблицы, ",
+            "смотрите внимательно на колонку Q.ntdst, необходимо либо просканировать данные активы или удалить устаревшие NAT правила.",
+            "Все активы из данного файла можно считать первичным периметром  и отношение к ним должно быть соответствующее",
+            "Фильтр можно менять, описание как - указано после фильтра в asset_filters, читайте блок comment_filter."
+        ],
+        "PDQL": [
+            "filter(NetworkDeviceHost.NATTable.Name) | ",
+            "select(NetworkDeviceHost.@name,",
+            "    NetworkDeviceHost.@id as id,",
+            "    NetworkDeviceHost.NATTable.Name as name,",
+            "    NetworkDeviceHost.NATTable.Rules.Comment as comment,",
+            "    NetworkDeviceHost.NATTable.Rules.LineNumber as ln,",
+            "    NetworkDeviceHost.NATTable.Rules.Type as type,",
+            "    compactunique(NetworkDeviceHost.NATTable.Rules.NormalizedSource.Values.address) as source,",
+            "    compactunique(NetworkDeviceHost.NATTable.Rules.NormalizedTranslatedSourceAddress.Values.Address) as ntsrc,",
+            "    NetworkDeviceHost.NATTable.Rules.NormalizedProtocol.Protocol.Values as proto,",
+            "    NetworkDeviceHost.NATTable.Rules.NormalizedProtocol.TCPUDPOptions.DestinationPorts.Values as dst_port,",
+            "    compactunique(NetworkDeviceHost.NATTable.Rules.NormalizedDestination.Values.address) as destination) |",
+            "filter(source != null and source.item != ::) |",
+            "join(filter(NetworkDeviceHost.NATTable.Name) | select (NetworkDeviceHost.@id as id,",
+            "    NetworkDeviceHost.NATTable.Name as name,",
+            "    NetworkDeviceHost.NATTable.Rules.LineNumber as ln,",
+            "    NetworkDeviceHost.NATTable.Rules.NormalizedTranslatedDestinationAddress.Values.Address as ntdst,",
+            "    compactunique(NetworkDeviceHost.NATTable.Rules.NormalizedTranslatedDestinationAddress.Values.Prefix) as ntdst_pref,",
+            "    NetworkDeviceHost.NATTable.rules.NormalizedTranslatedProtocol.TCPUDPOptions.DestinationPorts.Values as ntpdst_port) |",
+            "filter(name != null) as Q, id = Q.id and Q.name= name and Q.ln = ln)",
+            "| filter(destination and destination not in [172.16.0.0/12, 10.0.0.0/8, 192.168.0.0/16, ::1/128, 100.64.0.0/10, 0.0.0.0] and (source = 0.0.0.0 or source not in [172.16.0.0/12, 10.0.0.0/8, 192.168.0.0/16, ::1/128, 100.64.0.0/10]))",
+            "| select(compactunique(NetworkDeviceHost.@name) as net_dev_names, Q.ntdst, comment, compactunique(dst_port) as dst_ports, compactunique(Q.ntpdst_port) as ntdst_ports, source, ntsrc, destination) | unique()",
+            "| join(select(@host, host.@id, host.@description, host.vmid, host.@audittime, host.@ipaddresses) as NATed, Q.ntdst = NATed.host.@ipaddresses) | calc(TotalDays(now() - NATed.host.@AuditTime) as dur_audit)",
+            "| join(select(host.@id, host.@ScanningInfo.Type, host.@ScanningInfo.Status) | filter(host.@ScanningInfo.Type = 'Audit') as Sc, Sc.host.@id = NATed.host.@id) ",
+            "| calc(if NATed.host.vmid then True else False as VM)",
+            "| select(net_dev_names, source, ntsrc, destination, dst_ports, Q.ntdst, ntdst_ports, NATed.@host, NATed.host.@id as asset_id, NATed.host.@description, NATed.host.@AuditTime, Sc.host.@ScanningInfo.Status, dur_audit, compactunique(comment), VM)"
+        ],
+        "default_politics_whitelist": ".*",
+        "comment_filter": [
+            "вы можете получить список доступных из любой точки мира, а не по заготовленному списку адресов, просто замените `and (source = 0.0.0.0 or source not in [172.16.0.0/12, 10.0.0.0/8, 192.168.0.0/16, ::1/128, 100.64.0.0/10]))` на `and source = 0.0.0.0`",
+            "структура ответа: source - с какого адреса подключение, ntsrc - на какой адрес заменить (если пустой - не менять), destination + dst_ports - адрес и порт получателя в пакете до НАТ, ",
+            "Q.ntdst + ntdst_ports - адрес получателя после NAT, все что правее относится к активу, найденному по адресу из Q.ntdst"
+        ]
+    },
+    "EXTERNAL_NET_devices": {
+        "comment": [
+            "Устройства имеющие внешние адреса.",
+            "Для вывода наружу серверов (DMZ) можно указать адреса через NAT таблицы, так и выдать внешний адрес конечному устройству.",
+            "По хорошему этот запрос должен был быть золотой пулей для второго варианта, однако в реальности внешние адреса очень часто вяжутся на обычные хосты (например из-за ЕДР)",
+            "однако улучшить этот запрос можно только на конкретной инсталляции, поэтому применять его можно, но он нуждается в дополнительной фильтрации по месту."
+        ],
+        "PDQL": [
+            "select(@host, host.@id, Host.@ipaddresses, host.@audittime) |",
+            "filter(host.@ipaddresses.item not in [172.16.0.0/12, 10.0.0.0/8, 192.168.0.0/16, 0.0.0.0/32, 169.254.0.0/16,::1/0, 127.0.0.0/8, 100.64.0.0/10]) |",
+            "select(@host, host.@id, compactunique(Host.@ipaddresses) as ipaddresses, host.@audittime) |",
+            "join(select(host.@id, host.@description, host.@ScanningInfo.Type, host.@ScanningInfo.Status) | filter(host.@ScanningInfo.Type = 'Audit') as Sc, Sc.host.@id = host.@id) | ",
+            "select(@host, host.@id as asset_id, Sc.host.@description, ipaddresses, host.@audittime, Sc.host.@ScanningInfo.Status)  | calc(TotalDays(now() - host.@AuditTime) as dur_audit)"
+        ],
+        "default_politics_whitelist": ".*"
+    },
+    "HAP_servers": {
+        "comment": [
+            "Выводит все узлы с найденным HAProxy",
+            "Фильтрации по статусу сервиса или ведет ли этот прокси наружу, а не только на localhost - нету, в данном случае она и не нужна",
+            "Для всех узлов с HAProxy должен быть настроен аудит и сбор событий согласно политике p haproxy (event_src.title = 'haproxy')"
+        ],
+        "PDQL": [
+            "filter(host.softs<HAProxy>)",
+            "| select(@host, host.@id as asset_id, host.softs<HAProxy>.Vendor as Vendor, host.softs<HAProxy>.Name as Name, host.softs<HAProxy>.InstallPath as InstallPath, host.softs<HAProxy>.Version as Version, host.softs<HAProxy>.Architecture as Architecture, host.softs<HAProxy>.OsFamily as OsFamily, compactunique(host.softs<HAProxy>.Ports) as Ports, host.softs<HAProxy>.UninstallKey as UninstallKey, compactunique(host.softs<HAProxy>.ConfFiles) as ConfFiles, compactunique(host.softs<HAProxy>.ConfDir) as ConfDir, host.softs<HAProxy>.Chroot as Chroot, host.softs<HAProxy>.User as User, host.softs<HAProxy>.Group as \"Group\", host.softs<HAProxy>.ExternalCheck as ExternalCheck, host.softs<HAProxy>.InsecureForkWanted as InsecureForkWanted, host.softs<HAProxy>.InsecureSetuidWanted as InsecureSetuidWanted, compactunique(host.softs<HAProxy>.LuaLoad) as LuaLoad, compactunique(host.softs<HAProxy>.LuaLoadPerThread) as LuaLoadPerThread, host.softs<HAProxy>.UnixBind as UnixBind)",
+            "| join(select(@host, host.@id as asset_id, host.@description, host.@ScanningInfo.Type, host.@ScanningInfo.Status) | filter(host.@ScanningInfo.Type = 'Audit') as A, A.asset_id = asset_id)",
+            "| select(@host, asset_id, A.host.@description, A.host.@ScanningInfo.Status, Vendor, Name, InstallPath, Version, Architecture, OsFamily, Ports, UninstallKey, ConfFiles, ConfDir, Chroot, User, \"Group\", ExternalCheck, InsecureForkWanted, InsecureSetuidWanted, LuaLoad, LuaLoadPerThread, UnixBind)",
+            "| sort(@host)"
+        ],
+        "default_politics_whitelist": ".*"
+    },
+    "NAT_HAP": {
+        "comment": "Выводит только те HAProxy узлы, которые фигурировали в НАТ таблице, их важность максимальна",
+        "PDQL": [
+            "filter(host.softs<HAProxy>.Name != null)",
+            "| select(@host, host.@id as asset_id, host.endpoints<ipendpoint>.address as ip)",
+            "| filter(ip not in [127.0.0.1, ::1])",
+            "| join(select(@host, host.@id as asset_id, host.@description, host.@ScanningInfo.Type, host.@ScanningInfo.Status) | filter(host.@ScanningInfo.Type = 'Audit') as A, A.asset_id = asset_id) ",
+            "| select(@host, A.host.@description, A.host.@ScanningInfo.Status, asset_id, ip)",
+            "  | join(select(compactunique(NetworkDeviceHost.NATTable.Rules.NormalizedSource.Values.address) as source, ",
+            "      NetworkDeviceHost.NATTable.Rules.NormalizedTranslatedDestinationAddress.Values.address as address, ",
+            "      NetworkDeviceHost.NATTable.Rules.NormalizedTranslatedDestinationAddress.Values.prefix as pref, ",
+            "      compactunique(NetworkDeviceHost.NATTable.rules.NormalizedTranslatedProtocol.TCPUDPOptions.DestinationPorts.Values) as ntpdst_ports",
+            "  ) | filter(address and pref = 32) | unique() as NAT, NAT.address = ip)",
+            "| filter(NAT.address)",
+            "| unique() | sort(@host, ip, NAT.source)"
+        ],
+        "default_politics_whitelist": ".*"
+    },
+    "HAP_Listen_info": {
+        "comment": [
+            "Запрос показывает все сервера HAProxy, где описано проксирование через директиву Listen и создан для аналитики на странице FULL",
+            "Директива Listen является облеченным вариантом, где одновременно указывается и слушатель и куда отправлять пакеты.",
+            "Запрос выводит: сервер HAProxy, Имя сервера в HAProxy, слушаемые адреса и порты, куда отправляется траффик"
+        ],
+        "PDQL": [
+            "filter(host.softs<HAProxy>.Listen.Name) |",
+            "select(@host, host.@id, host.softs<HAProxy>.Listen.Name as Name, host.softs<HAProxy>.Listen.Mode as Mode, ",
+            "host.softs<HAProxy>.Listen.Status as Status, host.softs<HAProxy>.Listen.Servers as Servers, host.softs<HAProxy>.Listen.Servers.IpAddress as IpAddress, ",
+            "host.softs<HAProxy>.Listen.Servers.Hostname as Hostname, host.softs<HAProxy>.Listen.Servers.Port as Port)",
+            "| filter(Status = True and (Hostname or IpAddress) and IpAddress != 127.0.0.1 and Hostname != 'localhost') | unique()",
+            "| join(select(host.@id, host.softs<HAProxy>.Listen.Name as Name, compactunique(host.softs<HAProxy>.Listen.NetBinds) as NetBinds) as L, L.host.@id = host.@id and L.Name = Name)",
+            "| select(@host, Name, Mode, Status, L.NetBinds, Servers, Hostname, IpAddress, Port)",
+            "| unique()"
+        ],
+        "default_politics_whitelist": ".*",
+        "comment_filter": [
+            "чтобы получить список Listen серверов только за HAP после NAT поставьте вместо первой строки:",
+            "filter(<dynamic!{\"filter_name\":\"NAT_HAP\",\"prefix\":\"<asset_id>\",\"need_dict\":true,\"dict_keys\":[\"asset_ids\"],\"filter\":\"host.@id in <asset_id>['asset_ids']\"}dynamic!>) | ",
+            "можно, конечно, объединить в единый PDQL NAT + LISTEN, но есть вероятность что БД треснет от такого уровня вложенности, к тому же зачем напрягать АМ, если информация уже есть",
+            "поэтому дергаем asset_id из NAT_HAP и пользуем его (технически можно дергать и из NATed, но тогда мы пропускаем назначенные внутри",
+            "дефолтная строка, которая смотрит на все HAProxy: filter(host.softs<HAProxy>) | ",
+            "зачем опять разделение на 2? (просто прокси Listen и отдельно маппинг на активы) - страница FULL была слишком тяжело анализируема, фронты ссылаются на одни и те же бэки по разным портам и т.д. итоговое количество строк 40к+"
+        ]
+    },
+    "HAP_Listen_bcks": {
+        "comment": [
+            "В отличии от предыдущего запроса тут собираются все сервера куда отправляются пакеты через директиву Listen.",
+            "имена серверов HAProxy остаются, однако склеиваются в список (чтобы избежать дублирования backend-ов),",
+            "далее эти адреса склеиваются с активами и заодно полученные таким образом активы проверяются на наличие софта HAProxy,",
+            "чтобы подсветить последовательности цепочек проксирования."
+        ],
+        "PDQL": [
+            "filter(host.softs<HAProxy>.Listen.Name) |",
+            "select(host.@name, host.softs<HAProxy>.Listen.Name as Name, host.softs<HAProxy>.Listen.Mode as Mode, ",
+            "host.softs<HAProxy>.Listen.Status as Status, host.softs<HAProxy>.Listen.Servers as Servers, host.softs<HAProxy>.Listen.Servers.IpAddress as IpAddress, ",
+            "host.softs<HAProxy>.Listen.Servers.Hostname as Hostname, host.softs<HAProxy>.Listen.Servers.Port as Port)",
+            "| filter(Status = True and (Hostname or IpAddress) and IpAddress != 127.0.0.1 and Hostname != 'localhost') | unique()",
+            "| select(compactunique(host.@name) as HAP_hosts, compactunique(Name) as site_names, Hostname, IpAddress, compactunique(Port) as ports)",
+            "| join(select(@host, host.@id as asset_id, host.hostname, host.fqdn, host.endpoints<ipendpoint>.address as address) as H, H.host.fqdn = Hostname or H.host.hostname = Hostname or H.address = IpAddress)",
+            "| select(HAP_hosts, site_names, Hostname, IpAddress, ports, H.@host, H.asset_id, H.host.hostname, H.host.fqdn, compactunique(H.address) as addresses)",
+            "| join(select(host.@id as asset_id, host.@description, host.@ScanningInfo.Type, host.@ScanningInfo.Status, host.@Audittime) | filter(host.@ScanningInfo.Type = 'Audit') as A, A.asset_id = H.asset_id)",
+            "| join(filter(host.softs<HAProxy>) | select(host.@id as asset_id, compactunique(host.softs<HAProxy>) as HAP_loop)  as HAP, HAP.asset_id = H.asset_id)",
+            "| select(HAP_hosts, site_names, Hostname, IpAddress, ports, H.@host, A.host.@description, H.asset_id, H.host.hostname, H.host.fqdn, addresses, HAP.HAP_loop, A.host.@ScanningInfo.Status, A.host.@Audittime)"
+        ],
+        "default_politics_whitelist": ".*",
+        "comment_filter": [
+            "чтобы получить список Listen серверов только за HAP после NAT поставьте вместо первой строки:",
+            "filter(<dynamic!{\"filter_name\":\"NAT_HAP\",\"prefix\":\"<asset_id>\",\"need_dict\":true,\"dict_keys\":[\"asset_ids\"],\"filter\":\"host.@id in <asset_id>['asset_ids']\"}dynamic!>) | ",
+            "можно, конечно, объединить в единый PDQL NAT + LISTEN, но есть вероятность что БД треснет от такого уровня вложенности, к тому же зачем напрягать АМ, если информация уже есть",
+            "поэтому дергаем asset_id из NAT_HAP и пользуем его (технически можно дергать и из NATed, но тогда мы пропускаем значения внутри",
+            "Сам запрос показывает все сервера, которые стоят за серверами HAProxy через директиву Listen",
+            "дефолтная строка, которая смотрит на все HAProxy: filter(host.softs<HAProxy>) | "
+        ]
+    },
+    "HAP_Fr_Bck_info": {
+        "comment": [
+            "Запрос показывает все сервера HAProxy, где описано проксирование через директивы Frontend - Backend и создан для аналитики на странице FULL",
+            "Frontend является слушателем и внутри него указывается backend строкой, а уже в директиве Backend описываются сервера, куда отправлять траффик.",
+            "Запрос выводит: сервер HAProxy, Имя сервера в HAProxy, слушаемые адреса и порты, куда отправляется траффик"
+        ],
+        "PDQL": [
+            "filter(host.softs<HAProxy>.Frontends) |",
+            "select(@host, host.@id, host.softs<HAProxy>.Frontends.Name as Name, host.softs<HAProxy>.Frontends.Mode as Mode, host.softs<HAProxy>.Frontends.Status as Status, host.softs<HAProxy>.Frontends.NetBinds.Protocol as NetBinds_Protocol, compactunique(host.softs<HAProxy>.Frontends.NetBinds) as NetBinds, host.softs<HAProxy>.Frontends.Backends as Backend, host.softs<HAProxy>.Frontends.DefaultBackend as DefaultBackend)",
+            "| filter(Name and (Backend or DefaultBackend))",
+            "| join(filter(host.softs<HAProxy>) | select(@host, host.@id, host.softs<HAProxy>.Backends.Name as Name, host.softs<HAProxy>.Backends.Mode as Mode, host.softs<HAProxy>.Backends.Status as Status, host.softs<HAProxy>.Backends.Servers.IpAddress as IpAddress, host.softs<HAProxy>.Backends.Servers.Hostname as Hostname, host.softs<HAProxy>.Backends.Servers.Port as Port) as B, B.host.@id = host.@id and (B.name = Backend or DefaultBackend = B.name))",
+            "| select(@host, Name, Status, NetBinds, B.Name, B.Status, B.IpAddress, B.Hostname, B.Port)",
+            "| filter((B.IpAddress or B.Hostname) and B.IpAddress != 127.0.0.1 and B.Hostname != 'localhost')| unique()"
+        ],
+        "default_politics_whitelist": ".*",
+        "comment_filter": [
+            "чтобы получить список Frontend - Backend серверов только за HAP после NAT поставьте вместо первой строки:",
+            "filter(<dynamic!{\"filter_name\":\"NAT_HAP\",\"prefix\":\"<asset_id>\",\"need_dict\":true,\"dict_keys\":[\"asset_ids\"],\"filter\":\"host.@id in <asset_id>['asset_ids']\"}dynamic!>) | ",
+            "можно, конечно, объединить в единый PDQL NAT + LISTEN, но есть вероятность что БД треснет от такого уровня вложенности, к тому же зачем напрягать АМ, если информация уже есть",
+            "поэтому дергаем asset_id из NAT_HAP и пользуем его (технически можно дерагть и из NATed, но тогда мы пропускаем заначенные внутри",
+            "Сам запрос показывает все сервера, которые стоят за серверами HAProxy через директиву Listen",
+            "дефолтная строка, которая смотрит на все HAProxy: filter(host.softs<HAProxy>) | "
+        ]
+    },
+    "HAP_Fr_Bck_bck": {
+        "comment": [
+            "В отличии от HAP_Listen_bcks тут собираются все сервера куда отправляются пакеты через директиву Backend.",
+            "Однако игнорирются Frontends, чтобы не повышать сложность запроса.",
+            "имена серверов HAProxy остаются, однако склеиваются в список (чтобы избежать дублирования backend-ов),",
+            "далее эти адреса склеиваются с активами и заодно полученные таким образом активы проверяются на наличие софта HAProxy,",
+            "чтобы подсветить последовательности цепочек проксирования."
+        ],
+        "PDQL": [
+            "filter(host.softs<HAProxy>.Frontends) |",
+            "select(host.@name, host.@id, host.softs<HAProxy>.Backends.Name as Name, host.softs<HAProxy>.Backends.Mode as Mode, host.softs<HAProxy>.Backends.Status as Status, host.softs<HAProxy>.Backends.Servers.IpAddress as IpAddress, host.softs<HAProxy>.Backends.Servers.Hostname as Hostname, host.softs<HAProxy>.Backends.Servers.Port as Port)",
+            "| filter(Status = True and (IpAddress or Hostname) and IpAddress != 127.0.0.1 and Hostname != 'localhost')| unique()",
+            "| select(compactunique(host.@name) as HAP_hosts, compactunique(Name) as back_names, Hostname, IpAddress, compactunique(Port) as ports)",
+            "| join(select(@host, host.hostname, host.@id as asset_id, host.fqdn, host.endpoints<ipendpoint>.address as address) as H, H.host.fqdn = Hostname or H.host.hostname = Hostname or H.address = IpAddress)",
+            "| join(select(host.@id as asset_id, host.@description, host.@ScanningInfo.Type, host.@ScanningInfo.Status, host.@Audittime) | filter(host.@ScanningInfo.Type = 'Audit') as A, A.asset_id = H.asset_id)",
+            "| join(filter(host.softs<HAProxy>) | select(host.@id as asset_id, compactunique(host.softs<HAProxy>) as HAP_loop)  as HAP, HAP.asset_id = H.asset_id)",
+            "| select(HAP_hosts, back_names, Hostname, IpAddress, ports, H.@host, A.host.@description, H.asset_id as asset_id, H.host.hostname, H.host.fqdn, HAP.HAP_loop, A.host.@ScanningInfo.Status, A.host.@Audittime)"
+        ],
+        "default_politics_whitelist": ".*",
+        "comment_filter": [
+            "чтобы получить список Listen серверов только за HAP после NAT поставьте вместо первой строки:",
+            "filter(<dynamic!{\"filter_name\":\"NAT_HAP\",\"prefix\":\"<asset_id>\",\"need_dict\":true,\"dict_keys\":[\"asset_ids\"],\"filter\":\"host.@id in <asset_id>['asset_ids']\"}dynamic!>) | ",
+            "можно, конечно, объединить в единый PDQL NAT + LISTEN, но есть вероятность что БД треснет от такого уровня вложенности, к тому же зачем напрягать АМ, если информация уже есть",
+            "поэтому дергаем asset_id из NAT_HAP и пользуем его (технически можно дергать и из NATed, но тогда мы пропускаем назначенные внутри",
+            "Сам запрос показывает все сервера, которые стоят за серверами HAProxy через директиву Listen",
+            "дефолтная строка, которая смотрит на все HAProxy: filter(host.softs<HAProxy>) | "
+        ]
+    },
+    "nginx_servers": {
+        "comment": [
+            "показывает все активы с ПО nginx. Этот запрос не покажет вам какие nginx указаны в NAT таблице, однако вы можете добавить такой фильтр или найти активы вручную",
+            "После проверки страницы \"simple\" обязательно посмотрите не страницу \"FULL\", на ней указаны все сайты найденные на nginx-ах",
+            "если сайты встречаются несколько раз - это означает последовательное проксирование, для того чтобы понять ее необходимо посмотреть куда ссылаются активы,",
+            "скорее всего будут ссылаться друг на друга, и только последний на итоговый backend",
+            "для всех активов должна выполняться политика p nginx, то есть события попадающие под фильтр: event_src.title = 'nginx'"
+        ],
+        "PDQL": [
+            "filter(Host.Softs<Nginx>.Instances) | ",
+            "select(@host, host.@id as asset_id, host.@audittime, host.@description, host.@ScanningInfo.Type, host.@ScanningInfo.Status) | filter(host.@ScanningInfo.Type = 'Audit')",
+            "| join(select(host.@id, Host.Softs<Nginx>.Instances.RootConfFile as RootConfFile, ",
+            "    Host.Softs<Nginx>.Instances.Handlers<HTTPHandler>.Type as Type, ",
+            "    Host.Softs<Nginx>.Instances.Handlers<HTTPHandler>.ServerNames as ServerNames, ",
+            "    compactunique(Host.Softs<Nginx>.Instances.Handlers<HTTPHandler>.Listens.Port) as Port, ",
+            "    compactunique(Host.Softs<Nginx>.Instances.Handlers<HTTPHandler>.Listens.Address) as Address, ",
+            "    Host.Softs<Nginx>.Instances.Handlers<HTTPHandler>.SSLSettings.SSL as SSLSettings, ",
+            "    compactunique(Host.Softs<Nginx>.Instances.Handlers<HTTPHandler>.Locations.HTTPProxy.ProxyPass) as ProxyPass, ",
+            "    compactunique(Host.Softs<Nginx>.Instances.Handlers<HTTPHandler>.ErrorLogs) as ErrorLogs, ",
+            "    compactunique(Host.Softs<Nginx>.Instances.Handlers<HTTPHandler>.AccessLogs) as AccessLogs) ",
+            "as Ng, Ng.host.@id = asset_id) |",
+            "select(@host, asset_id, host.@description, host.@ScanningInfo.Status, Ng.RootConfFile, Ng.Type, Ng.ServerNames, Ng.Port, Ng.Address, Ng.SSLSettings, Ng.ProxyPass, Ng.ErrorLogs, Ng.AccessLogs)",
+            "| sort(@host, Ng.ServerNames)"
+        ],
+        "default_politics_whitelist": ".*"
+    },
+    "nginx_backends": {
+        "comment": [
+            "этот запрос для сбора информации о ProxyPass в инстансах nginx, нужен для следующего запроса nginx_backends_to_hosts, так как склеить ProxyPass силами PDQL не возможно, клеим в Python"
+        ],
+        "PDQL": [
+            "filter(Host.Softs<Nginx>.Instances) | select(@host, Host.Softs<Nginx>.Instances.Handlers<HTTPHandler>.Locations.HTTPProxy.ProxyPass as ProxyPass) | filter(ProxyPass) | unique() | sort(ProxyPass)"
+        ],
+        "default_politics_whitelist": ".*"
+    },
+    "nginx_backends_to_hosts": {
+        "comment": [
+            "это уникальный запрос, который основывается на данных предыдущего запроса, так как поле ProxyPass невозможно попилить PDQL-ем,",
+            "так как нет функций strip / split, а значения могут быть от http://10.125.139.12:8080 до http://unix:/var/opt/gitlab/gitlab-workhorse/sockets/socket",
+            "а join в PDQL для склейки использует только бинарные сравнения",
+            "<dynamic!{}dynamic!> старался сделать понятным и минимально прибивать функции в коде, если надо понять его структуру, то распакуйте JSON.",
+            "",
+            "Результаты запроса - те бэкенд сервера, куда ссылаются nginx-ы из запроса nginx_servers, к сожалению добавить какой сайт смотрит на эти бэкенды - невозможно."
+        ],
+        "PDQL": [
+            "select(@host, host.@id, host.@description, host.hostname, host.fqdn, Host.endpoints<ipendpoint>.address as addr, host.@audittime) |",
+            "filter(<dynamic!{\"filter_name\": \"nginx_backends\", \"prefix\": \"<ProxyPass>.lstrip('htps').lstrip(':/').split(':')[0]\", \"need_dict\": true, \"dict_keys\": [\"hostnames\", \"FQDNs\", \"IPs\"], \"filter\": \"host.hostname in <ProxyPass>['hostnames'] or host.fqdn in <ProxyPass>['FQDNs'] or addr in <ProxyPass>['IPs']\"}dynamic!>) |",
+            "join(select(host.@id, host.@ScanningInfo.Type, host.@ScanningInfo.Status) | filter(host.@ScanningInfo.Type = 'Audit') as Sc, Sc.host.@id = host.@id) | ",
+            "select(@host, host.@description, host.@id as asset_id, host.hostname, host.fqdn, addr, host.@audittime, Sc.host.@ScanningInfo.Status)  | calc(TotalDays(now() - host.@AuditTime) as dur_audit)"
+        ],
+        "default_politics_whitelist": ".*"
+    },
+    "PTAF_servers": {
+        "comment": [
+            "Выводит все узлы с найденным PT AF",
+            "Для всех узлов с PT AF должен быть настроен аудит и сбор событий согласно политике p ptaf (event_src.title = 'application_firewall')"
+        ],
+        "PDQL": [
+            "filter(host.softs<ApplicationFirewall>)",
+            "| select(@host, host.@id as asset_id, host.softs<ApplicationFirewall>.Vendor as Vendor, host.softs<ApplicationFirewall>.Name as Name, host.softs<ApplicationFirewall>.Version as Version, host.softs<ApplicationFirewall>.License.ExpiryDate as lic_exp, compactunique(host.softs<ApplicationFirewall>.Tenants) as Tenants, compactunique(host.softs<ApplicationFirewall>.ADSettings.Domain) as Domain, host.softs<ApplicationFirewall>.IAMSettings.Address as IAM)",
+            "| join(select(@host, host.@id as asset_id, host.@description, host.@ScanningInfo.Type, host.@ScanningInfo.Status) | filter(host.@ScanningInfo.Type = 'Audit') as A, A.asset_id = asset_id)",
+            "| select(@host, asset_id, Vendor, Name, Version, lic_exp, Tenants, Domain, IAM, A.host.@description, A.host.@ScanningInfo.Status)"
+        ],
+        "default_politics_whitelist": ".*"
+    },
+    "PTAF_info": {
+        "comment": [
+            "Запрос показывает все сервера PT AF, где описаны хоть какие-то сайты и создан для аналитики на странице FULL",
+            "Запрос выводит: сервер PT AF, Имя сервера в PT AF, слушаемые адреса и порты (listen), куда отправляется траффик (Address и NormalizedAddress)"
+        ],
+        "PDQL": [
+            "filter(host.softs<ApplicationFirewall>) | select(@host, host.@id as asset_id, host.softs<ApplicationFirewall>.Tenants.WebApps.name as WebApp_name, host.softs<ApplicationFirewall>.Tenants.WebApps.Hosts as hosts, host.softs<ApplicationFirewall>.Tenants.WebApps.TrafficProfiles as TrafficProfiles, host.softs<ApplicationFirewall>.Tenants.WebApps.TrafficProfiles.Backends.Address as Address, host.softs<ApplicationFirewall>.Tenants.WebApps.TrafficProfiles.Backends.NormalizedAddress as NormalizedAddress, Host.Softs<ApplicationFirewall>.Tenants.WebApps.TrafficProfiles.Backends.Port as Port)",
+            "| filter(hosts)",
+            "| join(select(@host, host.@id as asset_id, host.@description, host.@ScanningInfo.Type, host.@ScanningInfo.Status) | filter(host.@ScanningInfo.Type = 'Audit') as A, A.asset_id = asset_id)",
+            "| select(@host, WebApp_name, hosts as site, TrafficProfiles as listen, Address, NormalizedAddress, Port, asset_id, A.host.@ScanningInfo.Status, A.host.@description)",
+            "| sort(site)"
+        ],
+        "default_politics_whitelist": ".*"
+    },
+    "PTAF_backs": {
+        "comment": [
+            "Соединение Backend-ов описанных на PT AF с активами инфраструктуры",
+            "имена серверов PT AF остаются, однако склеиваются в список (чтобы избежать дублирования backend-ов),"
+        ],
+        "PDQL": [
+            "filter(host.softs<ApplicationFirewall>) | select(host.@name, host.softs<ApplicationFirewall>.Tenants.WebApps.name as WebApp_name, host.softs<ApplicationFirewall>.Tenants.WebApps.Hosts as hosts, host.softs<ApplicationFirewall>.Tenants.WebApps.TrafficProfiles as TrafficProfiles, host.softs<ApplicationFirewall>.Tenants.WebApps.TrafficProfiles.Backends.Address as Address, host.softs<ApplicationFirewall>.Tenants.WebApps.TrafficProfiles.Backends.NormalizedAddress as NormalizedAddress, Host.Softs<ApplicationFirewall>.Tenants.WebApps.TrafficProfiles.Backends.Port as Port)",
+            "| filter(Address)",
+            "| select(compactunique(host.@name) as PTAF_hosts, compactunique(WebApp_name) as WebApp_names, compactunique(hosts) as sites, TrafficProfiles as listen, Address, NormalizedAddress, compactunique(Port) as Ports)",
+            "| join(select(@host, host.hostname, host.@id as asset_id, host.fqdn, host.endpoints<ipendpoint>.address as address) as H, H.host.fqdn = Address or H.host.hostname = Address or H.address = NormalizedAddress)",
+            "| join(select(host.@id as asset_id, host.@description, host.@ScanningInfo.Type, host.@ScanningInfo.Status, host.@Audittime) | filter(host.@ScanningInfo.Type = 'Audit') as A, A.asset_id = H.asset_id)",
+            "| select(PTAF_hosts, WebApp_names, sites, listen, Address, NormalizedAddress, Ports, H.@host, A.host.@description, H.asset_id as asset_id, H.host.hostname, H.host.fqdn, H.address, A.host.@ScanningInfo.Status, A.host.@Audittime)"
+        ],
+        "default_politics_whitelist": ".*"
+    },
+    "OpenVPN": {
+        "comment": [
+            "Фактически найти сервера OpenVPN без аудита на активе почти невозможно, поэтому чтобы не давать рекомендаций по правильному размешиванию кофейной гущи,",
+            "рекомендуется найти в НАД все сервера OpenVPN и поставить их на аудит, данные же запросы нужны для проверки событий и цикличности аудита уже после.",
+            "в PT NAD:",
+            "Применить условие фильтрации app_proto == \"openvpn\"",
+            "На странице Дашборды экспортировать данные виджета Серверы по сессиям и трафику, нажав ↓",
+            "Если среди перечисленных серверов есть серверы OpenVPN с внешними IP-адресами, то имеется исходящий трафик. В этом случае вы можете убедиться, что все сессии легитимны.",
+            "Если среди перечисленных серверов есть серверы OpenVPN с внутренними IP-адресами, то имеется входящий трафик, который преобразуется правилами NAT. В этом случае вы можете просмотреть правила NAT и определить, к каким внутренним устройствам или сервисам направляется трафик.",
+            "чтобы увидеть только сервера, необходимо после второй строки добавить | filter(mode = 'server')",
+            "с данных активов должны собираться события s openvpn (event_src.title = 'openvpn' and event_src.subsys = 'vpn-gateway')"
+        ],
+        "PDQL": [
+            "filter(host.softs<OpenVPN>.configs)",
+            "| select(@host, host.@id as asset_id, host.@audittime, host.softs<OpenVPN>.Vendor as Vendor, host.softs<OpenVPN>.Name as Name, host.softs<OpenVPN>.Version as Version, host.softs<OpenVPN>.configs.ConfigPath as ConfFile, host.softs<OpenVPN>.configs.Mode as mode, compactunique(host.softs<OpenVPN>.configs.routes) as routes)",
+            "| join(select(host.@id, host.@ScanningInfo.Type, host.@ScanningInfo.Status) | filter(host.@ScanningInfo.Type = 'Audit') as Sc, Sc.host.@id = asset_id) ",
+            "| calc(TotalDays(now() - host.@AuditTime) as dur_audit)",
+            "| join(filter(host.softs<OpenVPN>.configs.ConfigPath) | select(host.@id, host.softs<OpenVPN>.configs.ConfigPath,  count(host.softs<OpenVPN>.configs.clients.clientName) as clients) | filter(clients) as Cl, Cl.host.@id = asset_id and Cl.host.softs<OpenVPN>.configs.ConfigPath = ConfFile)",
+            "| join(filter(host.softs<OpenVPN>.Configs) | select(@host, host.@id, host.softs<OpenVPN>.Configs.ConfigPath as ConfigPath, host.softs<OpenVPN>.Configs.LoggingSettings.LogPath as LogPath, host.softs<OpenVPN>.Configs.LoggingSettings.AppendLogPath as AppendLogPath) | filter(LogPath and LogPath != '') | calc(LogPath + ' | ' + AppendLogPath  as logging_temp) | calc(if (AppendLogPath and AppendLogPath != '') then 'logging_temp' else 'LogPath' as logging) as Log, Log.host.@id = asset_id and Log.ConfigPath = ConfFile)",
+            "| join(filter(host.softs<OpenVPN>.configs) | select(host.@id, compactunique(host.softs<OpenVPN>.openports.address) as Listen_addresses, compactunique(host.softs<Artifactory>.openports.Port) as Listen_ports, ",
+            "compactunique(host.endpoints<ipendpoint>.address) as Host_addresses) | filter(Listen_addresses) as G, G.host.@id = asset_id) ",
+            "| select(@host, asset_id, host.@audittime, dur_audit, Sc.host.@ScanningInfo.Status, Vendor, Name, Version, ConfFile, mode, G.Listen_addresses, G.Listen_ports, G.Host_addresses, routes, Cl.clients, Log.logging)"
+        ],
+        "default_politics_whitelist": ".*"
+    }
+}

@@ -1,13 +1,12 @@
-from pathlib import Path
-import xlsxwriter
-import json
 import asyncio
-import aiohttp
+import json
 import logging
-import requests
-from tqdm.asyncio import tqdm
-from collections import defaultdict
 import unicodedata
+from collections import defaultdict
+
+import xlsxwriter
+from aiohttp import ClientSession
+from tqdm.asyncio import tqdm
 
 try:
     from .settings_checker import Settings
@@ -21,6 +20,7 @@ try:
     from .incidents_checker import Inc_Checker
 except:
     from incidents_checker import Inc_Checker
+
 import difflib
 from datetime import datetime
 
@@ -44,9 +44,30 @@ class KB_Checker:
         for item in loc_dict["categories"]:
             if item["id"] == pack:
                 return item["name"]
-        
+
         return pack
-    
+
+    def remove_first_if_both_exist(self, data, name1, name2):
+        # Проверяем, существуют ли оба имени в данных
+        has_name1 = False
+        has_name2 = False
+        name1_index = -1
+
+        for i, item in enumerate(data):
+            key = list(item.keys())[0]
+            if key == name1:
+                has_name1 = True
+                name1_index = i
+            elif key == name2:
+                has_name2 = True
+
+        # Если оба имени найдены, удаляем элемент с name1
+        if has_name1 and has_name2 and name1_index != -1:
+            del data[name1_index]
+            return True
+
+        return False
+
     def merge_dicts(self, d1, d2):
         result = {}
 
@@ -57,8 +78,8 @@ class KB_Checker:
             buf = []
 
             if isinstance(v1, list):
-                buf.extend(v1)          # уже список → добавляем элементы
-            elif v1 is not None:       # обычное значение
+                buf.extend(v1)  # уже список → добавляем элементы
+            elif v1 is not None:  # обычное значение
                 buf.append(v1)
 
             if isinstance(v2, list):
@@ -66,7 +87,7 @@ class KB_Checker:
             elif v2 is not None:
                 buf.append(v2)
 
-            result[key] = buf          # любой ключ → список (в том числе с 1 элементом)
+            result[key] = buf  # любой ключ → список (в том числе с 1 элементом)
 
         return result
 
@@ -74,13 +95,23 @@ class KB_Checker:
         grouped = defaultdict(list)
 
         for rec in items:
-            if 'FolderPath' in rec.keys() and rec['FolderPath'] is not None:
-                folder = unicodedata.normalize('NFKC', rec['FolderPath']) \
-                            .encode('cp1251', errors='replace').decode('cp1251')
-                rest = {k: (unicodedata.normalize('NFKC', v)
-                            .encode('cp1251', errors='replace')
-                            .decode('cp1251') if isinstance(v, str) else v)
-                        for k, v in rec.items() if k != 'FolderPath'}
+            if "FolderPath" in rec.keys() and rec["FolderPath"] is not None:
+                folder = (
+                    unicodedata.normalize("NFKC", rec["FolderPath"])
+                    .encode("cp1251", errors="replace")
+                    .decode("cp1251")
+                )
+                rest = {
+                    k: (
+                        unicodedata.normalize("NFKC", v)
+                        .encode("cp1251", errors="replace")
+                        .decode("cp1251")
+                        if isinstance(v, str)
+                        else v
+                    )
+                    for k, v in rec.items()
+                    if k != "FolderPath"
+                }
                 grouped[folder.rsplit("/")[0]].append(rest)
 
         grouped = dict(grouped)
@@ -91,7 +122,7 @@ class KB_Checker:
         url = "https://{}:8091/api-studio/siem/correlation-rules/{}".format(
             self.settings.mpx_host, ptkb_id
         )
-        response_temp = requests.session().get(
+        response_temp = self.auth.session.get(
             url=url, headers=self.auth.headers, verify=False, cookies=self.auth.cookies
         )
         if response_temp.status_code == 200:
@@ -152,7 +183,7 @@ class KB_Checker:
         url = "https://{}:8091/api-studio/databases/content-databases".format(
             self.settings.mpx_host
         )
-        response_temp = requests.session().get(
+        response_temp = self.auth.session.get(
             url=url, headers=self.auth.headers, verify=False, cookies=self.auth.cookies
         )
         get_resp = False
@@ -164,9 +195,12 @@ class KB_Checker:
             raise ConnectionError(
                 "Get status code 401 unauthorized. Check your rights (or your token). "
                 "If you don't have rights and it's right disable kabachock (KB_check mode), use `k=0` "
-                "in config file")
+                "in config file"
+            )
         else:
-            raise ConnectionError(f'Status: {response_temp.status_code}. Content: {response_temp.content}')
+            raise ConnectionError(
+                f"Status: {response_temp.status_code}. Content: {response_temp.content}"
+            )
         if get_resp:
             for database in response:
                 if database["IsDeployable"]:
@@ -175,7 +209,7 @@ class KB_Checker:
 
     def get_real_names_pipeline(self, curr_conveyors):
         url = "https://{}:8091/api-studio/siem/pipelines".format(self.settings.mpx_host)
-        response_temp = requests.session().get(
+        response_temp = self.auth.session.get(
             url=url, headers=self.auth.headers, verify=False, cookies=self.auth.cookies
         )
         if response_temp.status_code == 200:
@@ -192,7 +226,7 @@ class KB_Checker:
 
     def get_siems_info(self):
         url = "https://{}/api/siem_manager/v1/siems".format(self.settings.mpx_host)
-        response_temp = requests.session().get(
+        response_temp = self.auth.session.get(
             url=url, headers=self.auth.headers, verify=False, cookies=self.auth.cookies
         )
         if response_temp.status_code == 200:
@@ -205,7 +239,7 @@ class KB_Checker:
             url_count = "https://{}/api/events/v1/siem_counters/correlation_rules?siem_id={}".format(
                 self.settings.mpx_host, pipeline["id"]
             )
-            response_temp_count = requests.session().get(
+            response_temp_count = self.auth.session.get(
                 url=url_count,
                 headers=self.auth.headers,
                 verify=False,
@@ -229,25 +263,97 @@ class KB_Checker:
 
         return result
 
-    def get_content_by_type(self, type_, amount):
+    def get_table_token(self, table_name, list_of_table_lists):
+        for list_processed in list_of_table_lists:
+            if list_processed["name"] == table_name:
+                return list_processed["token"]
 
+        return None
+
+    def get_siems_from_core(self):
+        url = "https://{}/api/siem_manager/v1/siems".format(self.settings.mpx_host)
+        response_temp = self.auth.session.get(
+            url=url, headers=self.auth.headers, verify=False, cookies=self.auth.cookies
+        )
+        if response_temp.status_code == 200:
+            response = response_temp.json()
+        else:
+            self.logger.debug(response_temp)
+
+        return response_temp.json()
+
+    def ptkb_id_to_siem_id(self, ptkb_id, siems_list):
+        for siem in siems_list:
+            if siem["alias"] == ptkb_id:
+                return siem["id"]
+
+        return None
+
+    def get_tokens_for_tl(self, siem_id):
+        url = "https://{}/api/events/v2/table_lists?siem_id={}".format(
+            self.settings.mpx_host, siem_id
+        )
+        response_temp = self.auth.session.get(
+            url=url, headers=self.auth.headers, verify=False, cookies=self.auth.cookies
+        )
+        if response_temp.status_code == 200:
+            response = response_temp.json()
+        else:
+            self.logger.debug(response_temp)
+
+        return response_temp.json()
+
+    def get_assetgrid_info(self, table_id, siem_id):
         query = {
-                "skip": 0,
-                "folderId": None,
-                "filters": {"SiemObjectType": [type_]},
-                "search": "",
-                "sort": [{"name": "objectId", "order": 0, "type": 0}],
-                "recursive": True,
-                "setId": "00000000-0000-0000-0000-000000000001",
-                "withoutSets": False,
-                "take": amount,
-            }
+            "offset": 0,
+            "limit": 50,
+            "filter": {
+                "select": "",
+                "where": "",
+                "orderBy": [{"field": "_last_changed", "sortOrder": "descending"}],
+                "timeZone": 10800,
+                "stringDatetime": True,
+            },
+        }
 
-        url = "https://{}:8091/api-studio/siem/objects/list".format(
-                self.settings.mpx_host
+        url = (
+            "https://{}/api/events/v2/table_lists/{}/content/search?siem_id={}".format(
+                self.settings.mpx_host, table_id, siem_id
+            )
+        )
+
+        response_temp = self.auth.session.post(
+            url=url,
+            headers=self.auth.headers,
+            verify=False,
+            json=query,
+            cookies=self.auth.cookies,
+        )
+        if response_temp.status_code == 200:
+            return response_temp.json()["totalItems"]
+        else:
+            raise RuntimeError(
+                f"GET content failed: {response_temp.status_code} – {response_temp.text}"
             )
 
-        response_temp = requests.session().post(
+    def get_content_by_type(self, type_, amount):
+        query = {
+            "skip": 0,
+            "folderId": None,
+            "filters": {"SiemObjectType": [type_]},
+            "search": "",
+            "sort": [{"name": "objectId", "order": 0, "type": 0}],
+            "recursive": True,
+            "setId": "00000000-0000-0000-0000-000000000001",
+            "withoutSets": False,
+            "take": amount,
+        }
+
+        url = "https://{}:8091/api-studio/siem/objects/list".format(
+            self.settings.mpx_host
+        )
+
+        response_temp = self.auth.session.post(
             url=url,
             headers=self.auth.headers,
             verify=False,
@@ -296,59 +402,80 @@ class KB_Checker:
             key for row in content["Rows"] for key in row["DeploymentStatuses"].keys()
         }
 
-    async def _check_one(self, key, value, prog):
+    async def _check_one(self, key, value, prog, session: ClientSession):
         async with self.semaphore:
-            async with aiohttp.ClientSession() as session:
-                query = {
-                    "skip": 0,
-                    "take": 50,
-                    "filters": {"ContentType": ["User"]},
-                    "sort": None,
-                }
-                url = f"https://{self.settings.mpx_host}:8091/api-studio/siem/tabular-lists/{value}/rows"
-                async with session.post(
-                    url,
-                    json=query,
-                    headers=self.auth.headers,
-                    cookies=self.auth.cookies,
-                    ssl=False,
-                ) as resp:
-                    if resp.status == 201:
-                        data = await resp.json()
-                        if data.get("Count", 0) > 0:
-                            prog.update(1)
-                            return {key: value}
+            query = {
+                "skip": 0,
+                "take": 50,
+                "filters": {"ContentType": ["User"]},
+                "sort": None,
+            }
+            url = f"https://{self.settings.mpx_host}:8091/api-studio/siem/tabular-lists/{value}/rows"
+            async with session.post(
+                url,
+                json=query,
+                headers=self.auth.headers,
+                cookies=self.auth.cookies,
+                ssl=False,
+            ) as resp:
+                if resp.status == 201:
+                    data = await resp.json()
+                    if data.get("Count", 0) > 0:
+                        prog.update(1)
+                        return {key: value}
         prog.update(1)
         return None
 
     async def get_changed(self, all_tables_list):
+        async_session = ClientSession(
+            cookies=self.auth.cookies, headers=self.auth.headers
+        )
         prog = tqdm(
             total=len(all_tables_list), desc="Checking tables", leave=True, unit="req"
         )
-        tasks = [self._check_one(k, v, prog) for k, v in all_tables_list.items()]
+        tasks = [
+            self._check_one(k, v, prog, async_session)
+            for k, v in all_tables_list.items()
+        ]
 
         results = [r for r in await asyncio.gather(*tasks) if r is not None]
         prog.close()
+        await async_session.close()
         return results
 
     def work(self):
+        tables_to_assets = {
+            "List_Servers": "AssetGrid_Servers",
+            "Sensitive_Users": "AssetGrid_Critical_Domain_Accounts",
+            "Known_Windows_Accounts": "AssetGrid_AD_User",
+            "Dismissed_Users": "AssetGrid_Fired_Users_Accounts",
+            "Critical_Hosts_Manual": "Critical_Hosts",
+            "UNIX_Hosts": "AssetGrid_UNIX_Hosts",
+            "Service_Accounts_Manual": "Service_Accounts",
+        }
+
         self.logger.info("Получаем правила")
 
         all_tables = self.get_content_by_type("TabularList", 1000)
         current_conveyors = list(self.get_conveyors(all_tables))
         all_tables_list = self.get_original_item_ids(all_tables, None)
         table_statuses = self.get_deploy(all_tables, None)
+        siem_ids = self.get_siems_from_core()
 
-        self.logger.info(f"В сиеме есть конвейеры: {current_conveyors}")        
+        self.logger.info(f"В сиеме есть конвейеры: {current_conveyors}")
+
         all_corrs = self.get_content_by_type("Correlation", 10000)["Rows"]
 
         self.logger.info("Восстанавливаем структуру пакетов экспертизы")
 
         expertise_dict = self.put_rules_to_packs(all_corrs)
         table_dict = self.put_rules_to_packs(all_tables["Rows"])
+
         combined_dict = self.merge_dicts(expertise_dict, table_dict)
 
-        with open(f"{self.settings.out_folder}\\KB_struct.json", "w", encoding="utf-8") as f:
+        with open(
+            f"{self.settings.out_folder}\\KB_struct.json", "w", encoding="utf-8"
+        ) as f:
             f.write(json.dumps(combined_dict, indent=4, ensure_ascii=False))
 
         uninstalled_content = {}
@@ -359,8 +486,12 @@ class KB_Checker:
                     temp_list.append(item["SystemName"])
             uninstalled_content[expert_pack] = temp_list
 
-        with open(f"{self.settings.out_folder}\\KB_struct_uninstalled.json", "w", encoding="utf-8") as f:
-            f.write(json.dumps(uninstalled_content, indent=4, ensure_ascii=False))            
+        with open(
+            f"{self.settings.out_folder}\\KB_struct_uninstalled.json",
+            "w",
+            encoding="utf-8",
+        ) as f:
+            f.write(json.dumps(uninstalled_content, indent=4, ensure_ascii=False))
 
         with open("configs\\packages_names.json", "r", encoding="utf-8") as f_packs:
             packs_names = json.load(f_packs)
@@ -408,8 +539,9 @@ class KB_Checker:
         self.logger.info("Cправились найти ручные инцы {}".format(len(closed_manual)))
         workbook = xlsxwriter.Workbook(report_file)
 
-        green_format = workbook.add_format({"bg_color": "#4d6335"})
-        red_format = workbook.add_format({"bg_color": "#9a1115"})
+        green_format = workbook.add_format({"bg_color": "#73c021"})
+        red_format = workbook.add_format({"bg_color": "#dc1319"})
+        asset_format = workbook.add_format({"bg_color": "#23A455"})
         yellow_format = workbook.add_format({"bg_color": "#F0E40C"})
 
         header_format = workbook.add_format(
@@ -446,7 +578,7 @@ class KB_Checker:
         worksheet.write(
             2,
             4 + len(current_conveyors),
-            "YES" if closed_incidents else "NO",
+            "YES" if closed_incidents and closed_incidents["totalItems"] > 0 else "NO",
             green_format
             if closed_incidents and closed_incidents["totalItems"] > 0
             else red_format,
@@ -461,16 +593,6 @@ class KB_Checker:
         for row_idx, tbl_name in enumerate(
             [item for _, tables in categories.items() for item in tables], start=2
         ):
-            fmt = green_format if tbl_name in changed_dict else red_format
-
-            worksheet.write(row_idx, 1, tbl_name, fmt)
-            worksheet.write(
-                row_idx,
-                2 + len(current_conveyors),
-                "YES" if tbl_name in changed_dict else "NO",
-                fmt,
-            )
-
             for i in range(len(current_conveyors)):
                 if current_conveyors[i] in table_statuses[tbl_name].keys():
                     if table_statuses[tbl_name][current_conveyors[i]] == "Installed":
@@ -482,6 +604,70 @@ class KB_Checker:
                     worksheet.write(
                         row_idx, 2 + len(current_conveyors), "-----", yellow_format
                     )
+
+        current_conveyors = self.get_real_names_pipeline(current_conveyors)
+
+        with open("configs/table_mapping.json", "r", encoding="utf-8") as table_file:
+            rules_to_tables = json.load(table_file)
+
+        for row_idx, tbl_name in enumerate(
+            [item for _, tables in categories.items() for item in tables], start=2
+        ):
+            state = "YES" if tbl_name in changed_dict else "NO"
+            if state == "YES":
+                for rule_name in rules_to_tables:
+                    for table in rules_to_tables[rule_name]:
+                        if tbl_name in table.keys():
+                            table[tbl_name] = "Changed"
+
+            for key in table_dict.keys():
+                for tl_name in table_dict[key]:
+                    if (
+                        tl_name["SystemName"] == tbl_name
+                        and tl_name["GeneralDeploymentStatus"] != "Installed"
+                    ):
+                        for rule_name in rules_to_tables:
+                            for table in rules_to_tables[rule_name]:
+                                if tbl_name in table.keys():
+                                    table[tbl_name] = "Not Installed!!!"
+
+            fmt = green_format if tbl_name in changed_dict else red_format
+
+            for table_with_asset_double in tables_to_assets.keys():
+                if tbl_name == table_with_asset_double:
+                    for expert_pack in combined_dict.keys():
+                        for item in combined_dict[expert_pack]:
+                            if (
+                                item["SystemName"] == tables_to_assets[tbl_name]
+                                and item["GeneralDeploymentStatus"] == "Installed"
+                            ):
+                                curr_siem_id = self.ptkb_id_to_siem_id(
+                                    current_conveyors[0], siem_ids
+                                )
+                                temp_tokens = self.get_tokens_for_tl(curr_siem_id)
+                                curr_token = self.get_table_token(
+                                    tables_to_assets[tbl_name], temp_tokens
+                                )
+                                if (
+                                    self.get_assetgrid_info(curr_token, curr_siem_id)
+                                    > 0
+                                ):
+                                    state = "Replaced by assetGrid"
+                                    for rule_name in rules_to_tables:
+                                        for table in rules_to_tables[rule_name]:
+                                            if tbl_name in table.keys():
+                                                table[
+                                                    tbl_name
+                                                ] = "Replaced by assetGrid"
+                                    fmt = asset_format
+
+            worksheet.write(row_idx, 1, tbl_name, fmt)
+            worksheet.write(
+                row_idx,
+                2 + len(current_conveyors),
+                state,
+                fmt,
+            )
 
         if missing != []:
             worksheet.write(
@@ -501,13 +687,19 @@ class KB_Checker:
                 shift = len(categories[key])
                 if shift > 1:
                     worksheet.merge_range(
-                        "A{}:A{}".format(index, index + shift - 1), self.localize_pack(key, packs_names), header_format
+                        "A{}:A{}".format(index, index + shift - 1),
+                        self.localize_pack(key, packs_names),
+                        header_format,
                     )
                 else:
-                    worksheet.write(index - 1, 0, self.localize_pack(key, packs_names), header_format)
+                    worksheet.write(
+                        index - 1,
+                        0,
+                        self.localize_pack(key, packs_names),
+                        header_format,
+                    )
                 index += shift
 
-        current_conveyors = self.get_real_names_pipeline(current_conveyors)
         top_triggered_rules = self.get_siems_info()
 
         for i in range(len(current_conveyors)):
@@ -534,8 +726,7 @@ class KB_Checker:
                         worksheet.write(
                             index, 10 + i * 2 + len(current_conveyors), rule["runCount"]
                         )
-                        index += 1    
-              
+                        index += 1
 
         self.logger.info("Ищем неустановленные правила среди {}".format(len(all_corrs)))
         uninstalled_rules = [r for r in all_corrs if r["DeploymentStatuses"] == {}]
@@ -569,6 +760,17 @@ class KB_Checker:
                     val[0] + " - " + val[2],
                     self.settings.mpx_host + "_" + key[0] + "_diff_" + val[0] + ".txt",
                 )
+
+        for replaced_table in tables_to_assets.keys():
+            for rule_name in rules_to_tables:
+                self.remove_first_if_both_exist(
+                    rules_to_tables[rule_name],
+                    tables_to_assets[replaced_table],
+                    replaced_table,
+                )
+
+        with open("out/table_mapping_filled.json", "w", encoding="utf-8") as f_out:
+            f_out.write(json.dumps(rules_to_tables, indent=4))
 
 
 # create_report()

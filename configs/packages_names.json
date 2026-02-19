@@ -82,23 +82,14 @@
             "name": "PT Application Firewall"
         }, {
             "id": "enterprise_1c_and_bitrix",
-            "name": "«1C:Предприятие» 8.3 и «Битрикс24»"
-        }, {
-            "id": "siemens_simatic",
-            "name": "Siemens Simatic S7"
+            "name": "1C:Предприятие 8.3 и Битрикс24"
         }, {
             "id": "pt_nad",
             "name": "PT Network Attack Discovery"
         }, {
-            "id": "adastra_trace_mode",
-            "name": "SCADA Trace Mode"
-        }, {
             "id": "antimalware",
             "name": "Вредоносное ПО и нежелательные рассылки"
-        }, {
-            "id": "wonderware",
-            "name": "System Platform. Подозрительная активность"
-        }, {
+        },  {
             "id": "yandex_cloud",
             "name": "Yandex Cloud. Подозрительная активность"
         }, {
@@ -107,13 +98,7 @@
         }, {
             "id": "process_chains_and_logons",
             "name": "Расследование запуска процессов и исследование сессий"
-        }, {
-            "id": "yokogawa",
-            "name": "Yokogawa CENTUM VP и Yokogawa ProSafe-RS"
-        }, {
-            "id": "masterscada",
-            "name": "MasterSCADA и MasterOPC"
-        }, {
+        },  {
             "id": "clickhouse",
             "name": "ClickHouse"
         }, {
@@ -157,7 +142,7 @@
             "name": "Эксплуатация уязвимостей"
         }, {
             "id": "kaspersky",
-            "name": "Продукты «Лаборатория Касперского». Выявление вредоносной активности"
+            "name": "Продукты «Лаборатория Касперского»"
         }, {
             "id": "security_code_secret_net_lsp",
             "name": "Secret Net LSP"
@@ -197,13 +182,7 @@
         }, {
             "id": "dnsmasq",
             "name": "Подозрительная активность в сетях с dnsmasq"
-        }, {
-            "id": "astraregul",
-            "name": "AstraRegul. Подозрительная активность"
-        }, {
-            "id": "automiq",
-            "name": "Alpha.Platform. Выявление атак на АСУ ТП"
-        }, {
+        },   {
             "id": "acronis",
             "name": "Acronis Backup. Мониторинг операций"
         }, {
@@ -217,7 +196,7 @@
             "name": "UEM SafeMobile. Подозрительная активность"
         }, {
             "id": "saltstack",
-            "name": "SaltStack. Подозрительная активность"
+            "name": "SaltStack"
         }, {
             "id": "eltex",
             "name": "Eltex"
@@ -236,10 +215,7 @@
         }, {
             "id": "infowatch_tm",
             "name": "InfoWatch Traffic Monitor. Подозрительная активность"
-        }, {
-            "id": "redkit_scada",
-            "name": "Redkit SCADA. Подозрительная активность"
-        }, {
+        },  {
             "id": "pt_isim",
             "name": "PT Industrial Security Incident Manager"
         }, {
@@ -280,7 +256,7 @@
             "name": "ATT&CK: «Эксфильтрация данных»"
         }, {
             "id": "elasticsearch",
-            "name": "Elasticsearch. Подозрительная активность"
+            "name": "Elasticsearch"
         }, {
             "id": "zvirt",
             "name": "zVirt. Подозрительная активность"
@@ -323,10 +299,7 @@
         }, {
             "id": "vk_workmail",
             "name": "VK WorkMail. Подозрительная активность"
-        }, {
-            "id": "honeywell_experion_pks",
-            "name": "Honeywell Experion PKS. Подозрительная активность"
-        }, {
+        },  {
             "id": "confluence",
             "name": "Atlassian Confluence. Подозрительная активность"
         }, {

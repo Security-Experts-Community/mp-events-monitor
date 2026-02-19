@@ -1,23 +1,29 @@
+import importlib.metadata
 import logging
-import shutil
 import re
+import shutil
+import sys
+import time
+from datetime import date, datetime, timedelta
 from pathlib import Path
 from uuid import UUID
-from pydantic import Field, SecretStr, model_validator, AliasChoices, FilePath
+
+from pydantic import AliasChoices, Field, FilePath, SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
-import time
-import sys
-from datetime import datetime, timedelta, date
+
 old_python = False
-if sys.version.find('3.7.') == 0:
+if sys.version.find("3.7.") == 0:
     old_python = True
+    from typing import List as list
+    from typing import Optional, Union
+
     from typing_extensions import Literal
-    from typing import List as list, Optional, Union
+
     base_params = {}
 else:
     from typing import Literal, Optional, Union
-    base_params = {"cli_parse_args": True, "cli_prog_name": "python event_checker.py"}
 
+    base_params = {"cli_parse_args": True, "cli_prog_name": "python event_checker.py"}
 
 
 class Settings(BaseSettings, **base_params):
@@ -36,86 +42,140 @@ class Settings(BaseSettings, **base_params):
     Параметры рекомендуется передавать через файл: `configs/.config.env`, так как при таком подходе парольно-кодовая
     информация не сохранится в логе запусков приложений ОС
     """
+
     logging_level: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"] = Field(
-        default="INFO", description="Уровень логирования",
-        validation_alias=AliasChoices('l', "logging", "logging_level"))
-    time_delta_hours: int = Field(default=168,
-                                  validation_alias=AliasChoices('d','time_delta_hours', 'time_from_delta_hours'),
-                                  description="Период анализа событий в часах. "
-                                              "Дельта для расчета времени откуда начинать сбор")
-    reconnect_times: int = Field(default=5, description="Количество попыток переподключения при ошибках "
-                                                        "(интервал 5 сек)", ge=1, le=2166,
-                                 validation_alias=AliasChoices('r', "reconnect_times"))
+        default="INFO",
+        description="Уровень логирования",
+        validation_alias=AliasChoices("l", "logging", "logging_level"),
+    )
+    time_delta_hours: int = Field(
+        default=168,
+        validation_alias=AliasChoices("d", "time_delta_hours", "time_from_delta_hours"),
+        description="Период анализа событий в часах. "
+        "Дельта для расчета времени откуда начинать сбор",
+    )
+    reconnect_times: int = Field(
+        default=5,
+        description="Количество попыток переподключения при ошибках "
+        "(интервал 5 сек)",
+        ge=1,
+        le=2166,
+        validation_alias=AliasChoices("r", "reconnect_times"),
+    )
     max_uuids_in_siem_query: int = Field(
         default=1000,
         description="Количество event_src.asset в фильтрах по событиям. "
-                    "Фактически пачками по сколько активов будут запрашивать данные по событиям.",
-        ge=10, le=9999,
-        validation_alias=AliasChoices('u', 'max_uuids', 'max_uuids_in_siem_query')
+        "Фактически пачками по сколько активов будут запрашивать данные по событиям.",
+        ge=10,
+        le=9999,
+        validation_alias=AliasChoices("u", "max_uuids", "max_uuids_in_siem_query"),
     )
     max_threads_for_siem_api: int = Field(
         default=11,
-        validation_alias=AliasChoices('t', 'max_threads_for_siem_api', 'max_threads'),
+        validation_alias=AliasChoices("t", "max_threads_for_siem_api", "max_threads"),
         description="Количество потоков при запросе данных из SIEM.",
-        ge=1, le=100)
-    out_folder: Path = Field(default=Path("out"),
-                             validation_alias=AliasChoices('o','out_folder', 'out_dir'),
-                             description="Папка для результатов (абсолютный или относительный путь, "
-                                         "в JSON используйте \\)")
-    clear_mode: Literal[
-        "full", "today", "day-1", "day-2", "not_clear"
-    ] = Field(default="full", validation_alias=AliasChoices('c', 'clear', 'clear_mode'),
-              description="Подходит только для режима работы Assets_filters (так как остальные создают только один "
-                          "файл). Выбор режима очистки папки из out_folder. full - чистить всегда полностью, "
-                          "today - очистить только отчеты созданные не сегодня и выполнить фильтры только для "
-                          "недостающих, day-1 - оставить вчерашнее, day-2 - оставить позавчерашние, not_clear - "
-                          "не чистить отчеты, создать недостающие.")
+        ge=1,
+        le=100,
+    )
+    out_folder: Path = Field(
+        default=Path("out"),
+        validation_alias=AliasChoices("o", "out_folder", "out_dir"),
+        description="Папка для результатов (абсолютный или относительный путь, "
+        "в JSON используйте \\)",
+    )
+    clear_mode: Literal["full", "today", "day-1", "day-2", "not_clear"] = Field(
+        default="full",
+        validation_alias=AliasChoices("c", "clear", "clear_mode"),
+        description="Подходит только для режима работы Assets_filters (так как остальные создают только один "
+        "файл). Выбор режима очистки папки из out_folder. full - чистить всегда полностью, "
+        "today - очистить только отчеты созданные не сегодня и выполнить фильтры только для "
+        "недостающих, day-1 - оставить вчерашнее, day-2 - оставить позавчерашние, not_clear - "
+        "не чистить отчеты, создать недостающие.",
+    )
     mode: Literal[
-        "Assets_filters", "ALL_events", "ALL_assets", "Dynamic_Groups_events",
-        "Dynamic_Groups_assets", "Asset_IDs", "Only_KB"
-    ] = Field(default="Assets_filters", description="Режим работы скрипта (см. раздел \"Режимы работы\")")
-    kb_check_mode: bool = Field(default=True, validation_alias=AliasChoices('k', 'kb_check', 'kb_check_mode'),
-                                description="Добавление информации из knowledgebase, будут анализироваться ПАКи, "
-                                            "их включенность и возможность работы для данного состояния источников. "
-                                            "Для токена необходимо добавить разрешений на работу с KB")
-    pdql_assets: str = Field(default="select(@Host, Host.@id as asset_id, Host.@audittime) | LIMIT(0)",
-                             description="PDQL-запрос для режимов с активами (кроме Assets_filters)",
-                             validation_alias=AliasChoices('pdql_assets', 'pdql'))
-    event_policies: str = Field(default="w os ", validation_alias=AliasChoices("e", "event_policies"),
-                                description="Регулярное выражение для политик сбора событий, для режимов работы, "
-                                            "кроме Assets_filters")
-    mpx_group: Union[str, list[str]] = Field(default="-1", validation_alias=AliasChoices('g','mpx_group'),
-                                       description="Динамическая группа для запроса. Совместимо с режимами работы: "
-                                       "ALL_events, ALL_assets. В остальных режимах игнорируется, так задается в "
-                                       "управляющих файлах режима. На вход принимает значения UUID или '-1'")
+        "Assets_filters",
+        "ALL_events",
+        "ALL_assets",
+        "Dynamic_Groups_events",
+        "Dynamic_Groups_assets",
+        "Asset_IDs",
+        "Only_KB",
+    ] = Field(
+        default="Assets_filters",
+        description='Режим работы скрипта (см. раздел "Режимы работы")',
+    )
+    kb_check_mode: bool = Field(
+        default=True,
+        validation_alias=AliasChoices("k", "kb_check", "kb_check_mode"),
+        description="Добавление информации из knowledgebase, будут анализироваться ПАКи, "
+        "их включенность и возможность работы для данного состояния источников. "
+        "Для токена необходимо добавить разрешений на работу с KB",
+    )
+    pdql_assets: str = Field(
+        default="select(@Host, Host.@id as asset_id, Host.@audittime) | LIMIT(0)",
+        description="PDQL-запрос для режимов с активами (кроме Assets_filters)",
+        validation_alias=AliasChoices("pdql_assets", "pdql"),
+    )
+    event_policies: str = Field(
+        default="w os Win (Ess|sysmon)",
+        validation_alias=AliasChoices("e", "event_policies"),
+        description="Регулярное выражение для политик сбора событий, для режимов работы, "
+        "кроме Assets_filters",
+    )
+    mpx_group: Union[str, list[str]] = Field(
+        default="-1",
+        validation_alias=AliasChoices("g", "mpx_group"),
+        description="Динамическая группа для запроса. Совместимо с режимами работы: "
+        "ALL_events, ALL_assets. В остальных режимах игнорируется, так задается в "
+        "управляющих файлах режима. На вход принимает значения UUID или '-1'",
+    )
     event_policies_file: FilePath = Field(
         default=Path("configs/event_policies.json"),
-        validation_alias=AliasChoices('p', 'event_policies_file'),
-        description="Путь к файлу с политиками событий"
+        validation_alias=AliasChoices("p", "event_policies_file"),
+        description="Путь к файлу с политиками событий",
     )
     asset_filters_file: FilePath = Field(
         default=Path("configs/assets_filters.json"),
-        validation_alias=AliasChoices('a', 'asset_filters_file'),
-        description="Путь к файлу с запросами к активам и описанием какие политики для этих активов надо проверить"
+        validation_alias=AliasChoices("a", "asset_filters_file"),
+        description="Путь к файлу с запросами к активам и описанием какие политики для этих активов надо проверить",
     )
-    mpx_host: str = Field(description="FQDN MaxPatrol", validation_alias=AliasChoices('mpx_host', 'host'))
+    mpx_host: str = Field(
+        description="FQDN MaxPatrol", validation_alias=AliasChoices("mpx_host", "host")
+    )
     personal_token: Optional[SecretStr] = Field(
-        default=None, validation_alias=AliasChoices('personal_token', 'mc_token', 'mc'),
+        default=None,
+        validation_alias=AliasChoices("personal_token", "mc_token", "mc"),
         description="Личный токен для аутентификации в API. Лучший вариант для использования скрипта. "
-                    "Инструкция по получению: 1. Слева в переключении между продуктами нажмите \"Management and Configuration\" "
-                    "ИЛИ справа нажмите на значок профиля, а далее \"Профиль\"; 2. Слева внизу нажмите на значок "
-                    "профиля; 3. Токены доступа; 4. Справа вверху \"Создать\"; 5. Заполните \"Имя\", в привилегиях "
-                    "можно оставить только MaxPatrol 10 (MaxPatrol SIEM, MaxPatrol VM); 6. Нажмите \"Создать\"; "
-                    "7. Скопируйте токен и вставьте в файл конфигурации скрипта.")
-    login: Optional[str] = Field(default=None, description="Логин учетной записи в MaxPatrol")
-    password: Optional[SecretStr] = Field(default=None, description="Пароль учетной записи в MaxPatrol")
+        'Инструкция по получению: 1. Слева в переключении между продуктами нажмите "Management and Configuration" '
+        'ИЛИ справа нажмите на значок профиля, а далее "Профиль"; 2. Слева внизу нажмите на значок '
+        'профиля; 3. Токены доступа; 4. Справа вверху "Создать"; 5. Заполните "Имя", в привилегиях '
+        'можно оставить только MaxPatrol 10 (MaxPatrol SIEM, MaxPatrol VM); 6. Нажмите "Создать"; '
+        "7. Скопируйте токен и вставьте в файл конфигурации скрипта.",
+    )
+    login: Optional[str] = Field(
+        default=None, description="Логин учетной записи в MaxPatrol"
+    )
+    password: Optional[SecretStr] = Field(
+        default=None, description="Пароль учетной записи в MaxPatrol"
+    )
     mpx_secret: Optional[SecretStr] = Field(
         default=None,
-        validation_alias=AliasChoices('mpx_secret', 'client_secret'),
+        validation_alias=AliasChoices("mpx_secret", "client_secret"),
         description="Секрет MaxPatrol, получаемый согласно "
-                    "https://doc.ptsecurity.com/ru-RU/projects/mp10/27.2/help/4598558347"
-                    " устаревший параметр, начиная с 27.3")
-    model_config = SettingsConfigDict(env_file=Path("configs/.config.env"), extra="ignore")
+        "https://doc.ptsecurity.com/ru-RU/projects/mp10/27.2/help/4598558347"
+        " устаревший параметр, начиная с 27.3",
+    )
+    check_privileges: bool = Field(
+        default=True,
+        validation_alias=AliasChoices("privileges", "check_privileges"),
+        description="Будет ли выполнена проверка привилегий после первичной аутентификации.",
+    )
+    dl_mode: bool = False
+    dl_table: str = ""
+    datalake_chunk_size: int = 10000
+    model_config = SettingsConfigDict(
+        env_file=Path("configs/.config.env"), extra="allow"
+    )
 
     @model_validator(mode="after")
     def validate_secrets(self):
@@ -128,11 +188,13 @@ class Settings(BaseSettings, **base_params):
         elif self.login and self.password:
             pass
         else:
-            raise ValueError("Негодник, нука, иди сюда, нехороший человек, а? "
-                             "Сдуру решил скрипт без чтения ридми запустить? Плут непутёвый, ну? "
-                             "Ну, иди сюда, попробуй его запустить — он тебя сам запустит, балбес, умник, "
-                             "да сколько можно! "
-                             "Иди, несмышлёныш, читай ридми и вноси креды в .config.env!")
+            raise ValueError(
+                "Негодник, нука, иди сюда, нехороший человек, а? "
+                "Сдуру решил скрипт без чтения ридми запустить? Плут непутёвый, ну? "
+                "Ну, иди сюда, попробуй его запустить — он тебя сам запустит, балбес, умник, "
+                "да сколько можно! "
+                "Иди, несмышлёныш, читай ридми и вноси креды в .config.env!"
+            )
             # raise ValueError("Ошибка заполнения параметров. "
             #                  "personal_token ИЛИ login, password ИЛИ login, password, mpx_secret "
             #                  "должны быть заполнены. Прочитайте описание скрипта.")
@@ -148,37 +210,83 @@ class Settings(BaseSettings, **base_params):
             if not self.out_folder.exists():
                 self.out_folder.mkdir()
             elif self.clear_mode == "not_clear":
-               pass
+                pass
             else:
-                date_dict = {"today": timedelta(days=0),
-                             "day-1": timedelta(days=1),
-                             "day-2": timedelta(days=2)}
+                date_dict = {
+                    "today": timedelta(days=0),
+                    "day-1": timedelta(days=1),
+                    "day-2": timedelta(days=2),
+                }
                 if self.clear_mode not in date_dict.keys():
-                    logger.error(f"{self.clear_mode} not in default dict use today mode.")
+                    logger.error(
+                        f"{self.clear_mode} not in default dict use today mode."
+                    )
                     self.clear_mode = "today"
-                min_date = (date.today() - date_dict[self.clear_mode])
-                logger.info(f"Preparing folder {self.out_folder.absolute()}. Delete all reports older then {min_date}")
+                min_date = date.today() - date_dict[self.clear_mode]
+                logger.info(
+                    f"Preparing folder {self.out_folder.absolute()}. Delete all reports older then {min_date}"
+                )
                 for excel_report in self.out_folder.glob("*.xlsx"):
                     create_find = re.search("^\\d{4}-\\d{2}-\\d{2}", excel_report.name)
                     if create_find:
                         create_find = create_find.group(0)
                         create_date = datetime.strptime(create_find, "%Y-%m-%d").date()
-                        if create_date < min_date or excel_report.name.find("table_report") != -1:
+                        if (
+                            create_date < min_date
+                            or excel_report.name.find("table_report") != -1
+                        ):
                             excel_report.unlink()
-                logger.info("Remove all folders and text files which have no excel report")
+                logger.info(
+                    "Remove all folders and text files which have no excel report"
+                )
                 for folder in self.out_folder.iterdir():
                     if folder.is_dir():
                         have_report = False
-                        for _ in self.out_folder.glob(f'*-{folder.name}-*.xlsx'):
+                        for _ in self.out_folder.glob(f"*-{folder.name}-*.xlsx"):
                             have_report = True
                         if not have_report:
                             if not folder_prepare(folder, 5, logger, False):
                                 exit(1)
-                    elif folder.is_file() and not folder.name.endswith('.xlsx'):
+                    elif folder.is_file() and not folder.name.endswith(".xlsx"):
                         folder.unlink()
         else:
             if not folder_prepare(self.out_folder, self.reconnect_times, logger):
                 exit(1)
+        if self.dl_mode:
+            if self.mode != "Assets_filters":
+                logger.error(
+                    "dl_mode using only in 'Assets_filters' mode. dl_mode disable."
+                )
+                self.dl_mode = False
+            if not self.dl_table:
+                logger.error("dl_mode enabled but no dl_table. dl_mode disable.")
+                self.dl_mode = False
+            dl_libs = ["loguru", "datalake_client", "pandas"]
+            installed_dl_libs = []
+            for package in importlib.metadata.distributions():
+                if package.metadata["Name"] in dl_libs:
+                    installed_dl_libs.append(package.metadata["Name"])
+            if len(installed_dl_libs) != len(dl_libs):
+                logger.error(
+                    f"Not all dl_libs installed. Libs to install: {dl_libs}. dl_mode disable."
+                )
+                self.dl_mode = False
+            dl_attrs = [
+                "datalake_username",
+                "datalake_password",
+                "datalake_api_endpoint",
+                "datalake_trino_host",
+                "datalake_auth_method",
+            ]
+            for extra_name in self.__pydantic_extra__.keys():
+                if extra_name.startswith("datalake_") and extra_name in dl_attrs:
+                    dl_attrs.remove(extra_name)
+            if dl_attrs:
+                logger.error(
+                    f"Not all dl_attrs wrote in .config.env. Absent dl_attr: {dl_attrs}. dl_mode disable."
+                )
+                self.dl_mode = False
+
 
 def check_group_id(group_id, where, logger: Optional[logging.Logger] = None):
     if group_id != "-1":
@@ -194,7 +302,10 @@ def check_group_id(group_id, where, logger: Optional[logging.Logger] = None):
     else:
         return True
 
-def folder_prepare(folder_path: Path, max_reties: int, logger: logging.Logger, need_create: bool = True):
+
+def folder_prepare(
+    folder_path: Path, max_reties: int, logger: logging.Logger, need_create: bool = True
+):
     logger = logging.getLogger("MaxPatrolEventsMonitor")
     for retry_num in range(max_reties):
         try:
@@ -205,18 +316,22 @@ def folder_prepare(folder_path: Path, max_reties: int, logger: logging.Logger, n
                 folder_path.mkdir()
             return True
         except PermissionError as Err:
-            logger.error(f"Error while \"{str(folder_path.absolute())} \" clear. Try number {retry_num + 1} of {max_reties} tries")
+            logger.error(
+                f'Error while "{str(folder_path.absolute())} " clear. Try number {retry_num + 1} of {max_reties} tries'
+            )
             logger.error(f"Error: {Err}.")
             logger.error("Close file in 10 seconds")
             time.sleep(10)
     logger.error(f"Can't clear folder {folder_path}")
     return False
 
+
 def test():
     import sys
+
     argv = sys.argv
     try:
-        sys.argv = ['event_checker.py', '--help']
+        sys.argv = ["event_checker.py", "--help"]
         Settings()
     except SystemExit as e:
         print(e)
@@ -225,7 +340,7 @@ def test():
         my_set = Settings()
         print(my_set.model_dump_json(indent=4))
 
-    except (Exception) as Err:
+    except Exception as Err:
         print(Err)
 
 

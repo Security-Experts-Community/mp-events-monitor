@@ -1,5 +1,6 @@
-import requests
 from datetime import datetime, timedelta, timezone
+
+import requests
 
 try:
     from .settings_checker import Settings
@@ -9,9 +10,11 @@ try:
     from .get_token import MPXAuthenticator
 except:
     from get_token import MPXAuthenticator
+
 import asyncio
-import aiohttp
 import logging
+
+import aiohttp
 from tqdm.asyncio import tqdm
 
 
