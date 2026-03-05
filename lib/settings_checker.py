@@ -112,7 +112,13 @@ class Settings(BaseSettings, **base_params):
         "Для токена необходимо добавить разрешений на работу с KB",
     )
     pdql_assets: str = Field(
-        default="select(@Host, Host.@id as asset_id, Host.@audittime) | LIMIT(0)",
+        default="select(@host, host.@id, host.@description, host.hostname, host.fqdn, "
+        "compactunique(Host.endpoints<ipendpoint>.address) as addresses, host.@audittime) "
+        "|join(select(host.@id, host.@ScanningInfo.Type, host.@ScanningInfo.Status) "
+        "| filter(host.@ScanningInfo.Type = 'Audit') as Sc, Sc.host.@id = host.@id) "
+        "| select(@host, host.@id as asset_id, host.@description, host.hostname, host.fqdn, addresses, "
+        "host.@audittime, Sc.host.@ScanningInfo.Status)  "
+        "| calc(TotalDays(now() - host.@AuditTime) as dur_audit)",
         description="PDQL-запрос для режимов с активами (кроме Assets_filters)",
         validation_alias=AliasChoices("pdql_assets", "pdql"),
     )
@@ -128,6 +134,15 @@ class Settings(BaseSettings, **base_params):
         description="Динамическая группа для запроса. Совместимо с режимами работы: "
         "ALL_events, ALL_assets. В остальных режимах игнорируется, так задается в "
         "управляющих файлах режима. На вход принимает значения UUID или '-1'",
+    )
+    dynamic_groups_file: FilePath = Field(
+        default=Path("configs/dynamic_groups.txt"),
+        description="Путь к файлу с UUID-ами динамических групп. Один UUID в одной строке. Для mode"
+        " Dynamic_Groups_events и Dynamic_Groups_assets",
+    )
+    asset_ids_file: FilePath = Field(
+        default=Path("configs/asset_ids.txt"),
+        description="Путь к файлу с UUID-ами активов для проверки. Один UUID в одной строке. ",
     )
     event_policies_file: FilePath = Field(
         default=Path("configs/event_policies.json"),
@@ -170,9 +185,19 @@ class Settings(BaseSettings, **base_params):
         validation_alias=AliasChoices("privileges", "check_privileges"),
         description="Будет ли выполнена проверка привилегий после первичной аутентификации.",
     )
+    proxy_host: Optional[str] = Field(default=None, description="Адрес proxy")
+    proxy_user: Optional[str] = Field(default=None, description="Логин proxy")
+    proxy_password: Optional[SecretStr] = Field(
+        default=None, description="Пароль proxy"
+    )
+    proxy_port: Optional[int] = Field(default=None, description="Порт proxy")
     dl_mode: bool = False
     dl_table: str = ""
     datalake_chunk_size: int = 10000
+    telemetry: Literal["no", "small", "all"] = Field(
+        default="small",
+        description="Уровень жадности телеметрии",
+    )
     model_config = SettingsConfigDict(
         env_file=Path("configs/.config.env"), extra="allow"
     )
@@ -253,18 +278,21 @@ class Settings(BaseSettings, **base_params):
             if not folder_prepare(self.out_folder, self.reconnect_times, logger):
                 exit(1)
         if self.dl_mode:
-            if self.mode != "Assets_filters":
-                logger.error(
-                    "dl_mode using only in 'Assets_filters' mode. dl_mode disable."
-                )
-                self.dl_mode = False
+            # if self.mode != "Assets_filters":
+            #     logger.error(
+            #         "dl_mode using only in 'Assets_filters' mode. dl_mode disable."
+            #     )
+            #     self.dl_mode = False
             if not self.dl_table:
                 logger.error("dl_mode enabled but no dl_table. dl_mode disable.")
                 self.dl_mode = False
             dl_libs = ["loguru", "datalake_client", "pandas"]
             installed_dl_libs = []
             for package in importlib.metadata.distributions():
-                if package.metadata["Name"] in dl_libs:
+                if (
+                    package.metadata["Name"] in dl_libs
+                    and package.metadata["Version"] != "0.0.0"
+                ):
                     installed_dl_libs.append(package.metadata["Name"])
             if len(installed_dl_libs) != len(dl_libs):
                 logger.error(
@@ -278,14 +306,33 @@ class Settings(BaseSettings, **base_params):
                 "datalake_trino_host",
                 "datalake_auth_method",
             ]
-            for extra_name in self.__pydantic_extra__.keys():
+            dl_settings = {}
+            for extra_name, extra_value in self.__pydantic_extra__.items():
                 if extra_name.startswith("datalake_") and extra_name in dl_attrs:
                     dl_attrs.remove(extra_name)
+                    dl_settings[extra_name[9:]] = extra_value
             if dl_attrs:
                 logger.error(
                     f"Not all dl_attrs wrote in .config.env. Absent dl_attr: {dl_attrs}. dl_mode disable."
                 )
                 self.dl_mode = False
+            if self.dl_mode:
+                from datalake_client import DatalakeClient, DatalakeSettings
+
+                # просто нагло ломимся в озеро, чтобы проверить что нет ошибок
+                try:
+                    DatalakeClient(
+                        DatalakeSettings(
+                            upload_chunk_size=self.datalake_chunk_size, **dl_settings
+                        )
+                    )
+                except Exception as Err:
+                    logger.error(
+                        f"DataLake client can't authenticate to lake with Error: {Err}."
+                    )
+                    logger.error("Exiting. Check DataLake settings in '.config.env'")
+                    exit(1)
+                logger.info("DataLake client successfully authenticated")
 
 
 def check_group_id(group_id, where, logger: Optional[logging.Logger] = None):

@@ -10,7 +10,7 @@ from venv import logger
 
 import requests
 import xlsxwriter
-from aiohttp import ClientSession, client_exceptions
+from aiohttp import BasicAuth, ClientSession, client_exceptions
 from tqdm.asyncio import tqdm
 
 from .get_token import MPXAuthenticator
@@ -49,6 +49,17 @@ class EventsWorker:
         self.semaphore = asyncio.Semaphore(self.settings.max_threads_for_siem_api)
         self.auth = auth
         self.policies.filter_policies(pol_blacklist, pol_whitelist, pol_spec, mand_pols)
+        self.proxy_inf = {}
+        if self.auth.session.proxies:
+            self.proxy_inf["proxy"] = (
+                f"http://{self.settings.proxy_host}:{self.settings.proxy_port}/"
+            )
+            if self.settings.proxy_user:
+                self.proxy_inf["proxy_auth"] = BasicAuth(
+                    self.settings.proxy_user,
+                    self.settings.proxy_password.get_secret_value(),
+                )
+
         if assets:
             audit_pol = {
                 "name": "Audit Events Hack",
@@ -63,12 +74,14 @@ class EventsWorker:
             self.policies.small_policies.update(
                 {audit_pol["name"]: {audit_pol["filter"]: {}}}
             )
+        self.statistic = {}
 
     async def work(self, group_id, asset_ids, out_folder):
         if self.policies.rebuilt_policies:
             self.async_session = ClientSession(
-                cookies=self.auth.cookies, headers=self.auth.headers
+                cookies=self.auth.cookies, headers=self.auth.headers, **self.proxy_inf
             )
+
             time_from_value = (
                 int(time.time()) - self.settings.time_delta_hours * 60 * 60
             )
@@ -298,8 +311,6 @@ class EventsWorker:
             asset_dict = excel_file.create_asset_dict(
                 self.policies.rebuilt_policies, self.policies.small_policies, asset_dict
             )
-        with (out_path / "!asset_dict.json").open("w", encoding="utf-8") as out_assets:
-            json.dump(asset_dict, out_assets, indent=4, ensure_ascii=False)
         excel_file.work_with_asset_dict(
             self.policies.small_policies,
             asset_dict,
@@ -307,6 +318,11 @@ class EventsWorker:
             out_path,
             self.policies.mandatory_policies,
         )
+        self.statistic = excel_file.statistics.model_dump()
+        if "exp_coverage_percent_array" in self.statistic.keys():
+            self.statistic.pop("exp_coverage_percent_array")
+        with (out_path / "!asset_dict.json").open("w", encoding="utf-8") as out_assets:
+            json.dump(asset_dict, out_assets, indent=4, ensure_ascii=False)
         closed = False
         for try_number in range(self.settings.reconnect_times):
             try:

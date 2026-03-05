@@ -43,7 +43,9 @@ def get_backoff_decorator(
 
 
 class SQLFilter(BaseModel):
-    select: str = 'select event_src__asset, event_src__host, COUNT(*) AS cnt from datalake."data".{table_name} '
+    select: str = (
+        'select event_src__asset, event_src__host, COUNT(*) AS cnt from datalake."data".{table_name} '
+    )
     event_filter: str = (
         "where {event_filter} and \"__emitted_at\" > timestamp '{time_with_delta}' "
     )

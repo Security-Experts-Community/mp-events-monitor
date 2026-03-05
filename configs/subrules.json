@@ -124,6 +124,12 @@
             "FreeIPA_Multiple_User_Lock"
         ]
     },
+    "DLL_Side_Loading": {
+        "hacking_tools": [
+            "APT31_Rat_Usage",
+            "Subrule_WannaMine_Usage"
+        ]
+    },
     "Remote_Execution_Via_Custom_Impacket": {
         "hacking_tools": [
             "Atexec_Activity"
@@ -207,6 +213,11 @@
         ],
         "mitre_attck_persistence": [
             "Windows_Startup_Folder_Modification"
+        ]
+    },
+    "Subrule_Defendnot_AV_Provider_Changed": {
+        "hacking_tools": [
+            "Defendnot_Activity"
         ]
     },
     "Remote_Password_Dump": {
@@ -351,11 +362,6 @@
     "Execute_Malicious_Command": {
         "hacking_tools": [
             "Subrule_Invoke_Rubeus_Usage"
-        ]
-    },
-    "DLL_Side_Loading": {
-        "hacking_tools": [
-            "Subrule_WannaMine_Usage"
         ]
     },
     "Creation_Suspicious_File": {
@@ -564,6 +570,16 @@
     "Subrule_Multifactor_Bypass_From_Local_Network_Side": {
         "mitre_attck_cred_access": [
             "Multifactor_Bypass_From_Local_Network_Side"
+        ]
+    },
+    "MemProcFS_Usage": {
+        "mitre_attck_cred_access": [
+            "Possible_Memory_Dump"
+        ]
+    },
+    "DumpIt_Usage": {
+        "mitre_attck_cred_access": [
+            "Possible_Memory_Dump"
         ]
     },
     "Subrule_PPLmedic_Svchost": {
@@ -918,6 +934,11 @@
             "Subrule_Task_Created_Via_Atsvc"
         ]
     },
+    "Subrule_SVCCTL_Connection": {
+        "mitre_attck_lateral_movement": [
+            "SVCCTL_Connection"
+        ]
+    },
     "RID_Hijacking_Persistence": {
         "mitre_attck_persistence": [
             "Hidden_Account_Creation"
@@ -1063,6 +1084,11 @@
     "Subrule_SambaDC_Tickets_Requested": {
         "samba_active_directory_attacks": [
             "SambaDC_Kerberoasting"
+        ]
+    },
+    "CAP_Default_Account_Logon": {
+        "sap_java_suspicious_user_activity": [
+            "SAPASJAVA_Password_Changed_For_SAP_Standard_Users_And_Logon"
         ]
     },
     "Subrule_SAPASABAP_GW_Check_Registered_Tp": {
@@ -1283,6 +1309,11 @@
             "CVE_2022_26503_Exploitation"
         ]
     },
+    "Confluence_App_Installed": {
+        "vulnerabilities": [
+            "CVE_2023_22515_Confluence"
+        ]
+    },
     "Unix_Connect_From_Suspicious_Dir": {
         "vulnerabilities": [
             "CVE_2023_22515_Confluence"
@@ -1376,11 +1407,6 @@
     "Subrule_StartProcess_And_Create_ConfigMsi": {
         "vulnerabilities": [
             "PrintSpooler_PrivEsc_CVE_2022_30206"
-        ]
-    },
-    "ZVirt_User_Creation": {
-        "zvirt": [
-            "ZVirt_Critical_Roles_Granted"
         ]
     }
 }

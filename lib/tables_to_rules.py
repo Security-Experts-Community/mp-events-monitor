@@ -100,6 +100,7 @@ def extract_co_data(root_directory):
                             data = yaml.safe_load(f)
                         # Извлекаем ContentAutoName
                         content_auto_name = data.get("ContentAutoName")
+                        print(content_auto_name)
                         if not content_auto_name:
                             continue
                         # Извлекаем TabularLists

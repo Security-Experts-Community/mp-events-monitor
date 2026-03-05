@@ -1,16 +1,29 @@
 import json
 import logging
 import re
-import sys
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Optional
+from typing import Any, Literal, Optional
 
 import xlsxwriter
+from pydantic import BaseModel
 
 old_python = False
-if sys.version.find("3.7.") == 0:
-    from typing import Any
+
+
+class WriterStatistic(BaseModel):
+    no_asset: int = 0
+    asset: int = 0
+    ok: int = 0
+    no_os_events: int = 0
+    no_audit: int = 0
+    no_audit_no_os_event: int = 0
+    policies_full: dict[str, dict[str, bool]] = {}
+    policies_with_all_events: list[str] = []
+    policies_with_missing_events: list[str] = []
+    policies_with_no_events: list[str] = []
+    exp_coverage_percent_array: list[float] = []
+    exp_coverage_percent: float = 0
 
 
 class MonitorXlsxWriter:
@@ -27,6 +40,7 @@ class MonitorXlsxWriter:
         orange: xlsxwriter.workbook.Format
 
     workbook: xlsxwriter.Workbook
+
     if old_python:
         worksheets: Any
     else:
@@ -81,6 +95,7 @@ class MonitorXlsxWriter:
         self.start_col_second = 7
         self.kb_view = {}
         self.kb_uninstalled = {}
+        self.statistics: WriterStatistic = WriterStatistic()
         try:
             kb_uninstalled_path = (
                 self.main_out_path.parent / "KB_struct_uninstalled.json"
@@ -125,6 +140,28 @@ class MonitorXlsxWriter:
 
         self.kb_check = {}
         self.worksheets_line_starter = {}
+
+    def upd_stats_for_tl(self, path_to_tl_stat: Path, new_data: list):
+        if isinstance(path_to_tl_stat, str):
+            path_to_tl_stat = Path(path_to_tl_stat)
+
+        if path_to_tl_stat.exists():
+            try:
+                with open(path_to_tl_stat, "r", encoding="utf-8") as f:
+                    existing_data = json.load(f)
+                if not isinstance(existing_data, list):
+                    existing_data = []
+            except (json.JSONDecodeError, IOError):
+                existing_data = []
+
+            merged_data = list(set(existing_data + new_data))
+        else:
+            merged_data = list(set(new_data))
+
+        path_to_tl_stat.parent.mkdir(parents=True, exist_ok=True)
+
+        with open(path_to_tl_stat, "w", encoding="utf-8") as f:
+            json.dump(merged_data, f, ensure_ascii=False, indent=4)
 
     def _set_workbook_path(self, main_out_path: Path, mpx: str, need_up_file: bool):
         current_time = datetime.now().strftime("%Y-%m-%d")
@@ -302,7 +339,7 @@ class MonitorXlsxWriter:
             4, 0, ["статистика", "Общее", "Активов"], self.formats.white_bold
         )  # A5
         self.worksheets["simple"].write_row(
-            4, 1, ["Количество", "%"], self.formats.white_bold
+            4, 1, ["% идентификации", "Количество"], self.formats.white_bold
         )  # B5
         self.worksheets["simple"].write(5, 2, "", self.formats.white_bold)  # C6
         self.worksheets["simple"].write_column(
@@ -316,7 +353,7 @@ class MonitorXlsxWriter:
             self.formats.white_bold,
         )  # A9
         self.worksheets["simple"].write_row(
-            8, 1, ["% выполнения"], self.formats.white_bold
+            8, 1, ["% выполнения", "Количество"], self.formats.white_bold
         )  # B9
         self.worksheets_line_number["simple"] += 9
 
@@ -534,13 +571,28 @@ class MonitorXlsxWriter:
         return asset_dict
 
     def polycolor_one_policy(self, policies_statistic, small_policies):
+
+        tables_to_assets = {
+            "AssetGrid_Servers": "List_Servers",
+            "AssetGrid_Critical_Domain_Accounts": "Sensitive_Users",
+            "AssetGrid_AD_User": "Known_Windows_Accounts",
+            "AssetGrid_Fired_Users_Accounts": "Dismissed_Users",
+            "Critical_Hosts": "Critical_Hosts_Manual",
+            "AssetGrid_UNIX_Hosts": "UNIX_Hosts",
+            "Service_Accounts": "Service_Accounts_Manual",
+            "Vulnerable_Hosts": "",
+        }
+
+        pol_stat: Literal["no", "not all", "all"]
         if policies_statistic and self.kb_installed:
             for policy in policies_statistic.keys():
                 if policy == "Audit Events Hack":
                     # ну или брать просто до list(policies_statistic.keys())[:-1]
                     continue
+                self.pol_stat_mat(policies_statistic, policy)
                 for index_filter, filter_query in enumerate(policies_statistic[policy]):
                     index_filter_str = str(index_filter)
+
                     # хотел убрать small_policies, но это не работает, приделываются все ключи из фильтра, хз почему
                     # for pack in self.kb_check[policy].keys():
                     #     for rule in self.kb_check[policy][pack].keys():
@@ -554,6 +606,7 @@ class MonitorXlsxWriter:
             for policy in self.kb_check.keys():
                 green_rules = 0
                 total_rules = 0
+                empty_table_lists = []
                 filters_like_list = list(policies_statistic[policy].keys())
                 for pack in self.kb_check[policy].keys():
                     pack_len = 0
@@ -585,8 +638,13 @@ class MonitorXlsxWriter:
                                     if (
                                         smthing[list(smthing.keys())[0]]
                                         == "No_manual_changes"
-                                    ):
+                                    ) and list(smthing.keys())[
+                                        0
+                                    ] not in tables_to_assets.keys():
                                         rule_color = "yellow"
+                                        empty_table_lists.append(
+                                            list(smthing.keys())[0]
+                                        )
                                         if pack_color == self.formats.green:
                                             pack_color = self.formats.yellow
                                         rule_in_list.append(
@@ -635,9 +693,38 @@ class MonitorXlsxWriter:
                             pack_color,
                         )
                 if total_rules != 0:
-                    self.worksheets[policy].write(
-                        1, 9, round(green_rules / total_rules * 100, 2)
+                    self.statistics.exp_coverage_percent_array.append(
+                        round(green_rules / total_rules * 100, 2)
                     )
+                else:
+                    self.statistics.exp_coverage_percent_array.append(0)
+
+                self.upd_stats_for_tl(
+                    self.main_out_path.parent / "empty_tables.json", empty_table_lists
+                )
+        else:
+            for policy in policies_statistic.keys():
+                if policy == "Audit Events Hack":
+                    # ну или брать просто до list(policies_statistic.keys())[:-1]
+                    continue
+                self.pol_stat_mat(policies_statistic, policy)
+
+    def pol_stat_mat(self, policies_statistic, policy):
+        pol_stat = "no"
+        all_pol = True
+        for index_filter, filter_query in enumerate(policies_statistic[policy]):
+            if policies_statistic[policy][filter_query]:
+                pol_stat = "all"
+            else:
+                all_pol = False
+        if pol_stat == "all" and not all_pol:
+            pol_stat = "not all"
+        if pol_stat == "all" and all_pol:
+            self.statistics.policies_with_all_events.append(policy)
+        elif pol_stat == "not all":
+            self.statistics.policies_with_missing_events.append(policy)
+        else:
+            self.statistics.policies_with_no_events.append(policy)
 
     def work_with_asset_dict(
         self,
@@ -654,7 +741,9 @@ class MonitorXlsxWriter:
         audit_task_len = 10
         max_p_l = 50
         # TODO переместить вниз, чтобы без ассетные были в таблицы ниже (заранее научить писать вторую таблицу?)
+        self.statistics.asset = len(asset_dict)
         if no_assets:
+            self.statistics.no_asset = len(no_assets)
             for no_asset in no_assets:
                 event_quality_array.append(0)
                 (
@@ -663,7 +752,7 @@ class MonitorXlsxWriter:
                     index_col,
                     extra_info,
                     simple_attrs,
-                ) = _asset_info_to_list(no_asset, col_sizer)
+                ) = self._asset_info_to_list(no_asset, col_sizer)
                 attrs_list.append("")
                 index_col += 1
                 self.worksheets["FULL"].write_row(
@@ -696,7 +785,7 @@ class MonitorXlsxWriter:
             for policy in small_policies.keys():
                 policies_statistic[policy] = {}
                 for event_filter in small_policies[policy]:
-                    policies_statistic[policy][event_filter] = True
+                    policies_statistic[policy][event_filter] = 0
         for asset in asset_dict.keys():
             index_col = 0
             extra_info = []
@@ -721,7 +810,7 @@ class MonitorXlsxWriter:
                     index_col,
                     extra_info,
                     simple_attrs,
-                ) = _asset_info_to_list(asset_dict[asset]["asset_info"], col_sizer)
+                ) = self._asset_info_to_list(asset_dict[asset]["asset_info"], col_sizer)
 
                 simple_attrs[2] = asset
                 if "audit_info" in asset_dict[asset].keys():
@@ -753,7 +842,7 @@ class MonitorXlsxWriter:
                             index_col_1,
                             extra_info_1,
                             simple_attrs_1,
-                        ) = _asset_info_to_list(extra, col_sizer)
+                        ) = self._asset_info_to_list(extra, col_sizer)
                         if extra_info_1:
                             self.logger.warning(
                                 "ERROR! attrs_list, col_sizer, index_col, extra_info_1 = _asset_info_to_list(extra, "
@@ -804,12 +893,11 @@ class MonitorXlsxWriter:
                                 # TODO вот тут проверка что мы вышли за трешхолд и надо красить фиолетовым
                                 color = self.formats.green
                                 value = full_info[index_filter_str]
+                                policies_statistic[policy][filter_query] += 1
                             else:
                                 color = self.formats.red
                                 empty_fields.append("0")
                                 value = 0
-                                if policies_statistic[policy][filter_query]:
-                                    policies_statistic[policy][filter_query] = False
                         else:
                             color = self.formats.green
                             value = 0
@@ -857,10 +945,6 @@ class MonitorXlsxWriter:
                             empty_fields,
                             self.formats.red,
                         )
-                        for index_filter, filter_query in enumerate(
-                            small_policies[policy]
-                        ):
-                            policies_statistic[policy][filter_query] = False
             if extra_info:
                 for extra_index in range(len(extra_info) + 1):
                     self.worksheets["FULL"].write_row(
@@ -876,11 +960,25 @@ class MonitorXlsxWriter:
             full_simple_attrs.append(part_policies)
             temp_quality = len(full_policies) + len(part_policies)
             temp_full = len(full_policies)
+            asset_dict[asset]["statistic"] = {
+                "full_policies": full_policies,
+                "part_policies": part_policies,
+            }
             full_policies = ", ".join(full_policies)
             part_policies = ", ".join(part_policies)
             simple_status, empty_policies_list = _status_master(
                 full_simple_attrs, list(small_policies.keys()), mandatory_policies
             )
+            if simple_status == "ok":
+                self.statistics.ok += 1
+            elif simple_status == "os events":
+                self.statistics.no_os_events += 1
+            elif simple_status == "audit":
+                self.statistics.no_audit += 1
+            else:
+                self.statistics.no_audit_no_os_event += 1
+            asset_dict[asset]["statistic"]["empty_policies"] = empty_policies_list
+            asset_dict[asset]["statistic"]["status"] = simple_status
             temp_quality += len(empty_policies_list)
             empty_policies = ", ".join(empty_policies_list)
             if temp_quality > 0:
@@ -903,6 +1001,7 @@ class MonitorXlsxWriter:
                 )
             index_row += 1
             index_row_no_extra += 1
+        self.statistics.policies_full = policies_statistic
         with Path(out_path / f"!check_installation_small.json").open(
             "w", encoding="utf-8"
         ) as check_installation:
@@ -937,39 +1036,39 @@ class MonitorXlsxWriter:
             max_p_l,
             40,
         ]
+        total_found_hosts = self.statistics.asset + self.statistics.no_asset
+
         for index, col_size in enumerate(col_size_simple):
             self.worksheets["simple"].set_column(index, index, col_size)
-        self.worksheets["simple"].write_formula(
-            5,
-            1,
-            f'=COUNTIF(A{str(self.worksheets_line_number["simple"] + 1)}:A{str(index_row_no_extra)}, "*")',
-            self.formats.white,
-        )  # B6
-        self.worksheets["simple"].write_formula(
-            6,
-            1,
-            f'=B6 - COUNTIF(A{str(self.worksheets_line_number["simple"] + 1)}:A{str(index_row_no_extra)}, "No asset")',
-            self.formats.white,
-        )  # B7
-        self.worksheets["simple"].write_formula(
-            6, 2, "=B7/B6", self.formats.percents
+        self.worksheets["simple"].write(
+            5, 2, total_found_hosts, self.formats.white
+        )  # C6
+        self.worksheets["simple"].write(
+            6, 2, self.statistics.asset, self.formats.white
         )  # C7
-
-        self.worksheets["simple"].write_formula(
+        self.worksheets["simple"].write(
+            6, 1, self.statistics.asset / total_found_hosts, self.formats.percents
+        )  # B7
+        self.worksheets["simple"].write(
             9,
             1,
-            f'=1 - (COUNTIF(A{str(self.worksheets_line_number["simple"] + 1)}:A{str(index_row_no_extra)}, "*audit*") + COUNTIF(A{str(self.worksheets_line_number["simple"] + 1)}:A{str(index_row_no_extra)}, "*No asset*"))/$B$6',
+            (self.statistics.ok + self.statistics.no_os_events) / total_found_hosts,
             self.formats.percents,
         )
-        if len(event_quality_array) > 0:
-            self.worksheets["simple"].write(
-                10,
-                1,
-                sum(event_quality_array) / len(event_quality_array),
-                self.formats.percents,
-            )
+        self.worksheets["simple"].write(
+            9, 2, self.statistics.ok + self.statistics.no_os_events, self.formats.white
+        )
+        self.worksheets["simple"].write(
+            10,
+            1,
+            (self.statistics.ok + self.statistics.no_audit) / total_found_hosts,
+            self.formats.percents,
+        )
+        self.worksheets["simple"].write(
+            10, 2, self.statistics.ok + self.statistics.no_audit, self.formats.white
+        )
 
-        temp_formula = "=AVERAGE("
+        hide_count = 0
 
         for policy in self.worksheets_line_starter.keys():
             if (
@@ -977,94 +1076,106 @@ class MonitorXlsxWriter:
                 == self.worksheets_line_number[policy]
             ):
                 self.worksheets[policy].hide()
-            else:
-                temp_formula += f"'{policy}'!J2,"
+                hide_count += 1
 
-        if temp_formula != "=AVERAGE(":
-            temp_formula = temp_formula.rstrip(",") + ")/100"
-            self.worksheets["simple"].write_formula(
-                11, 1, temp_formula, self.formats.percents
+        average_percent_exp = 0
+
+        if len(self.statistics.exp_coverage_percent_array) - hide_count > 0:
+            average_percent_exp = sum(self.statistics.exp_coverage_percent_array) / (
+                (len(self.statistics.exp_coverage_percent_array) - hide_count) * 100
             )
-            self.worksheets["simple"].write(
-                11,
-                0,
-                "Эффективность контента при текущей настройке",
-                self.formats.white_bold,
-            )
-
-
-def _asset_info_to_list(asset_info, col_sizer):
-    # TODO а тут ли место этой функции?
-    # TOOTOODUDU
-    len_col = 0
-    index_col = 0
-    attrs_list = []
-    extra_info = []
-    simple_attrs = ["", "", "", "", ""]
-    for attr_index, attr_name in enumerate(asset_info.keys()):
-        attr_value = asset_info[attr_name]
-        if attr_name == "$assetGridGroupKey":
-            continue
-        elif type(attr_value) is dict:
-            if "name" in attr_value.keys():
-                attrs_list.append(attr_value["name"])
-                simple_attrs[0] = attr_value["name"]
-                if attr_value["name"]:
-                    len_col = len(attr_value["name"])
-            elif "data" in attr_value.keys():
-                if attr_value["totalCount"] == 1:
-                    atr_j = str(attr_value["data"][0])
-                else:
-                    atr_j = str(attr_value["data"])
-                attrs_list.append(atr_j)
-                if atr_j:
-                    len_col = len(atr_j)
-            elif "displayName" in attr_value.keys():
-                attrs_list.append(attr_value["displayName"])
-                if attr_value["displayName"]:
-                    len_col = len(attr_value["displayName"])
-            elif "primaryType" in attr_value.keys():
-                attrs_list.append(attr_value["primaryType"])
-                if attr_value["primaryType"]:
-                    len_col = len(attr_value["primaryType"])
-            elif "value" in attr_value.keys():
-                attrs_list.append(attr_value["value"])
-                if attr_value["value"]:
-                    len_col = len(attr_value["value"])
-            else:
-                print("ERROR asset_info_to_list")
-                print(json.dumps(attr_value, indent=4, ensure_ascii=False))
-        elif attr_name != "asset_info_is_answer_again" and type(attr_value) is list:
-            attrs_list.append(str(attr_value))
-            if attr_value:
-                len_col = len(str(attr_value))
-        elif attr_name == "asset_info_is_answer_again" and type(attr_value) is list:
-            extra_info = attr_value
+            self.statistics.exp_coverage_percent = average_percent_exp
         else:
-            attrs_list.append(attr_value)
-            if attr_value:
-                len_col = len(attr_value)
-            if attr_name.lower().find(".@description") != -1:
-                simple_attrs[1] = attr_value
-            elif attr_name.lower().find(".@audittime") != -1:
-                simple_attrs[3] = attr_value
-            elif attr_name.lower().find(".@scanninginfo.status") != -1:
-                simple_attrs[4] = attr_value
-        if not (attr_name == "asset_info_is_answer_again" and type(attr_value) is list):
-            if len(col_sizer) <= attr_index:
-                col_sizer.append(len_col)
-            elif len_col > col_sizer[attr_index]:
-                col_sizer[attr_index] = len_col
-            index_col += 1
-    return attrs_list, col_sizer, index_col, extra_info, simple_attrs
+            self.statistics.exp_coverage_percent = 0
+
+        self.worksheets["simple"].write_number(
+            11, 1, average_percent_exp, self.formats.percents
+        )
+
+        self.worksheets["simple"].write(
+            11,
+            0,
+            "Эффективность контента при текущей настройке",
+            self.formats.white_bold,
+        )
+
+    def _asset_info_to_list(self, asset_info, col_sizer):
+        # TODO а тут ли место этой функции?
+        # TOOTOODUDU
+        len_col = 0
+        index_col = 0
+        attrs_list = []
+        extra_info = []
+        simple_attrs = ["", "", "", "", ""]
+        for attr_index, attr_name in enumerate(asset_info.keys()):
+            attr_value = asset_info[attr_name]
+            if attr_name == "$assetGridGroupKey":
+                continue
+            elif type(attr_value) is dict:
+                if "name" in attr_value.keys():
+                    attrs_list.append(attr_value["name"])
+                    simple_attrs[0] = attr_value["name"]
+                    if attr_value["name"]:
+                        len_col = len(attr_value["name"])
+                elif "data" in attr_value.keys():
+                    if attr_value["totalCount"] == 1:
+                        atr_j = str(attr_value["data"][0])
+                    else:
+                        atr_j = str(attr_value["data"])
+                    attrs_list.append(atr_j)
+                    if atr_j:
+                        len_col = len(atr_j)
+                elif "displayName" in attr_value.keys():
+                    attrs_list.append(attr_value["displayName"])
+                    if attr_value["displayName"]:
+                        len_col = len(attr_value["displayName"])
+                elif "primaryType" in attr_value.keys():
+                    attrs_list.append(attr_value["primaryType"])
+                    if attr_value["primaryType"]:
+                        len_col = len(attr_value["primaryType"])
+                elif "value" in attr_value.keys():
+                    attrs_list.append(attr_value["value"])
+                    if attr_value["value"]:
+                        len_col = len(attr_value["value"])
+                else:
+                    self.logger.error("ERROR asset_info_to_list")
+                    self.logger.error(
+                        json.dumps(attr_value, indent=4, ensure_ascii=False)
+                    )
+            elif attr_name != "asset_info_is_answer_again" and type(attr_value) is list:
+                attrs_list.append(str(attr_value))
+                if attr_value:
+                    len_col = len(str(attr_value))
+            elif attr_name == "asset_info_is_answer_again" and type(attr_value) is list:
+                extra_info = attr_value
+            else:
+                attrs_list.append(attr_value)
+                if attr_value:
+                    len_col = len(attr_value)
+                if attr_name.lower().find(".@description") != -1:
+                    simple_attrs[1] = attr_value
+                elif attr_name.lower().find(".@audittime") != -1:
+                    simple_attrs[3] = attr_value
+                elif attr_name.lower().find(".@scanninginfo.status") != -1:
+                    simple_attrs[4] = attr_value
+            if not (
+                attr_name == "asset_info_is_answer_again" and type(attr_value) is list
+            ):
+                if len(col_sizer) <= attr_index:
+                    col_sizer.append(len_col)
+                elif len_col > col_sizer[attr_index]:
+                    col_sizer[attr_index] = len_col
+                index_col += 1
+        return attrs_list, col_sizer, index_col, extra_info, simple_attrs
 
 
 def _status_master(full_simple_attrs, small_attrs, mandatory_policies=None):
     simple_pol_st_os = False
     simple_audit_st = False
     empty_policies = []
-    if small_attrs[-1] == "Audit Events Hack":
-        small_attrs = small_attrs[:-1]
+
+    if small_attrs and "Audit Events Hack" in small_attrs:
+        small_attrs.remove("Audit Events Hack")
     if len(full_simple_attrs) < 9:
         return "not 8"
     if not full_simple_attrs[0]:
@@ -1122,7 +1233,7 @@ def _status_master(full_simple_attrs, small_attrs, mandatory_policies=None):
         list_to_return.append("ok")
     else:
         if not simple_audit_st:
-            list_to_return.append("audit")
+            list_to_return.append("no audit")
         if not simple_pol_st_os:
-            list_to_return.append("os events")
+            list_to_return.append("no os events")
     return ", ".join(list_to_return), empty_policies
