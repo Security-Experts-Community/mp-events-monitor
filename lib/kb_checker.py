@@ -39,6 +39,7 @@ class KB_Checker:
         self.semaphore = asyncio.Semaphore(self.settings.max_threads_for_siem_api)
         self.auth = auth
         self.auth.headers["Content-Database"] = self.get_ContentDB()
+        self.lic_info = {}
 
     def localize_pack(self, pack, loc_dict):
         for item in loc_dict["categories"]:
@@ -123,7 +124,11 @@ class KB_Checker:
             self.settings.mpx_host, ptkb_id
         )
         response_temp = self.auth.session.get(
-            url=url, headers=self.auth.headers, verify=False, cookies=self.auth.cookies
+            url=url,
+            headers=self.auth.headers,
+            verify=False,
+            cookies=self.auth.cookies,
+            timeout=1000000,
         )
         if response_temp.status_code == 200:
             response = response_temp.json()
@@ -132,6 +137,23 @@ class KB_Checker:
 
         if response:
             return response["Formula"]
+
+    def get_license_info(self):
+        url = "https://{}:3334/api/licensing/v4/licenses".format(self.settings.mpx_host)
+        response_temp = self.auth.session.get(
+            url=url,
+            headers=self.auth.headers,
+            verify=False,
+            cookies=self.auth.cookies,
+            timeout=1000000,
+        )
+        if response_temp.status_code == 200:
+            response = response_temp.json()
+        else:
+            self.logger.debug(response_temp)
+
+        if response:
+            return response
 
     def diff_formulas_to_file(
         self, formula1_str, formula2_str, file1, file2, output_file="diff.txt"
@@ -184,7 +206,11 @@ class KB_Checker:
             self.settings.mpx_host
         )
         response_temp = self.auth.session.get(
-            url=url, headers=self.auth.headers, verify=False, cookies=self.auth.cookies
+            url=url,
+            headers=self.auth.headers,
+            verify=False,
+            cookies=self.auth.cookies,
+            timeout=1000000,
         )
         get_resp = False
         if response_temp.status_code == 200:
@@ -210,7 +236,11 @@ class KB_Checker:
     def get_real_names_pipeline(self, curr_conveyors):
         url = "https://{}:8091/api-studio/siem/pipelines".format(self.settings.mpx_host)
         response_temp = self.auth.session.get(
-            url=url, headers=self.auth.headers, verify=False, cookies=self.auth.cookies
+            url=url,
+            headers=self.auth.headers,
+            verify=False,
+            cookies=self.auth.cookies,
+            timeout=1000000,
         )
         if response_temp.status_code == 200:
             response = response_temp.json()
@@ -227,7 +257,11 @@ class KB_Checker:
     def get_siems_info(self):
         url = "https://{}/api/siem_manager/v1/siems".format(self.settings.mpx_host)
         response_temp = self.auth.session.get(
-            url=url, headers=self.auth.headers, verify=False, cookies=self.auth.cookies
+            url=url,
+            headers=self.auth.headers,
+            verify=False,
+            cookies=self.auth.cookies,
+            timeout=1000000,
         )
         if response_temp.status_code == 200:
             response = response_temp.json()
@@ -244,6 +278,7 @@ class KB_Checker:
                 headers=self.auth.headers,
                 verify=False,
                 cookies=self.auth.cookies,
+                timeout=1000000,
             )
             if response_temp_count.status_code == 200:
                 response_count = response_temp_count.json()
@@ -273,7 +308,11 @@ class KB_Checker:
     def get_siems_from_core(self):
         url = "https://{}/api/siem_manager/v1/siems".format(self.settings.mpx_host)
         response_temp = self.auth.session.get(
-            url=url, headers=self.auth.headers, verify=False, cookies=self.auth.cookies
+            url=url,
+            headers=self.auth.headers,
+            verify=False,
+            cookies=self.auth.cookies,
+            timeout=1000000,
         )
         if response_temp.status_code == 200:
             response = response_temp.json()
@@ -294,7 +333,11 @@ class KB_Checker:
             self.settings.mpx_host, siem_id
         )
         response_temp = self.auth.session.get(
-            url=url, headers=self.auth.headers, verify=False, cookies=self.auth.cookies
+            url=url,
+            headers=self.auth.headers,
+            verify=False,
+            cookies=self.auth.cookies,
+            timeout=1000000,
         )
         if response_temp.status_code == 200:
             response = response_temp.json()
@@ -328,6 +371,7 @@ class KB_Checker:
             verify=False,
             json=query,
             cookies=self.auth.cookies,
+            timeout=1000000,
         )
         if response_temp.status_code == 200:
             return response_temp.json()["totalItems"]
@@ -359,6 +403,7 @@ class KB_Checker:
             verify=False,
             json=query,
             cookies=self.auth.cookies,
+            timeout=1000000,
         )
         if response_temp.status_code == 201:
             return response_temp.json()
@@ -454,6 +499,43 @@ class KB_Checker:
             "Service_Accounts_Manual": "Service_Accounts",
         }
 
+        try:
+            all_licenses = self.get_license_info()
+            self.lic_info = {}
+
+            for license in all_licenses:
+                if (
+                    license["product"] is not None
+                    and "name" in license["product"].keys()
+                ):
+                    if license["product"]["name"] == "MaxPatrol 10":
+                        self.logger.info(
+                            "Нашел лицензию {} для клиента {}".format(
+                                license["license"]["licenseFile"]["licenseNumber"],
+                                license["license"]["licenseFile"]["general"]["account"][
+                                    "name"
+                                ],
+                            )
+                        )
+                        self.lic_info = {
+                            "licenseNumber": license["license"]["licenseFile"][
+                                "licenseNumber"
+                            ],
+                            "clientName": license["license"]["licenseFile"]["general"][
+                                "account"
+                            ]["name"],
+                        }
+
+            with open(
+                f"{self.settings.out_folder}\\license_info.json", "w", encoding="utf-8"
+            ) as f:
+                f.write(json.dumps(self.lic_info, indent=4, ensure_ascii=False))
+
+        except:
+            self.logger.error(
+                "Лицензия не активна или недостаточно прав для получения информации о лицензии."
+            )
+
         self.logger.info("Получаем правила")
 
         all_tables = self.get_content_by_type("TabularList", 1000)
@@ -473,6 +555,19 @@ class KB_Checker:
 
         combined_dict = self.merge_dicts(expertise_dict, table_dict)
 
+        keys_to_delete = []
+        for expert_pack, items in combined_dict.items():
+            only_custom = True
+            for item in items:
+                if "PT-" in item["ObjectId"]:
+                    only_custom = False
+                    break
+            if only_custom:
+                keys_to_delete.append(expert_pack)
+
+        for key in keys_to_delete:
+            del combined_dict[key]
+
         with open(
             f"{self.settings.out_folder}\\KB_struct.json", "w", encoding="utf-8"
         ) as f:
@@ -482,16 +577,20 @@ class KB_Checker:
         for expert_pack in combined_dict.keys():
             temp_list = []
             for item in combined_dict[expert_pack]:
-                if item["GeneralDeploymentStatus"] != "Installed":
+                if (
+                    item["GeneralDeploymentStatus"] != "Installed"
+                    and "PT-" in item["ObjectId"]
+                ):
                     temp_list.append(item["SystemName"])
-            uninstalled_content[expert_pack] = temp_list
+            if temp_list != []:
+                uninstalled_content[expert_pack] = temp_list
 
         with open(
             f"{self.settings.out_folder}\\KB_struct_uninstalled.json",
             "w",
             encoding="utf-8",
         ) as f:
-            f.write(json.dumps(uninstalled_content, indent=4, ensure_ascii=False))
+            json.dump(uninstalled_content, f, indent=4, ensure_ascii=False)
 
         with open("configs\\packages_names.json", "r", encoding="utf-8") as f_packs:
             packs_names = json.load(f_packs)
@@ -579,9 +678,11 @@ class KB_Checker:
             2,
             4 + len(current_conveyors),
             "YES" if closed_incidents and closed_incidents["totalItems"] > 0 else "NO",
-            green_format
-            if closed_incidents and closed_incidents["totalItems"] > 0
-            else red_format,
+            (
+                green_format
+                if closed_incidents and closed_incidents["totalItems"] > 0
+                else red_format
+            ),
         )
         worksheet.write(
             2,
@@ -656,9 +757,9 @@ class KB_Checker:
                                     for rule_name in rules_to_tables:
                                         for table in rules_to_tables[rule_name]:
                                             if tbl_name in table.keys():
-                                                table[
-                                                    tbl_name
-                                                ] = "Replaced by assetGrid"
+                                                table[tbl_name] = (
+                                                    "Replaced by assetGrid"
+                                                )
                                     fmt = asset_format
 
             worksheet.write(row_idx, 1, tbl_name, fmt)

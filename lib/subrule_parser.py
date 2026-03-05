@@ -12,6 +12,16 @@ def localize_pack(pack, loc_dict):
     return pack
 
 
+def sort_lists_in_structure(data):
+    if isinstance(data, dict):
+        return {key: sort_lists_in_structure(value) for key, value in data.items()}
+    elif isinstance(data, list):
+        sorted_list = sorted(data)
+        return [sort_lists_in_structure(item) for item in sorted_list]
+    else:
+        return data
+
+
 with open(r"D:\Work\repo\knowledgebase\_extra\slices.yaml") as exclude_file:
     cfg = yaml.safe_load(exclude_file)
     file_blacklist = cfg["KnowledgebaseSlices"]["SIEM-Public"]["Excludes"]["Files"]
@@ -99,6 +109,7 @@ for item in queries:
             if bad in queries_copy[item][filter].keys():
                 del queries_copy[item][filter][bad]
 
+queries_copy = sort_lists_in_structure(queries_copy)
 
 with open("configs\\event_policies.json", "w", encoding="utf-8") as f_out_2:
     queries = f_out_2.write(json.dumps(queries_copy, indent=4, ensure_ascii=False))

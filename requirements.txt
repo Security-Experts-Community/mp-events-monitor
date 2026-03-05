@@ -10,4 +10,5 @@ flake8
 pytest
 isort
 PyYAML
+pyTelegramBotAPI
 backoff

@@ -70,10 +70,16 @@ class MPXAuthenticator:
             self._get_token_ui(settings)
             self.logger.info("Successfully authenticated")
         if settings.check_privileges:
-            if not self._check_privileges(settings):
-                raise AttributeError(
-                    "Not all needed privileges. Use new token or update Account. "
-                    "If it's right to KnowledgeBase then disable kb_check_mode."
+            try:
+                privileges_status = self._check_privileges(settings)
+                if not privileges_status:
+                    self.logger.error(
+                        "Not all needed privileges. Use new token or update Account. "
+                        "If it's right to KnowledgeBase then disable kb_check_mode."
+                    )
+            except Exception:
+                self.logger.error(
+                    "_check_privileges failed. Maybe you have no privilege to PT MC. Skip. Try work."
                 )
         if self.auth_mode == "user":
             # куки от ПТКБ
@@ -84,13 +90,13 @@ class MPXAuthenticator:
         return True
 
     def _check_privileges(self, settings: Settings):
-        kb_privilgeges = {
+        kb_privileges = {
             # "GetContentDatabaseTopRevision": "Получение номера последней ревизии для БД (PT KB Базы данных API)",
             "UiViewAnyContentDatabase": "UI просмотр содержимого любой БД (PT KB Базы данных UI)",
             "UiViewContentDatabase": "просмотр содержимого БД (PT KB Базы данных UI)",
-            "kb.access.allow": "kb.access.allow (PT KB Другое)",
+            # "kb.access.allow": "kb.access.allow (PT KB Другое)",
             # "GetLocales": "Получение списка локалей (PT KB Профиль)",
-            "GetSiemData": "Просмотра данных SIEM (PT KB SIEM  API)",
+            # "GetSiemData": "Просмотра данных SIEM (PT KB SIEM  API)",
             "UiGetReservedTaxons": "UI просмотр зарезервированных таксонов (PT KB SIEM UI)",
             "UiViewSiemData": "UI просмотр данных SIEM (PT KB SIEM UI)",
             "UiViewTaxonParams": "UI просмотр параметров таксона (PT KB SIEM UI)",
@@ -105,7 +111,7 @@ class MPXAuthenticator:
             # "events.monitoring.read": "Просмотр (MaxPatrol 10 Сбор данных Мониторинг источников)",
             # "events.monitoring": "Создание, просмотр, изменение, удаление (MaxPatrol 10 Сбор данных Мониторинг "
             #  "источников)",
-            "infrastructure": "Инфраструктура (MaxPatrol 10 Сбор данных)",
+            # "infrastructure": "Инфраструктура (MaxPatrol 10 Сбор данных)",
             # "siem.correlation_rules.read": "Просмотр (MaxPatrol 10 Правила и табличные списки Правила корреляции)",
             # "siem.enrichment_rules.read": "Просмотр (MaxPatrol 10 Правила и табличные списки Правила обогащения)",
             # "siem.table_lists.read": "Просмотр (MaxPatrol 10 Правила и табличные списки Табличные списки)",
@@ -115,7 +121,7 @@ class MPXAuthenticator:
             "incidents": "Инциденты (MaxPatrol 10 Инциденты)",
         }
         if settings.kb_check_mode:
-            for kb_privilege_code, kb_privilege_desc in kb_privilgeges.items():
+            for kb_privilege_code, kb_privilege_desc in kb_privileges.items():
                 common_privileges.update({kb_privilege_code: kb_privilege_desc})
         all_privileges = True
         for privilege_code, privilege_desc in common_privileges.items():
@@ -141,6 +147,7 @@ class MPXAuthenticator:
             )
             try:
                 self.session = requests.session()
+                self.add_proxy(settings)
                 scopes = self.session.get(
                     url, headers=self.headers, cookies=self.cookies, verify=False
                 )
@@ -148,7 +155,7 @@ class MPXAuthenticator:
                     connected = True
                     break
                 elif scopes.status_code == 401:
-                    self.logger.error("Personal Token expired")
+                    self.logger.error("Personal Token expired or no rights to PT MC.")
                     exit(1)
                 else:
                     raise requests.exceptions.ConnectionError(
@@ -158,6 +165,19 @@ class MPXAuthenticator:
                 self.logger.warning(f"Проблемы при проверке токена: {Err}")
                 time.sleep(5)
         return connected
+
+    def add_proxy(self, settings: Settings):
+        if settings.proxy_host and settings.proxy_port:
+            if settings.proxy_user and settings.proxy_password:
+                self.session.proxies.update(
+                    {
+                        "https": f"http://{settings.proxy_user}:{settings.proxy_password.get_secret_value()}@{settings.proxy_host}:{settings.proxy_port}/"
+                    }
+                )
+            else:
+                self.session.proxies.update(
+                    {"https": f"http://{settings.proxy_host}:{settings.proxy_port}/"}
+                )
 
     @backoff.on_exception(
         backoff.expo,
@@ -185,9 +205,10 @@ class MPXAuthenticator:
         url = f"https://{settings.mpx_host}:3334/api/iam/v1/personal_access_tokens"
         tokens_json = self._get_requester_pat(url)["items"]
         for token in tokens_json:
-            token = TokenInfo(**token)
-            if not self.token_info or token.lastUsage > self.token_info.lastUsage:
-                self.token_info = token
+            if token["lastUsage"]:
+                token = TokenInfo(**token)
+                if not self.token_info or token.lastUsage > self.token_info.lastUsage:
+                    self.token_info = token
         if not self.token_info:
             raise ValueError("no last token, but have. Shit.")
         url = f"https://{settings.mpx_host}:3334/api/iam/v1/personal_access_tokens/{self.token_info.id}"
@@ -210,6 +231,8 @@ class MPXAuthenticator:
                 f"of {settings.reconnect_times}"
             )
             try:
+                self.session = requests.session()
+                self.add_proxy(settings)
                 headers = {"Content-Type": "application/x-www-form-urlencoded"}
                 auth_data = {
                     "client_id": "mpx",
@@ -222,7 +245,9 @@ class MPXAuthenticator:
                 }
                 if auth_data["username"].find("@") != -1:
                     auth_data.update({"amr": "ldap"})
-                r = requests.post(url, data=auth_data, headers=headers, verify=False)
+                r = self.session.post(
+                    url, data=auth_data, headers=headers, verify=False
+                )
                 access_token = r.json()["access_token"]
                 self.headers = {
                     "Authorization": f"Bearer {access_token}",
@@ -257,6 +282,7 @@ class MPXAuthenticator:
     def _ui_login(self, settings: Settings):
         self.logger.info(f"try take first response to: {settings.mpx_host}")
         self.session = requests.Session()
+        self.add_proxy(settings)
         url = f"https://{settings.mpx_host}:3334/ui/login"
         auth_type = 1 if settings.login.find("@") != -1 else 0
         auth_data = {

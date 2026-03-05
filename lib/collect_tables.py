@@ -8,7 +8,7 @@ import yaml
 
 BASE_KB_ROOT = Path(r"D:\Work\repo\knowledgebase")
 BASE_PACKAGES = BASE_KB_ROOT / "packages"
-EXCLUDE_CFG = Path(r"D:\Work\repo\knowledgebase\_extra\build_on_server\slices.yaml")
+EXCLUDE_CFG = Path(r"D:\Work\repo\knowledgebase\_extra\slices.yaml")
 
 
 def _load_excludes(cfg_path: Path) -> set[Path]:

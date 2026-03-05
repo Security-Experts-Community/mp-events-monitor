@@ -13,6 +13,7 @@ from lib.get_token import MPXAuthenticator
 from lib.kb_checker import KB_Checker
 from lib.policies_checker import EventPolicies
 from lib.settings_checker import Settings, check_group_id
+from lib.test_bot import telem_bot
 
 old_python = False
 if sys.version.find("3.7.") == 0:
@@ -51,6 +52,10 @@ class MaxPatrolEventsMonitor:
         self.policies.check_policies()
         self.auth = MPXAuthenticator(self.logger)
         self.auth.authenticate(self.settings)
+        self.statistic = {
+            "common": {"host": self.settings.mpx_host},
+            "asset_file": str(self.settings.asset_filters_file),
+        }
 
     def all_events_worker(self):
         temp_dir = self.settings.out_folder / "ALL_events"
@@ -67,16 +72,15 @@ class MaxPatrolEventsMonitor:
         else:
             ev.work(self.settings.mpx_group, [], temp_dir)
         ev.make_readable_out(temp_dir, [], {}, [], True, [])
+        self.statistic["ALL_events"] = ev.statistic
 
     def asset_ids_worker(self):
         asset_dict = {}
-        with Path("configs/asset_ids.txt").open(
-            "r", encoding="utf-8"
-        ) as asset_ids_file:
+        with self.settings.asset_ids_file.open("r", encoding="utf-8") as asset_ids_file:
             checker = True
             for line in asset_ids_file:
                 line = line.strip()
-                if not check_group_id(line, "configs/asset_ids.txt", self.logger):
+                if not check_group_id(line, self.settings.asset_ids_file, self.logger):
                     checker = False
                 elif line == "-1":
                     logging.error("-1 is not asset_id")
@@ -98,6 +102,7 @@ class MaxPatrolEventsMonitor:
         else:
             ev.work(self.settings.mpx_group, asset_dict, temp_dir)
         ev.make_readable_out(temp_dir, [], asset_dict, [], True, [])
+        self.statistic["Asset_IDs"] = ev.statistic
 
     def all_assets_worker(self):
         default_asset_filter = {
@@ -116,16 +121,17 @@ class MaxPatrolEventsMonitor:
             default_asset_filter,
         )
         aw.assets_take_info(temp_dir, True, {})
+        self.statistic["ALL_assets"] = aw.statistic
 
     def dynamic_modes(self):
         groups = []
         full_info_group = {}
-        with Path("configs/dynamic_groups.txt").open(
+        with self.settings.dynamic_groups_file.open(
             "r", encoding="utf-8"
         ) as groups_file:
             for line in groups_file:
                 line = line.strip()
-                if check_group_id(line, "configs/dynamic_groups.txt", self.logger):
+                if check_group_id(line, self.settings.dynamic_groups_file, self.logger):
                     groups.append(line)
         for group in groups.copy():
             url = f"https://{self.settings.mpx_host}:443/api/assets_temporal_readmodel/v2/groups/{group}"
@@ -159,7 +165,7 @@ class MaxPatrolEventsMonitor:
         temp_dir.mkdir()
         if mem.settings.mode == "Dynamic_Groups_assets":
             default_asset_filter = {
-                "PDQL": self.settings.default_PDQL_assets,
+                "PDQL": self.settings.pdql_assets,
                 "default_politics_blacklist": self.settings.event_policies,
                 "group": groups,
             }
@@ -172,6 +178,7 @@ class MaxPatrolEventsMonitor:
                 default_asset_filter,
             )
             aw.assets_take_info(temp_dir, True, {})
+            self.statistic["Dynamic_Groups_assets"] = aw.statistic
         elif mem.settings.mode == "Dynamic_Groups_events":
             ev = EventsWorker(
                 self.settings,
@@ -185,8 +192,10 @@ class MaxPatrolEventsMonitor:
             else:
                 ev.work(groups, [], temp_dir)
             ev.make_readable_out(temp_dir, [], {}, [], True, [])
+            self.statistic["Asset_IDs"] = ev.statistic
 
     def asset_filters(self):
+        self.statistic["|Asset_filters|"] = {}
         with Path(self.settings.asset_filters_file).open(
             "r", encoding="utf-8"
         ) as assets_filters_file:
@@ -199,6 +208,15 @@ class MaxPatrolEventsMonitor:
             out_folder = self.settings.out_folder / folder_name
             if out_folder.exists():
                 self.logger.info(f"Out folder: {out_folder} exists. Skip filter")
+                try:
+                    with (out_folder / "AssetWorker_stat.json").open(
+                        "r", encoding="utf-8"
+                    ) as old_aw_stat_file:
+                        old_aw_stat = json.load(old_aw_stat_file)
+                        old_aw_stat["OLD AssetWorker_stat"] = True
+                        self.statistic["|Asset_filters|"][assets_filter] = old_aw_stat
+                except Exception:
+                    pass
                 continue
             out_folder.mkdir()
             if "group" not in assets_filters[assets_filter]:
@@ -249,6 +267,7 @@ class MaxPatrolEventsMonitor:
                 assets_filters[assets_filter],
             )
             aw.assets_take_info(out_folder, True, all_search_values)
+            self.statistic["|Asset_filters|"][assets_filter] = aw.statistic
 
 
 if __name__ == "__main__":
@@ -256,6 +275,13 @@ if __name__ == "__main__":
     if mem.settings.kb_check_mode:
         kb_check_a = KB_Checker(mem.settings, mem.logger, mem.auth)
         kb_check_a.work()
+        mem.statistic["lic_info"] = kb_check_a.lic_info
+        with open(
+            f"{mem.settings.out_folder}\\KB_struct_uninstalled.json",
+            "r",
+            encoding="utf-8",
+        ) as f:
+            mem.statistic["not_installed"] = json.load(f)
     if mem.settings.mode == "ALL_events":
         mem.all_events_worker()
     elif mem.settings.mode == "Asset_IDs":
@@ -268,3 +294,18 @@ if __name__ == "__main__":
         mem.asset_filters()
     # elif mem.settings.mode == "Only_KB":
     #     mem.kb_check()
+    stat_file_path = mem.settings.out_folder / f"{mem.settings.mpx_host}_stat.json"
+
+    with open(
+        f"{mem.settings.out_folder}\\empty_tables.json",
+        "r",
+        encoding="utf-8",
+    ) as f:
+        mem.statistic["empty_table_lists_to_fill"] = json.load(f)
+
+    mem.statistic = dict(sorted(mem.statistic.items()))
+
+    with stat_file_path.open("w", encoding="utf-8") as stat:
+        json.dump(mem.statistic, stat, ensure_ascii=False, indent=4)
+    if mem.settings.telemetry != "no":
+        telem_bot(stat_file_path)

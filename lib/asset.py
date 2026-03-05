@@ -127,6 +127,7 @@ class AssetWorker:
                 f"{self.settings.event_policies}"
             )
             self.default_politics_blacklist = self.settings.event_policies
+        self.statistic = {"name": self.filter_name}
 
     def assets_take_info(self, out_folder, need_up_file, all_search_values):
         if self.comment:
@@ -151,75 +152,54 @@ class AssetWorker:
                 not self.settings.dl_mode,
             )
             self.logger.info("Now take events by policies")
-            if num_assets < counter:
-                if not old_python:
-                    asyncio.run(
-                        ev.work(
-                            self.settings.mpx_group, list(asset_dict.keys()), out_folder
-                        )
+            count = (
+                num_assets // counter + 1
+                if num_assets % counter > 0
+                else num_assets // counter
+            )
+            temp_list = list(asset_dict.keys())
+            for stack in range(count):
+                if stack + 1 < count:
+                    out_dir = out_folder / (
+                        str(stack * counter) + "-" + str((stack + 1) * counter)
                     )
                 else:
-                    ev.work(
-                        self.settings.mpx_group, list(asset_dict.keys()), out_folder
+                    out_dir = out_folder / (
+                        str(stack * counter) + "-" + str(num_assets)
                     )
-                ev.make_readable_out(
-                    out_folder,
-                    asset_fields,
-                    asset_dict,
-                    no_assets,
-                    need_up_file,
-                    self.comment,
-                )
-            else:
-                count = (
-                    num_assets // counter + 1
-                    if num_assets % counter > 0
-                    else num_assets // counter
-                )
-                temp_list = list(asset_dict.keys())
-                for stack in range(count):
-                    if stack + 1 < count:
-                        out_dir = out_folder / (
-                            str(stack * counter) + "-" + str((stack + 1) * counter)
-                        )
-                    else:
-                        out_dir = out_folder / (
-                            str(stack * counter) + "-" + str(num_assets)
-                        )
-                    out_dir.mkdir()
-                    if not old_python:
-                        asyncio.run(
-                            ev.work(
-                                self.settings.mpx_group,
-                                temp_list[stack * counter : (stack + 1) * counter],
-                                out_dir,
-                            )
-                        )
-                    else:
+                out_dir.mkdir()
+                if not old_python:
+                    asyncio.run(
                         ev.work(
                             self.settings.mpx_group,
                             temp_list[stack * counter : (stack + 1) * counter],
                             out_dir,
                         )
-                    if stack + 1 < count:
-                        self.logger.info(
-                            f"{stack * counter}-{(stack + 1) * counter} done"
-                        )
-                    else:
-                        self.logger.info(f"{stack * counter}-{num_assets} done")
-                    if not old_python:
-                        ev.semaphore = asyncio.Semaphore(
-                            self.settings.max_threads_for_siem_api
-                        )
-                self.logger.info(f"make readable out in {out_folder}")
-                ev.make_readable_out(
-                    out_folder,
-                    asset_fields,
-                    asset_dict,
-                    no_assets,
-                    need_up_file,
-                    self.comment,
-                )
+                    )
+                else:
+                    ev.work(
+                        self.settings.mpx_group,
+                        temp_list[stack * counter : (stack + 1) * counter],
+                        out_dir,
+                    )
+                if stack + 1 < count:
+                    self.logger.info(f"{stack * counter}-{(stack + 1) * counter} done")
+                else:
+                    self.logger.info(f"{stack * counter}-{num_assets} done")
+                if not old_python:
+                    ev.semaphore = asyncio.Semaphore(
+                        self.settings.max_threads_for_siem_api
+                    )
+            self.logger.info(f"make readable out in {out_folder}")
+            ev.make_readable_out(
+                out_folder,
+                asset_fields,
+                asset_dict,
+                no_assets,
+                need_up_file,
+                self.comment,
+            )
+            self.statistic.update(ev.statistic)
         elif no_assets:
             ev = EventsWorker(
                 self.settings,
@@ -242,6 +222,9 @@ class AssetWorker:
                 need_up_file,
                 self.comment,
             )
+            self.statistic.update(ev.statistic)
+        with (out_folder / "AssetWorker_stat.json").open("w", encoding="utf-8") as stat:
+            json.dump(self.statistic, stat, ensure_ascii=False, indent=4)
 
     def work(self, out_folder):
         response, fields, asset_id_field, all_search_values = self.create_pdql_token(
@@ -355,10 +338,8 @@ class AssetWorker:
                                     asset_id_field = field["name"]
                     if not asset_exist:
                         self.logger.error(
-                            'Error in self.pdql, no field "asset_id" please add this field for correct work in next'
-                            " step:\n",
-                            self.pdql,
-                            '\noften you need to add "host.@id as asset_id" to self.pdql',
+                            f'Error in self.pdql, no field "asset_id" please add this field for correct work in next'
+                            f' step:\n {self.pdql} \noften you need to add "host.@id as asset_id" to self.pdql'
                         )
                         raise ValueError
                     for all_search_value in all_search_values.keys():
@@ -475,16 +456,13 @@ class AssetWorker:
             for asset in asset_info:
                 if all_search_values:
                     for all_search_attr in list(all_search_values.keys()).copy():
-                        if asset[all_search_attr] in all_search_values[all_search_attr]:
-                            all_search_values[all_search_attr].remove(
-                                asset[all_search_attr]
-                            )
+                        search_val = asset[all_search_attr].lower()
+                        if search_val in all_search_values[all_search_attr]:
+                            all_search_values[all_search_attr].remove(search_val)
                             if all_search_attr[-5:] == ".fqdn":
                                 dom_field = all_search_attr[: all_search_attr.find(".")]
                                 if dom_field + ".hostname" in all_search_values.keys():
-                                    hostname = asset[all_search_attr][
-                                        : asset[all_search_attr].find(".")
-                                    ]
+                                    hostname = search_val[: search_val.find(".")]
                                     if (
                                         hostname
                                         in all_search_values[dom_field + ".hostname"]
@@ -533,14 +511,18 @@ class AssetWorker:
                 json.dump(no_assets, token_file, ensure_ascii=False, indent=4)
             return asset_dict, no_assets
         else:
+            no_assets = []
             if not all_search_values:
                 self.logger.warning(
                     f"{self.pdql} give no asset info, no info, no attempt to taken events"
                 )
-                return {}, []
             else:
                 prep_dict = {i: None for i in fields}
-                return {}, all_search_to_no_asset(all_search_values, prep_dict, [])
+                no_assets = all_search_to_no_asset(all_search_values, prep_dict, [])
+            file_name = "!take_no_asset_ids.json"
+            with (out_folder / file_name).open("w", encoding="utf-8") as token_file:
+                json.dump(no_assets, token_file, ensure_ascii=False, indent=4)
+            return {}, no_assets
 
 
 def switch_and_clear_filter(
