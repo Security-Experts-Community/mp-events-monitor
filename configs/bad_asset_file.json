@@ -1,0 +1,29 @@
+{
+    "Bad_by_FQDN": {
+        "comment": [
+            "Дубли по FQDN"
+        ],
+        "PDQL": [
+            "filter(host.fqdn and not networkdevicehost) | select(Host.fqdn, COUNTUNIQUE(Host.@id) as ID_Cnt, COMPACTUNIQUE(@Host)) | filter(ID_Cnt > 1)"
+        ],
+        "default_politics_whitelist": ".*"
+    },
+    "Bad_by_HOSTNAME": {
+        "comment": [
+            "Дубли по HOSTNAME"
+        ],
+        "PDQL": [
+            "filter(host.hostname and not host.fqdn and not networkdevicehost) | select(Host.hostname, COUNTUNIQUE(Host.@id) as ID_Cnt, COMPACTUNIQUE(@Host)) | filter(ID_Cnt > 1)"
+        ],
+        "default_politics_whitelist": ".*"
+    },
+    "Too_many_IPs": {
+        "comment": [
+            "Много IP примапилось к одному узлу из HostDiscovery"
+        ],
+        "PDQL": [
+            "filter((Host.OsCandidates.Detection LIKE 'HD%' or Host.OsVersion LIKE '%-%') and not networkdevicehost)| select(@Host, Host.hostname as HOSTN, host.fqdn as HOSTF, Host.Endpoints<IpEndpoint>.Address as IP_addr) | filter(not IP_addr in 127.0.0.0/8 and not IP_addr in ::1/128) | select( @Host, COUNTUNIQUE(IP_addr) as IP_Cnt, COMPACTUNIQUE(IP_addr)) | filter(IP_Cnt > 5)"
+        ],
+        "default_politics_whitelist": ".*"
+    }
+}

@@ -1,30 +1,16 @@
 import json
 import logging
 import re
-import sys
 from json import JSONDecodeError
 from pathlib import Path
-from typing import Dict, List, Union
-
-old_python = False
-if sys.version.find("3.7.") == 0:
-    old_python = True
-    from typing import Any
+from typing import Dict, Union
 
 
 class EventPolicies:
-    if old_python:
-        policies_by_file: Any
-        rebuilt_policies: Any
-        small_policies: Any
-        mandatory_policies: Any
-    else:
-        policies_by_file: Dict[str, Dict[str, Dict[str, list[str]]]]
-        rebuilt_policies: list[
-            dict[str, str | int | dict[str, dict[str, Union[str, int]]]]
-        ]
-        small_policies: Dict[str, Dict[str, Dict[str, list[str]]]]
-        mandatory_policies: list[str]
+    policies_by_file: Dict[str, Dict[str, Dict[str, list[str]]]]
+    rebuilt_policies: list[dict[str, str | int | dict[str, dict[str, Union[str, int]]]]]
+    small_policies: Dict[str, Dict[str, Dict[str, list[str]]]]
+    mandatory_policies: list[str]
     policies_path: Path
     loger: logging.Logger
 

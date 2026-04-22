@@ -286,6 +286,7 @@ class KB_Checker:
                 self.logger.error(url_count)
                 self.logger.error(response_temp_count.status_code)
                 self.logger.error(response_temp_count.content)
+                response_count = {}
 
             result[pipeline["alias"]] = response_count
 
@@ -354,7 +355,7 @@ class KB_Checker:
                 "select": "",
                 "where": "",
                 "orderBy": [{"field": "_last_changed", "sortOrder": "descending"}],
-                "timeZone": 10800,
+                "timeZone": 0,
                 "stringDatetime": True,
             },
         }
@@ -375,7 +376,11 @@ class KB_Checker:
         )
         if response_temp.status_code == 200:
             return response_temp.json()["totalItems"]
+        elif response_temp.status_code == 204:
+            self.logger.warning("Got 204 - no responce from url {}".format(url))
+            return 0
         else:
+            # return 0
             raise RuntimeError(
                 f"GET content failed: {response_temp.status_code} – {response_temp.text}"
             )
@@ -478,12 +483,22 @@ class KB_Checker:
         prog = tqdm(
             total=len(all_tables_list), desc="Checking tables", leave=True, unit="req"
         )
-        tasks = [
-            self._check_one(k, v, prog, async_session)
-            for k, v in all_tables_list.items()
-        ]
 
-        results = [r for r in await asyncio.gather(*tasks) if r is not None]
+        results = []
+        batch_size = self.settings.max_threads_for_siem_api  # Размер батча
+
+        # Обрабатываем батчами
+        items = list(all_tables_list.items())
+        for i in range(0, len(items), batch_size):
+            batch = items[i : i + batch_size]
+            tasks = [self._check_one(k, v, prog, async_session) for k, v in batch]
+
+            batch_results = await asyncio.gather(*tasks, return_exceptions=True)
+
+            for r in batch_results:
+                if r and not isinstance(r, Exception):
+                    results.append(r)
+
         prog.close()
         await async_session.close()
         return results

@@ -1,0 +1,42 @@
+# UTF-8
+#
+# Для получения дополнительной информации см. сведения о версии файла (VERSIONINFO)
+# в документации MSDN
+#
+
+VSVersionInfo(
+  ffi=FixedFileInfo(
+    # версия файла: 4 числа, разделенных запятыми:
+    filevers=(1, 0, 1, 0),
+    # версия продукта:
+    prodvers=(1, 0, 1, 0),
+    # флаги маски: 0x3f для VS_FF_DEBUG, VS_FF_PRERELEASE и т.д.
+    mask=0x3f,
+    # флаги: 0x0 для релиза
+    flags=0x0,
+    # ОС: 0x40004 для Windows NT
+    OS=0x40004,
+    # тип файла: 0x1 для приложения, 0x2 для DLL и т.д.
+    fileType=0x1,
+    # подтип файла: 0x0 для неизвестного
+    subtype=0x0,
+    # дата/время создания: не используется
+    date=(0, 0)
+    ),
+  kids=[
+    StringFileInfo(
+      [
+      StringTable(
+        u'040904B0',  # язык: английский (США), кодировка: Unicode
+        [StringStruct(u'CompanyName', u'Positive Technologies'),
+        StringStruct(u'FileDescription', u'Проверка полноты внедрения SIEM\VM'),
+        StringStruct(u'FileVersion', u'1.0.1.0'),
+        StringStruct(u'InternalName', u'Nomos'),
+        StringStruct(u'LegalCopyright', u'MIT'),
+        StringStruct(u'OriginalFilename', u'Nomos.exe'),
+        StringStruct(u'ProductName', u'Nomos'),
+        StringStruct(u'ProductVersion', u'1.0.1.0')])
+      ]),
+    VarFileInfo([VarStruct(u'Translation', [1033, 1200])])
+  ]
+)

@@ -4,19 +4,18 @@ import logging
 import re
 import time
 import warnings
-from copy import deepcopy
 from pathlib import Path
-from venv import logger
 
-import requests
 import xlsxwriter
-from aiohttp import BasicAuth, ClientSession, client_exceptions
+from aiohttp import (BasicAuth, ClientError, ClientResponseError,
+                     ClientSession, ClientTimeout)
+from aiohttp.client_exceptions import ContentTypeError
 from tqdm.asyncio import tqdm
 
-from .get_token import MPXAuthenticator
-from .policies_checker import EventPolicies
-from .settings_checker import Settings
-from .xlsx_out import MonitorXlsxWriter
+from lib.get_token import MPXAuthenticator
+from lib.policies_checker import EventPolicies
+from lib.settings_checker import Settings
+from lib.xlsx_out import MonitorXlsxWriter
 
 warnings.filterwarnings("ignore")
 
@@ -60,7 +59,7 @@ class EventsWorker:
                     self.settings.proxy_password.get_secret_value(),
                 )
 
-        if assets:
+        if assets and self.settings.audit_hack:
             audit_pol = {
                 "name": "Audit Events Hack",
                 "number": 0,
@@ -76,7 +75,14 @@ class EventsWorker:
             )
         self.statistic = {}
 
-    async def work(self, group_id, asset_ids, out_folder):
+    async def work(
+        self,
+        group_id,
+        asset_ids,
+        out_folder,
+        second_siem_dict=None,
+        second_event_field="",
+    ):
         if self.policies.rebuilt_policies:
             self.async_session = ClientSession(
                 cookies=self.auth.cookies, headers=self.auth.headers, **self.proxy_inf
@@ -86,16 +92,30 @@ class EventsWorker:
                 int(time.time()) - self.settings.time_delta_hours * 60 * 60
             )
             group_tasks = []
+            group_tasks_second = []
             for index, policy in enumerate(self.policies.rebuilt_policies):
                 filter_new = policy["full_filter"]
+                filter_second = policy["full_filter"]
                 if asset_ids:
                     if policy["name"] != "Audit Events Hack":
                         filter_new = create_new_filter(
-                            asset_ids, filter_new, "event_src"
+                            asset_ids, filter_new, "event_src.asset"
                         )
                         temp_time_from = time_from_value
+                        if second_siem_dict:
+                            filter_second = filter_second.replace(
+                                "group(key: [event_src.asset, event_src.host]",
+                                f"group(key: [event_src.asset, event_src.host, {second_event_field}]",
+                            )
+                            filter_second = create_new_filter(
+                                second_siem_dict.values(),
+                                filter_second,
+                                second_event_field,
+                            )
                     else:
-                        filter_new = create_new_filter(asset_ids, filter_new, "dst")
+                        filter_new = create_new_filter(
+                            asset_ids, filter_new, "dst.asset"
+                        )
                         temp_time_from = int(time.time()) - 700 * 60 * 60
                 else:
                     temp_time_from = time_from_value
@@ -106,98 +126,119 @@ class EventsWorker:
                         )
                     )
                 )
-            results = await tqdm.gather(*group_tasks)
-            for index, policy in enumerate(self.policies.rebuilt_policies):
-                if "host_ids" not in self.policies.rebuilt_policies[index].keys():
-                    self.policies.rebuilt_policies[index].update(
-                        {"host_ids": results[index]}
-                    )
-                else:
-                    for host in results[index]:
-                        self.policies.rebuilt_policies[index]["host_ids"].update(
-                            {host: results[index][host]}
+                if second_siem_dict:
+                    group_tasks_second.append(
+                        asyncio.create_task(
+                            self.take_events(
+                                group_id,
+                                temp_time_from,
+                                filter_second,
+                                out_folder,
+                                policy,
+                                second_siem_dict,
+                            )
                         )
-                # break
-            with (out_folder / "!out_all.json").open("w", encoding="utf-8") as out_file:
-                json.dump(
-                    self.policies.rebuilt_policies,
-                    out_file,
-                    ensure_ascii=False,
-                    indent=4,
-                )
-            with (out_folder / "!small_policies.json").open(
-                "w", encoding="utf-8"
-            ) as out_file:
-                json.dump(
-                    self.policies.small_policies, out_file, ensure_ascii=False, indent=4
-                )
+                    )
+            await tqdm.gather(*group_tasks)
+            if group_tasks_second:
+                await tqdm.gather(*group_tasks_second, desc="second")
+            if self.settings.logging_level == "DEBUG":
+                with (out_folder / "!out_all.json").open(
+                    "w", encoding="utf-8"
+                ) as out_file:
+                    json.dump(
+                        self.policies.rebuilt_policies,
+                        out_file,
+                        ensure_ascii=False,
+                        indent=4,
+                    )
+                with (out_folder / "!small_policies.json").open(
+                    "w", encoding="utf-8"
+                ) as out_file:
+                    json.dump(
+                        self.policies.small_policies,
+                        out_file,
+                        ensure_ascii=False,
+                        indent=4,
+                    )
             await self.async_session.close()
             return self.policies
         else:
             return [], {}
 
-    async def take_events(self, group_id, time_from, event_filter, out_dir, all_policy):
-        url = "https://{}:443/api/events/v3/events/aggregation".format(
-            self.settings.mpx_host
-        )
+    async def take_events(
+        self, group_id, time_from, event_filter, out_dir, all_policy, secondary=None
+    ):
+        url = f"https://{self.settings.mpx_host}:443/api/events/v3/events/aggregation"
         file_name = all_policy["name"].replace(" ", "_")
-        temp_policy = deepcopy(all_policy)
-        temp_policy["host_ids"] = {}
-        if "list_value" in temp_policy.keys():
+        if secondary:
+            file_name += "_secondary"
+        temp_policy = all_policy
+        if "host_ids" not in temp_policy:
+            temp_policy["host_ids"] = {}
+
+        if "list_value" in temp_policy:
             file_name += "_" + temp_policy["list_value"]
-        file_name = re.sub("[^a-zA-Zа-яА-я_ 0-9-]", "_", file_name)
+
+        # Очистка имени файла от недопустимых символов
+        file_name = re.sub(r"[^a-zA-Zа-яА-Я_0-9\-]", "_", file_name)
+        # Ограничение длины имени
         if len(file_name) > 35:
             file_name = file_name[:35]
-        index = 0
-        here = False
+
         file_name += "_" + str(temp_policy["number"])
-        while True:
-            file_name += ".json"
-            if (out_dir / file_name).is_file():
-                if here:
-                    file_name = file_name[:-6]
-                else:
-                    file_name = file_name[:-5]
-                file_name += "_" + str(index)
-                here = True
-            else:
-                break
+        file_name += ".json"
+
+        # Генерация уникального имени файла
+        original_name = file_name
+        index = 0
+        while (out_dir / file_name).exists():
+            # Убираем ".json" перед добавлением индекса
+            base_name = original_name[:-5]  # "-5" because ".json"
+            file_name = f"{base_name}_{index}.json"
             index += 1
+
         filter_file_name = file_name[:-5] + ".txt"
         file_path = out_dir / filter_file_name
+
         modified_delta = 0
         data = {"filter": event_filter, "timeFrom": time_from}
-        if type(group_id) is str:
+
+        if isinstance(group_id, str):
             param = {"groupId": group_id}
         else:
             param = {"groupIds": group_id}
-        with file_path.open("w", encoding="utf-8") as out_file:
-            temp_data_with_params = {"data": data, "params": param}
-            json.dump(temp_data_with_params, out_file, ensure_ascii=False, indent=4)
-            del temp_data_with_params
+        if self.settings.logging_level == "DEBUG":
+            with file_path.open("w", encoding="utf-8") as out_file:
+                temp_data_with_params = {"data": data, "params": param}
+                json.dump(temp_data_with_params, out_file, ensure_ascii=False, indent=4)
+                del temp_data_with_params
+
         try_number = 0
         all_ok = False
         response = {}
-        async with self.semaphore:
-            while try_number < self.settings.reconnect_times:
-                try:
-                    try_number += 1
+
+        # ⚠️ ВАЖНО: семафор захватываем только на отправку запроса, НЕ на retry + sleep!
+        while try_number < self.settings.reconnect_times:
+            try_number += 1
+            try:
+                # захват семафора только для короткого действия: отправки запроса
+                async with self.semaphore:
                     async with self.async_session.post(
                         url=url,
                         json=data,
                         params=param,
                         ssl=False,
-                        timeout=10000000,
+                        timeout=ClientTimeout(total=600),  # явный таймаут 100 сек
                     ) as response_temp:
-                        if response_temp.status == 200:
+                        status = response_temp.status
+                        if status == 200:
                             response = await response_temp.json()
-                            self.logger.debug(
-                                f"take_events response for {data}: {response}"
-                            )
-                            if not response["errors"]:
+                            if not response.get("errors"):
                                 all_ok = True
-                                break
+                                break  # успех — выходим из retry-цикла
                             else:
+                                # Ошибка в ответе — уменьшаем timeFrom
                                 if not modified_delta:
                                     modified_delta = self.settings.time_delta_hours // 2
                                 else:
@@ -206,12 +247,11 @@ class EventsWorker:
                                     int(time.time()) - modified_delta * 60 * 60
                                 )
                                 self.logger.warning(
-                                    f"Errors in take_events response for {file_path} in try number {try_number}: "
-                                    f"{response}. The delta time for this query has been halved to {modified_delta}"
-                                    f". Next try after 5 seconds"
+                                    f"Errors in take_events response for {file_path} (try {try_number}): "
+                                    f"{response}. New timeFrom: {data['timeFrom']}. Retrying in 5s..."
                                 )
-                                await asyncio.sleep(5)
-                        elif response_temp.status >= 500:
+                        elif status >= 500:
+                            # Серверная ошибка — retry
                             if not modified_delta:
                                 modified_delta = self.settings.time_delta_hours // 2
                             else:
@@ -220,65 +260,81 @@ class EventsWorker:
                                 int(time.time()) - modified_delta * 60 * 60
                             )
                             self.logger.warning(
-                                f"Response code: {response_temp.status} for {file_path}. Try number: {try_number} "
-                                f"of {self.settings.reconnect_times} The delta time for this query has been halved "
-                                f"to {modified_delta}. Next try after 5 seconds"
+                                f"Server error {status} for {file_path}. Try {try_number}/{self.settings.reconnect_times}. "
+                                f"New timeFrom: {data['timeFrom']}. Retrying in 5s..."
                             )
-                            await asyncio.sleep(5)
-                        elif response_temp.status == 400:
+                        elif status == 400:
                             response = await response_temp.json()
                             self.logger.error(
-                                f"Response code: {response_temp.status}. Response message: {response['message']}."
-                            )
-                            self.logger.error(
-                                f"Most likely there is an error in the request: {file_path}"
+                                f"Bad request (400) for {file_path}. Error: {response.get('message', 'unknown')}."
                             )
                             self.logger.error(
                                 f"Full response: {json.dumps(response, indent=4)}"
                             )
-                            break
+                            break  # не retryable
                         else:
                             response = await response_temp.json()
                             self.logger.error(
-                                f"Unspecified response code: {response_temp.status}. Event filter: {file_path}. Break."
+                                f"Unexpected status {status} for {file_path}. Break. Response: {response}"
                             )
-                            self.logger.error(
-                                f"Full response: {json.dumps(response, indent=4)}"
-                            )
-                            break
-                except requests.exceptions.RequestException as Err:
-                    self.logger.warning(
-                        f"Connection error, something went horribly wrong, let's try again. Error: {Err}"
+                            break  # не retryable
+
+                # ✅ sleep — ВНЕ semafore!
+                if not all_ok and try_number < self.settings.reconnect_times:
+                    await asyncio.sleep(5)
+
+            except (ClientError, ClientResponseError, ContentTypeError) as Err:
+                self.logger.warning(
+                    f"HTTP error (try {try_number}): {Err}. Retrying in 5s..."
+                )
+                # sleep вне семафора — уже сделано выше, но для надёжности:
+                if try_number < self.settings.reconnect_times:
+                    await asyncio.sleep(5)
+            except Exception as Err:
+                self.logger.exception(
+                    f"Unexpected error in take_events (try {try_number}): {Err}"
+                )
+                if try_number < self.settings.reconnect_times:
+                    await asyncio.sleep(5)
+
+        # Обработка результата
+        if all_ok and response.get("rows"):
+            for row in response["rows"]:
+                event_info = {
+                    "count": row["values"][0],
+                    "event_src.host": [row["groups"][1]],
+                }
+                group_id_from_row = row["groups"][0]
+                if group_id_from_row not in temp_policy["host_ids"].keys():
+                    temp_policy["host_ids"].update({group_id_from_row: event_info})
+                    if secondary:
+                        for asset_id_sec, asset_host in secondary.items():
+                            if (
+                                asset_host == row["groups"][2]
+                                and asset_id_sec != group_id_from_row
+                            ):
+                                if asset_id_sec not in temp_policy["host_ids"].keys():
+                                    temp_policy["host_ids"].update(
+                                        {asset_id_sec: event_info}
+                                    )
+                                else:
+                                    temp_policy["host_ids"][asset_id_sec][
+                                        "count"
+                                    ] += row["values"][0]
+                elif not secondary:
+                    temp_policy["host_ids"][group_id_from_row]["count"] += row[
+                        "values"
+                    ][0]
+                    temp_policy["host_ids"][group_id_from_row]["event_src.host"].append(
+                        row["groups"][1]
                     )
-                except client_exceptions.ContentTypeError as Err:
-                    self.logger.warning(
-                        f"Connection error, something went horribly wrong, let's try again. Error: {Err}"
-                    )
-        if all_ok:
-            if response["rows"]:
-                for row in response["rows"]:
-                    if row["groups"][0] not in temp_policy["host_ids"].keys():
-                        temp_policy["host_ids"].update(
-                            {
-                                row["groups"][0]: {
-                                    "count": row["values"][0],
-                                    "event_src.host": [row["groups"][1]],
-                                }
-                            }
-                        )
-                    else:
-                        temp_policy["host_ids"][row["groups"][0]]["count"] += row[
-                            "values"
-                        ][0]
-                        temp_policy["host_ids"][row["groups"][0]][
-                            "event_src.host"
-                        ].append(row["groups"][1])
+
+        # Сохранение в файл (только если нужно)
+        if self.settings.logging_level == "DEBUG":
             with (out_dir / file_name).open("w", encoding="utf-8") as out_file:
                 json.dump(temp_policy, out_file, ensure_ascii=False, indent=4)
-            # TODO возможно лучше прям тут заполнять все политики
-            return temp_policy["host_ids"]
-        else:
-            return {}
+
+        return temp_policy["host_ids"] if all_ok else {}
 
     def make_readable_out(
         self,
@@ -330,12 +386,12 @@ class EventsWorker:
                 closed = True
                 break
             except xlsxwriter.exceptions.FileCreateError:
-                logger.error(
+                self.logger.error(
                     f"Can't create file {excel_file.workbook.filename}. Retry."
                 )
                 time.sleep(10)
         if not closed:
-            logger.error(f"{excel_file.workbook.filename} not created. Skipping.")
+            self.logger.error(f"{excel_file.workbook.filename} not created. Skipping.")
         if Path(".bot.json").is_file():
             try:
                 from .test_bot import start_work_bot
@@ -347,9 +403,12 @@ class EventsWorker:
 
 
 def create_new_filter(asset_ids, filter_new, field):
-    filter_pref = "filter({}.asset in [".format(field)
+    filter_pref = "filter({} in [".format(field)
     for asset_id in asset_ids:
-        filter_pref += asset_id + ","
+        if field.find(".asset") != -1:
+            filter_pref += asset_id + ","
+        else:
+            filter_pref += '"' + asset_id + '",'
     filter_pref = filter_pref.rstrip(",")
     filter_pref += "]"
     if filter_new.startswith("filter("):
