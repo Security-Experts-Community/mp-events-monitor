@@ -1,29 +1,20 @@
+import asyncio
 import json
 import logging
 import re
-import sys
 import time
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Union
+from typing import Union
 from uuid import UUID
 
 import requests
 
+from lib.events import EventsWorker
+from lib.get_token import MPXAuthenticator
 from lib.policies_checker import EventPolicies
 from lib.settings_checker import Settings
 
-from .get_token import MPXAuthenticator
-
-old_python = False
-if sys.version.find("3.7.") == 0:
-    print("Use old Python")
-    old_python = True
-    from .events_no_ai import EventsWorker
-else:
-    import asyncio
-
-    from .events import EventsWorker
 EventsWorker = EventsWorker
 
 
@@ -33,31 +24,19 @@ class AssetWorker:
     logger: logging.Logger
     policies: EventPolicies
     filter_name: str
-    if not old_python:
-        pdql: Union[str, list[str]]
-        default_politics_whitelist: Union[str, list[str], None]
-        default_politics_blacklist: Union[str, list[str], None]
-        mandatory_policies: Union[str, list[str], None]
-        comment: Union[str, list[str], None]
-        group: Union[str, UUID, list[UUID], list[str]]
-        specific_politics: dict[str, list[dict[str, str | list[str]]]] | None
-    else:
-        pdql: Any
-        default_politics_whitelist: Any
-        default_politics_blacklist: Any
-        mandatory_policies: Any
-        comment: Any
-        group: Any
-        specific_politics: Any
+    pdql: Union[str, list[str]]
+    default_politics_whitelist: Union[str, list[str], None]
+    default_politics_blacklist: Union[str, list[str], None]
+    mandatory_policies: Union[str, list[str], None]
+    comment: Union[str, list[str], None]
+    group: Union[str, UUID, list[UUID], list[str]]
+    specific_politics: dict[str, list[dict[str, str | list[str]]]] | None
     """
     specific_politics - по сути легальный способ перезаписать системную политику, так как внутри filter_policies
     self.filtered_policies.update({add_pol..., то есть если встретится политика с таким же названием, то она 
     перезапишется.
     """
-    if not old_python:
-        all_search_values: dict[str, list[str]] | None
-    else:
-        all_search_values: Any
+    all_search_values: dict[str, list[str]] | None
     """
     это нужно если ты хочешь прибить гвоздями проверки каких-то определенных хостов, проще примером:
     предположим у тебя в инфре есть хост c FQDN = one.default.local
@@ -85,9 +64,9 @@ class AssetWorker:
     ):
         self.settings = settings
         # так надо, ведь мы не указываем весь набор библиотек необходимых для работы с озером
-        if self.settings.dl_mode and not old_python:
+        if self.settings.dl_mode:
             global EventsWorker
-            from .events_dl import EventsWorkerDL
+            from lib.events_dl import EventsWorkerDL
 
             EventsWorker = EventsWorkerDL
         self.auth = auth
@@ -120,6 +99,7 @@ class AssetWorker:
         self.group = filter_settings["group"]
         self.specific_politics = filter_settings.get("specific_politics")
         self.all_search_values = filter_settings.get("all_search_values")
+        self.fallback_search_field = filter_settings.get("fallback_search_field")
         if (self.default_politics_whitelist or self.default_politics_blacklist) is None:
             self.logger.warning(
                 f"In asset filter {filter_name} no default_politics_whitelist or "
@@ -158,6 +138,21 @@ class AssetWorker:
                 else num_assets // counter
             )
             temp_list = list(asset_dict.keys())
+            second_siem_dict = {}
+            second_event_field = ""
+            if (
+                self.fallback_search_field
+                and self.fallback_search_field.get("asset_field")
+                and self.fallback_search_field.get("event_field")
+            ):
+                second_event_field = self.fallback_search_field.get("event_field")
+                for asset in asset_dict:
+                    if asset_dict[asset].get("asset_info") and asset_dict[asset][
+                        "asset_info"
+                    ].get(self.fallback_search_field["asset_field"]):
+                        second_siem_dict[asset] = asset_dict[asset]["asset_info"][
+                            self.fallback_search_field["asset_field"]
+                        ]
             for stack in range(count):
                 if stack + 1 < count:
                     out_dir = out_folder / (
@@ -168,28 +163,20 @@ class AssetWorker:
                         str(stack * counter) + "-" + str(num_assets)
                     )
                 out_dir.mkdir()
-                if not old_python:
-                    asyncio.run(
-                        ev.work(
-                            self.settings.mpx_group,
-                            temp_list[stack * counter : (stack + 1) * counter],
-                            out_dir,
-                        )
-                    )
-                else:
+                asyncio.run(
                     ev.work(
                         self.settings.mpx_group,
                         temp_list[stack * counter : (stack + 1) * counter],
                         out_dir,
+                        second_siem_dict,
+                        second_event_field,
                     )
+                )
                 if stack + 1 < count:
-                    self.logger.info(f"{stack * counter}-{(stack + 1) * counter} done")
+                    self.logger.debug(f"{stack * counter}-{(stack + 1) * counter} done")
                 else:
-                    self.logger.info(f"{stack * counter}-{num_assets} done")
-                if not old_python:
-                    ev.semaphore = asyncio.Semaphore(
-                        self.settings.max_threads_for_siem_api
-                    )
+                    self.logger.debug(f"{stack * counter}-{num_assets} done")
+                ev.semaphore = asyncio.Semaphore(self.settings.max_threads_for_siem_api)
             self.logger.info(f"make readable out in {out_folder}")
             ev.make_readable_out(
                 out_folder,
@@ -234,7 +221,7 @@ class AssetWorker:
             all_search_values = self.all_search_values
         if response:
             temp_token = str(response["token"])
-            self.logger.info(f"get PDQL token: {temp_token}")
+            self.logger.debug(f"get PDQL token: {temp_token}")
             asset_dict, no_assets = self.take_assets(
                 response["token"], out_folder, asset_id_field, all_search_values, fields
             )
@@ -288,7 +275,7 @@ class AssetWorker:
         retry_num = 0
         while True:
             try:
-                self.logger.info("try to make self.pdql token")
+                self.logger.debug("try to make self.pdql token")
                 retry_num += 1
                 if self.settings.reconnect_times < retry_num:
                     self.logger.error(
@@ -304,15 +291,16 @@ class AssetWorker:
                 )
                 if response_temp.status_code == 200:
                     file_name = "create_pdql_token_" + str(retry_num) + ".json"
-                    with (out_folder / file_name).open(
-                        "w", encoding="utf-8"
-                    ) as token_file:
-                        json.dump(
-                            response_temp.json(),
-                            token_file,
-                            ensure_ascii=False,
-                            indent=4,
-                        )
+                    if self.settings.logging_level == "DEBUG":
+                        with (out_folder / file_name).open(
+                            "w", encoding="utf-8"
+                        ) as token_file:
+                            json.dump(
+                                response_temp.json(),
+                                token_file,
+                                ensure_ascii=False,
+                                indent=4,
+                            )
                     response = response_temp.json()
                     fields = []
                     asset_exist = False
@@ -391,7 +379,7 @@ class AssetWorker:
         asset_info = []
         unsuccessful = False
 
-        self.logger.info("try to get assets")
+        self.logger.debug("try to get assets")
         while True:
             try:
                 if unsuccessful:
@@ -413,13 +401,19 @@ class AssetWorker:
                 )
                 file_name = "take_assets_" + str(try_num) + ".json"
                 try_num += 1
-                with (out_folder / file_name).open("w", encoding="utf-8") as token_file:
-                    json.dump(
-                        response_temp.json(), token_file, ensure_ascii=False, indent=4
+                if self.settings.logging_level == "DEBUG":
+                    with (out_folder / file_name).open(
+                        "w", encoding="utf-8"
+                    ) as token_file:
+                        json.dump(
+                            response_temp.json(),
+                            token_file,
+                            ensure_ascii=False,
+                            indent=4,
+                        )
+                    self.logger.info(
+                        f"Create {file_name} code: {response_temp.status_code}"
                     )
-                self.logger.info(
-                    f"Create {file_name} code: {response_temp.status_code}"
-                )
                 if response_temp.status_code == 200:
                     response = response_temp.json()
                     if not response.get("records"):
@@ -428,7 +422,7 @@ class AssetWorker:
                         asset_info.extend(response["records"])
                         len_resp_rec = len(response["records"])
                         if len(response["records"]) < limit:
-                            self.logger.info(f"take: {len_resp_rec} asset lines")
+                            self.logger.debug(f"take: {len_resp_rec} asset lines")
                             break
                         else:
                             self.logger.info(
@@ -456,8 +450,12 @@ class AssetWorker:
             for asset in asset_info:
                 if all_search_values:
                     for all_search_attr in list(all_search_values.keys()).copy():
-                        search_val = asset[all_search_attr].lower()
-                        if search_val in all_search_values[all_search_attr]:
+                        if (
+                            asset.get(all_search_attr)
+                            and asset[all_search_attr].lower()
+                            in all_search_values[all_search_attr]
+                        ):
+                            search_val = asset[all_search_attr].lower()
                             all_search_values[all_search_attr].remove(search_val)
                             if all_search_attr[-5:] == ".fqdn":
                                 dom_field = all_search_attr[: all_search_attr.find(".")]
@@ -494,9 +492,10 @@ class AssetWorker:
                             asset_dict[asset_id]["asset_info"][
                                 "asset_info_is_answer_again"
                             ].append(asset)
-            file_name = "!take_assets.json"
-            with (out_folder / file_name).open("w", encoding="utf-8") as token_file:
-                json.dump(asset_dict, token_file, ensure_ascii=False, indent=4)
+            if self.settings.logging_level == "DEBUG":
+                file_name = "!take_assets.json"
+                with (out_folder / file_name).open("w", encoding="utf-8") as token_file:
+                    json.dump(asset_dict, token_file, ensure_ascii=False, indent=4)
             file_name = "!take_no_asset_ids.json"
             if all_search_values:
                 self.logger.warning("not found by all_search_values:")
@@ -568,22 +567,23 @@ def work_with_dynamic(dyn_filter: dict, out_folder: Path, logger: logging.Logger
     dm_fields = {}
     out_folder = out_folder.parent
     out_folder = out_folder / dyn_filter["filter_name"]
-    if not out_folder.is_dir() or not (out_folder / "!take_assets.json").is_file():
+    assets_file_path = out_folder / "!asset_dict.json"
+    if not out_folder.is_dir() or not assets_file_path.is_file():
         logger.info(
-            f"no folder {dyn_filter['filter_name']} in {out_folder} or no file with assets"
+            f"no folder {dyn_filter['filter_name']} in {out_folder} or no file with assets {assets_file_path}"
         )
         return "", {}
     assets = []
     # TODO а почему мы не берем !take_assets.json?
-    for assets_file_path in out_folder.glob("take_assets_*.json"):
-        with assets_file_path.open("r", encoding="utf-8") as assets_file:
-            records = json.load(assets_file)
-            if (
-                "records" in records.keys()
-                and type(records["records"]) is list
-                and len(records["records"]) > 0
-            ):
-                assets.extend(records["records"])
+    with assets_file_path.open("r", encoding="utf-8") as assets_file:
+        for asset_id, asset_info in json.load(assets_file).items():
+            assets.append(asset_info["asset_info"])
+    no_asset_path = out_folder / "!take_no_asset_ids.json"
+    if no_asset_path.exists():
+        with no_asset_path.open("r", encoding="utf-8") as no_asset_file:
+            records = json.load(no_asset_file)
+            if records:
+                assets.extend(records)
     if not assets:
         logger.info(f"no assets in {dyn_filter['filter_name']}")
         return "", {}

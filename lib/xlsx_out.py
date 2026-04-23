@@ -3,22 +3,21 @@ import logging
 import re
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Literal, Optional
+from typing import Literal, Optional
 
 import xlsxwriter
 from pydantic import BaseModel
-
-old_python = False
 
 
 class WriterStatistic(BaseModel):
     no_asset: int = 0
     asset: int = 0
+    bad_assets: int = 0
     ok: int = 0
     no_os_events: int = 0
     no_audit: int = 0
     no_audit_no_os_event: int = 0
-    policies_full: dict[str, dict[str, bool]] = {}
+    total_processed_policies: dict[str, dict[str, bool]] = {}
     policies_with_all_events: list[str] = []
     policies_with_missing_events: list[str] = []
     policies_with_no_events: list[str] = []
@@ -40,32 +39,18 @@ class MonitorXlsxWriter:
         orange: xlsxwriter.workbook.Format
 
     workbook: xlsxwriter.Workbook
-
-    if old_python:
-        worksheets: Any
-    else:
-        worksheets: dict[str, xlsxwriter.workbook.Worksheet]
+    worksheets: dict[str, xlsxwriter.workbook.Worksheet]
 
     formats: MainFormats = MainFormats()
-    if old_python:
-        worksheets_line_number: Any
-        worksheets_line_starter: Any
-        kb_view: Any
-        kb_uninstalled: Any
-        kb_installed: Any
-        table_mapping: Any
-    else:
-        worksheets_line_number: dict[str, int]
-        worksheets_line_starter: dict[str, int]
-        kb_view: dict[str, dict[str, int]]
-        kb_uninstalled: dict[str, list[dict[str, str | dict[str, str | bool]]]]
-        kb_installed: dict[
-            str,
-            list[
-                dict[str, str | int | bool | None | dict[str, str | int | bool | None]]
-            ],
-        ]
-        table_mapping: dict[str, list[dict[str, str]] | None]
+    worksheets_line_number: dict[str, int]
+    worksheets_line_starter: dict[str, int]
+    kb_view: dict[str, dict[str, int]]
+    kb_uninstalled: dict[str, list[dict[str, str | dict[str, str | bool]]]]
+    kb_installed: dict[
+        str,
+        list[dict[str, str | int | bool | None | dict[str, str | int | bool | None]]],
+    ]
+    table_mapping: dict[str, list[dict[str, str]] | None]
     workbook_path: Path
     delta_hours: int
     len_attrs_simple: int
@@ -111,6 +96,19 @@ class MonitorXlsxWriter:
             )
             self.logger.warning(f"Full Exception {Err}")
             pass
+        self.attrs_simple = [
+            "STATUS",
+            "asset_info",
+            "description",
+            "asset_id",
+            "audit_time",
+            "audit_status",
+            "edr_on_host",
+            "event_src.host",
+            "good_policy",
+            "not all_policy",
+            "empty policies",
+        ]
 
         self.kb_installed = {}
         try:
@@ -226,7 +224,7 @@ class MonitorXlsxWriter:
                 self.worksheets["simple"].merge_range(
                     index + 1, 6, index + 1, 8, str(comment_line), self.formats.white
                 )
-        self._stat_to_simple()
+        self._stat_to_simple("simple")
         index = 0
         self.worksheets_line_number["FULL"] += 2
         if asset_attrs:
@@ -269,29 +267,19 @@ class MonitorXlsxWriter:
             )
             index += 2
         self.worksheets_line_number["simple"] += 2
-        attrs_simple = [
-            "STATUS",
-            "asset_info",
-            "description",
-            "asset_id",
-            "audit_time",
-            "audit_status",
-            "audit_task",
-            "event_src.host",
-            "good_policy",
-            "not all_policy",
-            "empty policies",
-        ]
         self.worksheets["simple"].write_row(
-            self.worksheets_line_number["simple"], 0, attrs_simple, self.formats.cyan
+            self.worksheets_line_number["simple"],
+            0,
+            self.attrs_simple,
+            self.formats.cyan,
         )
+        self.len_attrs_simple = len(self.attrs_simple)
         self.worksheets["simple"].write_row(
             self.worksheets_line_number["simple"] - 1,
-            len(attrs_simple),
+            self.len_attrs_simple,
             ["full attrs for no_asset"],
             self.formats.cyan,
         )
-        self.len_attrs_simple = len(attrs_simple)
         self.worksheets["simple"].merge_range(
             self.worksheets_line_number["simple"] - 1,
             self.len_attrs_simple,
@@ -334,15 +322,15 @@ class MonitorXlsxWriter:
         sheet.write(2, 1, "Дни", self.formats.white_bold)  # B3
         sheet.write(2, 2, delta_hours / 24, self.formats.white)  # C3
 
-    def _stat_to_simple(self):
-        self.worksheets["simple"].write_column(
+    def _stat_to_simple(self, worksheet_name: str):
+        self.worksheets[worksheet_name].write_column(
             4, 0, ["статистика", "Общее", "Активов"], self.formats.white_bold
         )  # A5
-        self.worksheets["simple"].write_row(
+        self.worksheets[worksheet_name].write_row(
             4, 1, ["% идентификации", "Количество"], self.formats.white_bold
         )  # B5
-        self.worksheets["simple"].write(5, 2, "", self.formats.white_bold)  # C6
-        self.worksheets["simple"].write_column(
+        self.worksheets[worksheet_name].write(5, 2, "", self.formats.white_bold)  # C6
+        self.worksheets[worksheet_name].write_column(
             8,
             0,
             [
@@ -352,10 +340,10 @@ class MonitorXlsxWriter:
             ],
             self.formats.white_bold,
         )  # A9
-        self.worksheets["simple"].write_row(
+        self.worksheets[worksheet_name].write_row(
             8, 1, ["% выполнения", "Количество"], self.formats.white_bold
         )  # B9
-        self.worksheets_line_number["simple"] += 9
+        self.worksheets_line_number[worksheet_name] += 9
 
     def prepare_pol_sheets(self, policy_name, policy, out_path):
         self.worksheets.update({policy_name: self.workbook.add_worksheet(policy_name)})
@@ -738,7 +726,7 @@ class MonitorXlsxWriter:
         event_quality_array = []
         index_row = self.worksheets_line_number["FULL"]
         index_row_no_extra = self.worksheets_line_number["simple"]
-        audit_task_len = 10
+        # audit_task_len = 10
         max_p_l = 50
         # TODO переместить вниз, чтобы без ассетные были в таблицы ниже (заранее научить писать вторую таблицу?)
         self.statistics.asset = len(asset_dict)
@@ -796,7 +784,17 @@ class MonitorXlsxWriter:
                 self.worksheets["FULL"].write_row(
                     index_row, index_col, [asset, e_host_info], self.formats.white
                 )
-                full_simple_attrs = ["", "", asset, "", "", "", e_host_info, "", ""]
+                full_simple_attrs = [
+                    "",
+                    "",
+                    asset,
+                    "",
+                    "",
+                    check_edr(asset_dict[asset], small_policies),
+                    e_host_info,
+                    "",
+                    "",
+                ]
                 self.worksheets["simple"].write_row(
                     index_row_no_extra, 1, full_simple_attrs, self.formats.white_wrapped
                 )
@@ -813,13 +811,14 @@ class MonitorXlsxWriter:
                 ) = self._asset_info_to_list(asset_dict[asset]["asset_info"], col_sizer)
 
                 simple_attrs[2] = asset
-                if "audit_info" in asset_dict[asset].keys():
-                    audit_tasks = "\n".join(asset_dict[asset]["audit_info"])
-                    if len(audit_tasks) > audit_task_len:
-                        audit_task_len = len(audit_tasks) + 2
-                else:
-                    audit_tasks = ""
-                simple_attrs.append(audit_tasks)
+                # if "audit_info" in asset_dict[asset].keys():
+                #     audit_tasks = "\n".join(asset_dict[asset]["audit_info"])
+                #     # if len(audit_tasks) > audit_task_len:
+                #     #     audit_task_len = len(audit_tasks) + 2
+                # else:
+                #     audit_tasks = ""
+                # #simple_attrs.append(audit_tasks)
+                simple_attrs.append(check_edr(asset_dict[asset], small_policies))
                 if "names" in asset_dict[asset].keys():
                     e_host_info = " / ".join(asset_dict[asset]["names"])
                 attrs_list.append(e_host_info)
@@ -956,13 +955,14 @@ class MonitorXlsxWriter:
                 self.worksheets["FULL"].write_row(
                     index_row, index_col, pol_out_list, self.formats.white
                 )
+
             full_simple_attrs.append(full_policies)
             full_simple_attrs.append(part_policies)
             temp_quality = len(full_policies) + len(part_policies)
             temp_full = len(full_policies)
             asset_dict[asset]["statistic"] = {
-                "full_policies": full_policies,
-                "part_policies": part_policies,
+                "STATUS": None,
+                **dict(zip(self.attrs_simple[1:], full_simple_attrs)),
             }
             full_policies = ", ".join(full_policies)
             part_policies = ", ".join(part_policies)
@@ -977,8 +977,8 @@ class MonitorXlsxWriter:
                 self.statistics.no_audit += 1
             else:
                 self.statistics.no_audit_no_os_event += 1
-            asset_dict[asset]["statistic"]["empty_policies"] = empty_policies_list
-            asset_dict[asset]["statistic"]["status"] = simple_status
+            asset_dict[asset]["statistic"]["empty policies"] = empty_policies_list
+            asset_dict[asset]["statistic"]["STATUS"] = simple_status
             temp_quality += len(empty_policies_list)
             empty_policies = ", ".join(empty_policies_list)
             if temp_quality > 0:
@@ -1001,7 +1001,7 @@ class MonitorXlsxWriter:
                 )
             index_row += 1
             index_row_no_extra += 1
-        self.statistics.policies_full = policies_statistic
+        self.statistics.total_processed_policies = policies_statistic
         with Path(out_path / f"!check_installation_small.json").open(
             "w", encoding="utf-8"
         ) as check_installation:
@@ -1030,7 +1030,8 @@ class MonitorXlsxWriter:
             36,
             20,
             13,
-            audit_task_len,
+            # audit_task_len,
+            16,
             40,
             max_p_l,
             max_p_l,
@@ -1213,7 +1214,16 @@ def _status_master(full_simple_attrs, small_attrs, mandatory_policies=None):
                         simple_pol_st_os = True
                         break
         if mandatory_policies:
-            for mandatory in mandatory_policies:
+            mandatory_policies_copy = mandatory_policies.copy()
+            if (
+                "sa pt edr win" in mandatory_policies_copy
+                and "sa pt edr unix" in mandatory_policies_copy
+            ):
+                if "sa pt edr win" in full_simple_attrs[7]:
+                    mandatory_policies_copy.remove("sa pt edr unix")
+                elif "sa pt edr unix" in full_simple_attrs[7]:
+                    mandatory_policies_copy.remove("sa pt edr win")
+            for mandatory in mandatory_policies_copy:
                 if mandatory not in full_simple_attrs[7]:
                     empty = True
                     for not_all_with_msgid in full_simple_attrs[8]:
@@ -1237,3 +1247,20 @@ def _status_master(full_simple_attrs, small_attrs, mandatory_policies=None):
         if not simple_pol_st_os:
             list_to_return.append("no os events")
     return ", ".join(list_to_return), empty_policies
+
+
+def check_edr(asset, small_policies):
+    """edr_statuses: Literal["No policies", "Good EDR events", "No EDR events"]"""
+    if (
+        "sa pt edr win" in small_policies.keys()
+        or "sa pt edr unix" in small_policies.keys()
+    ):
+        if "policies" in asset.keys() and (
+            "sa pt edr win" in asset["policies"]
+            or "sa pt edr unix" in asset["policies"]
+        ):
+            return "Good EDR events"
+        else:
+            return "No EDR events"
+    else:
+        return "No policies"

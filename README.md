@@ -19,7 +19,7 @@
     │   .gitignore                          # Игнорируемые при commit файлы
     │   .gitlab-ci.yml                      # Автоматизация GitLab runners
     │   CONTRIBUTING.md                     # Руководство по участию
-    │   event_checker.py                    # Основной скрипт
+    │   Nomos.py                            # Основной скрипт
     │   LICENSE                             # Лицензия MIT
     │   README.md                           # Документация проекта (вы читаете этот файл)
     │   requirements.txt                    # Зависимости от Python
@@ -77,19 +77,20 @@
 
 ### Системные требования
 
-- Python 3.7+
+- Python 3.11+
 - MaxPatrol 27.3+
 - Доступ к API MP
+- microsoft Visual C++ v14+ (https://learn.microsoft.com/ru-ru/cpp/windows/latest-supported-vc-redist?view=msvc-170)
 
 ### Быстрый старт
 
 1. **Клонируйте репозиторий:**
    ```bash
-   git clone git@gitlab.ptsecurity.com:kb/nomos.git
+   git clone git@gitlab.ptsecurity.com:internal/kb/nomos.git
    ```
    ИЛИ 
    ```bash
-   git clone https://gitlab.ptsecurity.com/kb/nomos.git
+   git clone https://gitlab.ptsecurity.com/internal/kb/nomos.git
    ```
 2. перейдите в репозиторий
    ```bash
@@ -100,6 +101,7 @@
    ```bash
    pip install -r requirements.txt
    ```
+    > 💡 **тут есть маленький нюанс**: скрипт способен отправлять телеметрию, она отправляется на честный storage.ptsecurity.com, однако прежде чем отправить мы для экономии места архивируем файл телеметрии, а для большой безопасности архивируем с паролем. Скрипт способен архивировать с паролем через pyminizip, а также через 7zip, если он установлен в . Первично проверяется 7zip. А вот для работы через pyminizip необходимо его поставить. Тогда команда установки зависимостей `pip install -r requirements_pyminizip.txt`, но имейте ввиду что необходимо иметь VC++ 14+ https://learn.microsoft.com/ru-ru/cpp/windows/latest-supported-vc-redist?view=msvc-170, иначе при установке зависимостей колесо развалится и расскажет вам об этом.
 
    > 💡 **Если отстутствует интернет:** используйте архив с предустановленными зависимостями `dependencies/python-dependencies-offline.zip`. Подробные инструкции по установке см. в [dependencies/offline-install.md](dependencies/offline-install.md)
    
@@ -141,11 +143,11 @@
    | `event_policies_file` | Путь к файлу с политиками событий | `configs/event_policies.json` |
    | `asset_filters_file` | Путь к файлу с фильтрами активов | `configs/assets_filters.json` |
    
-   > 💡 **Полный список параметров и их дефолтных значений:** Запустите скрипт с флагом `python event_checker.py -h`
+   > 💡 **Полный список параметров и их дефолтных значений:** Запустите скрипт с флагом `python Nomos.py -h`
 
 6. **Запустите первую проверку:**
    ```bash
-   python event_checker.py
+   python Nomos.py
    ```
 
 ## 🎛️ Режимы работы

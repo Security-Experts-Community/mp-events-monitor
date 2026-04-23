@@ -19,7 +19,7 @@ from pydantic.v1 import BaseModel
 from sqlalchemy.exc import DBAPIError
 from tqdm.asyncio import tqdm
 
-from .events import EventsWorker
+from lib.events import EventsWorker
 
 warnings.filterwarnings("ignore")
 global_reconnect_times = 5
@@ -95,7 +95,14 @@ class EventsWorkerDL(EventsWorker):
         )
         self.logger.info("EventsWorkerDL initialized")
 
-    async def work(self, group_id, asset_ids, out_folder):
+    async def work(
+        self,
+        group_id,
+        asset_ids,
+        out_folder,
+        second_siem_dict=None,
+        second_event_field="",
+    ):
         group_tasks = []
         # не тащим Audit Events Hack потому что аудит выполняется EDR, а значит
         # https://gitlab.ptsecurity.com/dzaripov/am_scripts/-/tree/master/siem_scans?ref_type=heads
@@ -132,9 +139,10 @@ class EventsWorkerDL(EventsWorker):
             else:
                 filter_new = filter_dl.select + filter_dl.event_filter + filter_dl.group
             policy["sql"] = filter_new
-            with file_path.open("w", encoding="utf-8") as out_file:
-                self.logger.debug(f"Create {file_path} with info for SQL query")
-                json.dump(policy, out_file, ensure_ascii=False, indent=4)
+            if self.settings.logging_level == "DEBUG":
+                with file_path.open("w", encoding="utf-8") as out_file:
+                    self.logger.debug(f"Create {file_path} with info for SQL query")
+                    json.dump(policy, out_file, ensure_ascii=False, indent=4)
             group_tasks.append(
                 asyncio.create_task(self._starter_get_data_by_sql(policy, out_folder))
             )
@@ -149,19 +157,20 @@ class EventsWorkerDL(EventsWorker):
                     self.policies.rebuilt_policies[index]["host_ids"].update(
                         {host: results[index][host]}
                     )
-        with (out_folder / "!out_all.json").open("w", encoding="utf-8") as out_file:
-            json.dump(
-                self.policies.rebuilt_policies,
-                out_file,
-                ensure_ascii=False,
-                indent=4,
-            )
-        with (out_folder / "!small_policies.json").open(
-            "w", encoding="utf-8"
-        ) as out_file:
-            json.dump(
-                self.policies.small_policies, out_file, ensure_ascii=False, indent=4
-            )
+        if self.settings.logging_level == "DEBUG":
+            with (out_folder / "!out_all.json").open("w", encoding="utf-8") as out_file:
+                json.dump(
+                    self.policies.rebuilt_policies,
+                    out_file,
+                    ensure_ascii=False,
+                    indent=4,
+                )
+            with (out_folder / "!small_policies.json").open(
+                "w", encoding="utf-8"
+            ) as out_file:
+                json.dump(
+                    self.policies.small_policies, out_file, ensure_ascii=False, indent=4
+                )
         return self.policies
 
     def check_filter(self, old_filter: str):
@@ -212,7 +221,8 @@ class EventsWorkerDL(EventsWorker):
         self.logger.debug(
             f"Get {data_by_sql.shape[0]} rows for {policy['file_name']}. Lead time SQL: {lead_time} seconds."
         )
-        policy["host_ids"] = {}
+        if "host_ids" not in policy:
+            policy["host_ids"] = {}
         for row in data_by_sql.to_dict("records"):
             asset = str(row["event_src__asset"])
 
@@ -230,8 +240,11 @@ class EventsWorkerDL(EventsWorker):
                 policy["host_ids"][asset]["event_src.host"].append(
                     row["event_src__host"]
                 )
-        with (out_dir / policy["file_name"]).open("w", encoding="utf-8") as out_file:
-            json.dump(policy, out_file, ensure_ascii=False, indent=4)
+        if self.settings.logging_level == "DEBUG":
+            with (out_dir / policy["file_name"]).open(
+                "w", encoding="utf-8"
+            ) as out_file:
+                json.dump(policy, out_file, ensure_ascii=False, indent=4)
         return policy["host_ids"]
 
     @get_backoff_decorator()

@@ -638,6 +638,11 @@
             "DLL_Side_Loading"
         ]
     },
+    "Subrule_Doppelganging_Usage": {
+        "mitre_attck_defense_evasion": [
+            "Doppelganging_Usage"
+        ]
+    },
     "Copying_Files": {
         "mitre_attck_defense_evasion": [
             "Explicit_Recycle_Bin_Directory_Usage"
@@ -1106,6 +1111,11 @@
             "SupplyChain_Merge_Request_Apply_From_New_Assignee"
         ]
     },
+    "Subrule_Possible_Unix_Beacon": {
+        "unix_mitre_attck_command_and_control": [
+            "Unix_Cobalt_Strike_System_Command_Execution"
+        ]
+    },
     "Unix_Suspicious_Command": {
         "unix_mitre_attck_command_and_control": [
             "Unix_Possible_GSocket_Usage"
@@ -1309,11 +1319,6 @@
             "CVE_2022_26503_Exploitation"
         ]
     },
-    "Confluence_App_Installed": {
-        "vulnerabilities": [
-            "CVE_2023_22515_Confluence"
-        ]
-    },
     "Unix_Connect_From_Suspicious_Dir": {
         "vulnerabilities": [
             "CVE_2023_22515_Confluence"
@@ -1392,6 +1397,11 @@
     "Subrule_CVE_2025_48799_PrivEsc_Via_Windows_Update_Service": {
         "vulnerabilities": [
             "CVE_2025_48799_PrivEsc_Via_Windows_Update_Service"
+        ]
+    },
+    "Subrule_CVE_2026_20931_TapiSrv": {
+        "vulnerabilities": [
+            "CVE_2026_20931_TapiSrv"
         ]
     },
     "MS17_010_SMB_Privellege_Escalation": {

@@ -2,28 +2,16 @@ import importlib.metadata
 import logging
 import re
 import shutil
-import sys
 import time
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
 from pathlib import Path
+from typing import Literal, Optional, Union
 from uuid import UUID
 
 from pydantic import AliasChoices, Field, FilePath, SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-old_python = False
-if sys.version.find("3.7.") == 0:
-    old_python = True
-    from typing import List as list
-    from typing import Optional, Union
-
-    from typing_extensions import Literal
-
-    base_params = {}
-else:
-    from typing import Literal, Optional, Union
-
-    base_params = {"cli_parse_args": True, "cli_prog_name": "python event_checker.py"}
+base_params = {"cli_parse_args": True, "cli_prog_name": "python event_checker.py"}
 
 
 class Settings(BaseSettings, **base_params):
@@ -83,13 +71,12 @@ class Settings(BaseSettings, **base_params):
         description="Папка для результатов (абсолютный или относительный путь, "
         "в JSON используйте \\)",
     )
-    clear_mode: Literal["full", "today", "day-1", "day-2", "not_clear"] = Field(
+    clear_mode: Literal["full", "1-day", "2-day", "3-day", "not_clear"] = Field(
         default="full",
         validation_alias=AliasChoices("c", "clear", "clear_mode"),
         description="Подходит только для режима работы Assets_filters (так как остальные создают только один "
         "файл). Выбор режима очистки папки из out_folder. full - чистить всегда полностью, "
-        "today - очистить только отчеты созданные не сегодня и выполнить фильтры только для "
-        "недостающих, day-1 - оставить вчерашнее, day-2 - оставить позавчерашние, not_clear - "
+        "1-day - оставить вчерашнее, 2-day - оставить позавчерашние, 3-day - -//-, not_clear - "
         "не чистить отчеты, создать недостающие.",
     )
     mode: Literal[
@@ -154,6 +141,11 @@ class Settings(BaseSettings, **base_params):
         validation_alias=AliasChoices("a", "asset_filters_file"),
         description="Путь к файлу с запросами к активам и описанием какие политики для этих активов надо проверить",
     )
+    bad_asset_file: FilePath = Field(
+        default=Path("configs/bad_asset_file.json"),
+        validation_alias=AliasChoices("b", "bad_asset_file"),
+        description="Путь к файлу с запросами к активам, являющимися некорректными",
+    )
     mpx_host: str = Field(
         description="FQDN MaxPatrol", validation_alias=AliasChoices("mpx_host", "host")
     )
@@ -195,8 +187,11 @@ class Settings(BaseSettings, **base_params):
     dl_table: str = ""
     datalake_chunk_size: int = 10000
     telemetry: Literal["no", "small", "all"] = Field(
-        default="small",
+        default="no",
         description="Уровень жадности телеметрии",
+    )
+    audit_hack: bool = Field(
+        default=False, description="Если у вас применен скрипт siem_scans.py на MP 10"
     )
     model_config = SettingsConfigDict(
         env_file=Path("configs/.config.env"), extra="allow"
@@ -237,52 +232,56 @@ class Settings(BaseSettings, **base_params):
             elif self.clear_mode == "not_clear":
                 pass
             else:
-                date_dict = {
-                    "today": timedelta(days=0),
-                    "day-1": timedelta(days=1),
-                    "day-2": timedelta(days=2),
-                }
-                if self.clear_mode not in date_dict.keys():
-                    logger.error(
-                        f"{self.clear_mode} not in default dict use today mode."
-                    )
-                    self.clear_mode = "today"
-                min_date = date.today() - date_dict[self.clear_mode]
+                min_date = datetime.now() - timedelta(days=int(self.clear_mode[0]))
                 logger.info(
                     f"Preparing folder {self.out_folder.absolute()}. Delete all reports older then {min_date}"
                 )
-                for excel_report in self.out_folder.glob("*.xlsx"):
-                    create_find = re.search("^\\d{4}-\\d{2}-\\d{2}", excel_report.name)
-                    if create_find:
-                        create_find = create_find.group(0)
-                        create_date = datetime.strptime(create_find, "%Y-%m-%d").date()
-                        if (
-                            create_date < min_date
-                            or excel_report.name.find("table_report") != -1
+                for file_path in self.out_folder.iterdir():
+                    create_date = datetime.fromtimestamp(file_path.stat().st_ctime)
+                    # TODO. Если мы хотим делать статистику за время, то эти файлы наоборот надо оставлять
+                    #  elif file_path.name.find(f"{self.mpx_host}_stat.json") != -1:
+                    if create_date < min_date:
+                        if file_path.is_dir() and not folder_prepare(
+                            file_path, self.reconnect_times, logger, False
                         ):
-                            excel_report.unlink()
-                logger.info(
-                    "Remove all folders and text files which have no excel report"
-                )
-                for folder in self.out_folder.iterdir():
-                    if folder.is_dir():
-                        have_report = False
-                        for _ in self.out_folder.glob(f"*-{folder.name}-*.xlsx"):
-                            have_report = True
-                        if not have_report:
-                            if not folder_prepare(folder, 5, logger, False):
-                                exit(1)
-                    elif folder.is_file() and not folder.name.endswith(".xlsx"):
-                        folder.unlink()
+                            exit(1)
+                        elif file_path.is_file():
+                            file_unlink(file_path, self.reconnect_times)
+                    elif file_path.name == "diffs":
+                        pass
+                    elif (
+                        file_path.is_dir()
+                        and not (file_path / "!asset_dict.json").exists()
+                        and not folder_prepare(
+                            file_path, self.reconnect_times, logger, False
+                        )
+                    ):
+                        exit(1)
+                logger.info("Check that all xlsx files have folder with stat info")
+                for excel_report in self.out_folder.glob("*.xlsx"):
+                    create_find = re.search(
+                        ("^\\d{4}-\\d{2}-\\d{2}-(.*)-" + f"{self.mpx_host}\\.xlsx"),
+                        excel_report.name,
+                    )
+                    if create_find and create_find.group(1) != "table_report":
+                        stat_folder = self.out_folder / create_find.group(1)
+                        if not stat_folder.exists() or not stat_folder.is_dir():
+                            file_unlink(excel_report, self.reconnect_times)
+                    elif re.search(
+                        (
+                            "^!\\d{4}-\\d{2}-\\d{2}-final_stat-"
+                            + f"{self.mpx_host}\\.xlsx"
+                        ),
+                        excel_report.name,
+                    ) and excel_report.name[1:11] == str(datetime.now().date()):
+                        logger.info(
+                            f"The file {excel_report} will be deleted because the script will create the new one"
+                        )
+                        file_unlink(excel_report, self.reconnect_times)
         else:
             if not folder_prepare(self.out_folder, self.reconnect_times, logger):
                 exit(1)
         if self.dl_mode:
-            # if self.mode != "Assets_filters":
-            #     logger.error(
-            #         "dl_mode using only in 'Assets_filters' mode. dl_mode disable."
-            #     )
-            #     self.dl_mode = False
             if not self.dl_table:
                 logger.error("dl_mode enabled but no dl_table. dl_mode disable.")
                 self.dl_mode = False
@@ -333,6 +332,7 @@ class Settings(BaseSettings, **base_params):
                     logger.error("Exiting. Check DataLake settings in '.config.env'")
                     exit(1)
                 logger.info("DataLake client successfully authenticated")
+        return self
 
 
 def check_group_id(group_id, where, logger: Optional[logging.Logger] = None):
@@ -351,10 +351,13 @@ def check_group_id(group_id, where, logger: Optional[logging.Logger] = None):
 
 
 def folder_prepare(
-    folder_path: Path, max_reties: int, logger: logging.Logger, need_create: bool = True
+    folder_path: Path,
+    max_retries: int,
+    logger: logging.Logger,
+    need_create: bool = True,
 ):
-    logger = logging.getLogger("MaxPatrolEventsMonitor")
-    for retry_num in range(max_reties):
+    # logger = logging.getLogger("MaxPatrolEventsMonitor")
+    for retry_num in range(max_retries):
         try:
             if folder_path.exists():
                 shutil.rmtree(folder_path)
@@ -364,13 +367,31 @@ def folder_prepare(
             return True
         except PermissionError as Err:
             logger.error(
-                f'Error while "{str(folder_path.absolute())} " clear. Try number {retry_num + 1} of {max_reties} tries'
+                f'Error while "{str(folder_path.absolute())} " clear. Try number {retry_num + 1} of {max_retries} tries'
             )
             logger.error(f"Error: {Err}.")
             logger.error("Close file in 10 seconds")
-            time.sleep(10)
+            if retry_num != max_retries - 1:
+                time.sleep(10)
     logger.error(f"Can't clear folder {folder_path}")
     return False
+
+
+def file_unlink(file: Path, max_retries: int):
+    logger = logging.getLogger("MaxPatrolEventsMonitor")
+    for retry_num in range(max_retries):
+        try:
+            file.unlink()
+            return True
+        except PermissionError as Err:
+            logger.error(
+                f'Error while "{str(file.absolute())} " clear. Try number {retry_num + 1} of {max_retries} tries'
+            )
+            logger.error(f"Error: {Err}.")
+            logger.error("Close file in 10 seconds")
+            if retry_num != max_retries - 1:
+                time.sleep(10)
+    raise PermissionError(f"Finally can't clear folder {file}")
 
 
 def test():
