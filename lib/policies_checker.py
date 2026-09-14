@@ -1,3 +1,4 @@
+import sys
 import json
 import logging
 import re
@@ -25,14 +26,14 @@ class EventPolicies:
                 self.policies_by_file = json.load(policies_file)
         except JSONDecodeError as Err:
             self.logger.error(f"Policies file {self.policies_path} is not JSON: {Err}")
-            exit(1)
+            sys.exit(1)
 
     def check_policies(self):
         all_good = True
 
         if not self.policies_by_file:
             self.logger.error("Policies file is empty")
-            exit(1)
+            sys.exit(1)
         for policy in self.policies_by_file.keys():
             if type(self.policies_by_file[policy]) is not dict:
                 self.logger.error(f"Policy `{policy}` is not a dict")
@@ -67,7 +68,7 @@ class EventPolicies:
         if all_good:
             self.logger.info("All policies is good")
         else:
-            exit(1)
+            sys.exit(1)
 
     def check_policies_type(self, pol_blacklist=None, pol_whitelist=None):
         if type(pol_blacklist) is str:

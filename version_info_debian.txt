@@ -1,0 +1,4 @@
+# Версия сборки; кладётся внутрь бандла как данные (--add-data).
+# Плейсхолдеры подставляет CI (Build:debian).
+version={{BUILD_VERSION}}
+pipeline={{CI_PIPELINE_IID}}

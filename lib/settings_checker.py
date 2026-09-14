@@ -1,3 +1,4 @@
+import sys
 import importlib.metadata
 import logging
 import re
@@ -193,6 +194,21 @@ class Settings(BaseSettings, **base_params):
     audit_hack: bool = Field(
         default=False, description="Если у вас применен скрипт siem_scans.py на MP 10"
     )
+    debug_dump: bool = Field(
+        default=False,
+        description="Сохранять редактированные тела HTTP-обменов в debug/{run_id}/ "
+        "(для передачи в диагностическом бандле)",
+    )
+    record_fixtures: bool = Field(
+        default=False,
+        description="Записывать ответы API в fixtures/{run_id}/ для offline-регрессии. "
+        "Включите при снятии золотого эталона (первый прогон на стенде)",
+    )
+    dump_queries: bool = Field(
+        default=False,
+        description="Выводить план предстоящих запросов (PDQL фильтра, применимые "
+        "политики и тексты их запросов) в журнал и в out/query_fixtures.json",
+    )
     model_config = SettingsConfigDict(
         env_file=Path("configs/.config.env"), extra="allow"
     )
@@ -223,7 +239,7 @@ class Settings(BaseSettings, **base_params):
     @model_validator(mode="after")
     def valid_group_and_folder_prepare(self):
         if not check_group_id(self.mpx_group, "in configs/.config.env mpx_group"):
-            exit(1)
+            sys.exit(1)
         logging.basicConfig(level=self.logging_level)
         logger = logging.getLogger("MaxPatrolEventsMonitor")
         if self.mode == "Assets_filters" and self.clear_mode != "full":
@@ -244,7 +260,7 @@ class Settings(BaseSettings, **base_params):
                         if file_path.is_dir() and not folder_prepare(
                             file_path, self.reconnect_times, logger, False
                         ):
-                            exit(1)
+                            sys.exit(1)
                         elif file_path.is_file():
                             file_unlink(file_path, self.reconnect_times)
                     elif file_path.name == "diffs":
@@ -256,7 +272,7 @@ class Settings(BaseSettings, **base_params):
                             file_path, self.reconnect_times, logger, False
                         )
                     ):
-                        exit(1)
+                        sys.exit(1)
                 logger.info("Check that all xlsx files have folder with stat info")
                 for excel_report in self.out_folder.glob("*.xlsx"):
                     create_find = re.search(
@@ -280,7 +296,7 @@ class Settings(BaseSettings, **base_params):
                         file_unlink(excel_report, self.reconnect_times)
         else:
             if not folder_prepare(self.out_folder, self.reconnect_times, logger):
-                exit(1)
+                sys.exit(1)
         if self.dl_mode:
             if not self.dl_table:
                 logger.error("dl_mode enabled but no dl_table. dl_mode disable.")
@@ -330,7 +346,7 @@ class Settings(BaseSettings, **base_params):
                         f"DataLake client can't authenticate to lake with Error: {Err}."
                     )
                     logger.error("Exiting. Check DataLake settings in '.config.env'")
-                    exit(1)
+                    sys.exit(1)
                 logger.info("DataLake client successfully authenticated")
         return self
 
@@ -363,7 +379,8 @@ def folder_prepare(
                 shutil.rmtree(folder_path)
             if need_create:
                 logger.info(f"Create folder: {folder_path.absolute()}")
-                folder_path.mkdir()
+                # parents=True: веб-прогоны используют вложенные out/web-<ts>
+                folder_path.mkdir(parents=True, exist_ok=True)
             return True
         except PermissionError as Err:
             logger.error(

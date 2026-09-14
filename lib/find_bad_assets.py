@@ -7,6 +7,8 @@ from typing import Any
 
 import requests
 
+from nomos.errors import FilterExecutionError
+
 try:
     from lib.settings_checker import Settings
 except ImportError:
@@ -180,7 +182,7 @@ class MaxPatrolPDQL:
             return pdql
         else:
             self.logger.error("PDQL must be string or list of strings")
-            exit(1)
+            raise FilterExecutionError("bad_assets", "PDQL не строка и не список строк")
 
     def asset_filters(self) -> list[dict]:
         total_assets: list[dict] = []

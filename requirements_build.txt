@@ -1,0 +1,4 @@
+# Зависимости сборочного агента CI: прогон + PyInstaller.
+# Обычный запуск требует только requirements.txt.
+-r requirements.txt
+pyinstaller>=6.10

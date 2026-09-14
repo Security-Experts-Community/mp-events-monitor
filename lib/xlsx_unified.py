@@ -6,6 +6,7 @@ from typing import Optional
 import xlsxwriter
 
 from lib.xlsx_out import MonitorXlsxWriter, WriterStatistic
+from nomos.domain.analysis import status_counter_field
 
 
 class XlsxUnited(MonitorXlsxWriter):
@@ -79,21 +80,24 @@ class XlsxUnited(MonitorXlsxWriter):
                 if type(value) is str:
                     value_for_write = value
                     if key == "STATUS":
-                        if value == "ok":
-                            write_format = self.formats.green
-                            self.statistics.ok += 1
+                        # Единая классификация статусов — nomos.domain
+                        # (совместно с листом simple, фикс N25)
+                        known = {"ok", "no os events", "no audit",
+                                 "no audit, no os events"}
+                        write_format = (
+                            self.formats.green if value == "ok" else self.formats.red
+                        )
+                        if value in known:
+                            field = status_counter_field(value)
+                            setattr(
+                                self.statistics,
+                                field,
+                                getattr(self.statistics, field) + 1,
+                            )
                         else:
-                            write_format = self.formats.red
-                            if value == "no os events":
-                                self.statistics.no_os_events += 1
-                            elif value == "no audit":
-                                self.statistics.no_audit += 1
-                            elif value == "no audit, no os events":
-                                self.statistics.no_audit_no_os_event += 1
-                            else:
-                                self.logger.warning(
-                                    f"Status {value} unexpected in {asset_id}."
-                                )
+                            self.logger.warning(
+                                f"Status {value} unexpected in {asset_id}."
+                            )
                     elif key == "edr_on_host":
                         if value == "Good EDR events":
                             write_format = self.formats.green

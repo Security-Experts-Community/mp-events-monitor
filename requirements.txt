@@ -1,13 +1,21 @@
-requests
-xlsxwriter
-aiohttp
-tqdm
-pydantic
-pydantic-settings
-urllib3
-black
-flake8
-pytest
-isort
-PyYAML
-backoff
+# Зависимости прогона и веб-интерфейса.
+# Источник истины — pyproject.toml; здесь то же самое для pip install -r.
+# Опциональное ставится отдельно:
+#   pip install -e .[dev]        тесты и линт (pytest, ruff)
+#   pip install -e .[dl]         режим DataLake (pandas)
+#   pip install -e .[telemetry]  отправка отчётов (pyminizip, требует компилятор)
+
+# HTTP к MaxPatrol
+requests>=2.32,<3
+aiohttp>=3.12,<4
+urllib3>=2.4
+backoff>=2.2
+
+# Конфигурация
+pydantic>=2.11,<3
+pydantic-settings>=2.11,<3
+PyYAML>=6.0
+
+# Отчёты и прогресс
+xlsxwriter>=3.2,<4
+tqdm>=4.67

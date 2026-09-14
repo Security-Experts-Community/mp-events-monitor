@@ -1,3 +1,18 @@
+# Проверка версии Python — до любых сторонних импортов: иначе оператор
+# видит "DLL load failed while importing _pydantic_core" вместо объяснения
+import os
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from envcheck import ensure_supported_python  # noqa: E402
+
+ensure_supported_python()
+
+# В собранном exe работаем в его папке: configs/, out/ и logs/ лежат рядом
+# с исполняемым файлом, откуда бы его ни запустили
+if getattr(sys, "frozen", False):
+    os.chdir(os.path.dirname(os.path.abspath(sys.executable)))
+
 import asyncio
 import json
 import logging
@@ -18,8 +33,22 @@ from lib.policies_checker import EventPolicies
 from lib.settings_checker import Settings, check_group_id
 from lib.test_bot import archive_upload
 from lib.xlsx_unified import XlsxUnited
+from nomos import init_debug_harness
+from nomos.autofinish import finalize_last_run
+from nomos.errors import FilterExecutionError
+from nomos.domain import dump_unified_report, merge_asset_statistics
+from nomos.queryplan import plan_asset_worker
+from nomos.service.collect import collect_unified
 
 warnings.filterwarnings("ignore")
+
+# Дружественный CLI: принимаем как канонический формат pydantic-settings
+# (--debug_dump true), так и env-стиль (debug_dump=true) — оператору не нужно
+# помнить разницу между файлом конфигурации и командной строкой.
+sys.argv[1:] = [
+    ("--" + arg) if ("=" in arg and not arg.startswith("-")) else arg
+    for arg in sys.argv[1:]
+]
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
@@ -34,13 +63,16 @@ class MaxPatrolEventsMonitor:
     auth: MPXAuthenticator
     united_xlsx: XlsxUnited
 
-    def __init__(self) -> None:
+    def __init__(self, settings=None) -> None:
         self.logger: logging.Logger = logging.getLogger("MaxPatrolEventsMonitor")
         try:
-            self.settings = Settings()
+            self.settings = settings if settings is not None else Settings()
         except (ValueError, ValidationError) as Err:
             self.logger.error(Err)
-            exit(1)
+            sys.exit(1)
+        # Этап 0: журналирование (консоль + nomos.log + JSONL) и HTTP-трассировка.
+        # Ставится ДО первого запроса к MaxPatrol, чтобы попала и аутентификация.
+        self.run_id = init_debug_harness(self.settings)
         self.logger.setLevel(self.settings.logging_level)
         self.logger.info(
             f"Settings checked. Accepted script mode: {self.settings.mode}"
@@ -52,7 +84,7 @@ class MaxPatrolEventsMonitor:
         self.auth = MPXAuthenticator(self.logger)
         self.auth.authenticate(self.settings)
         self.statistic = {
-            "common": {"host": self.settings.mpx_host},
+            "common": {"host": self.settings.mpx_host, "run_id": self.run_id},
             "asset_file": str(self.settings.asset_filters_file),
         }
 
@@ -83,7 +115,7 @@ class MaxPatrolEventsMonitor:
                     checker = False
                 asset_dict.update({line: {}})
             if not checker:
-                exit(1)
+                sys.exit(1)
         temp_dir = self.settings.out_folder / "Asset_IDs"
         temp_dir.mkdir()
         ev = EventsWorker(
@@ -184,16 +216,23 @@ class MaxPatrolEventsMonitor:
             ev.make_readable_out(temp_dir, [], {}, [], True, [])
             self.statistic["Asset_IDs"] = ev.statistic
 
-    def asset_filters(self):
+    def asset_filters(self, progress_cb=None, filter_done_cb=None):
         self.statistic["|Asset_filters|"] = {}
         with Path(self.settings.asset_filters_file).open(
             "r", encoding="utf-8"
         ) as assets_filters_file:
             assets_filters = json.load(assets_filters_file)
+        filter_names = [f for f in assets_filters if f != "comments"]
         for assets_filter in assets_filters:
             self.logger.info(f"start {assets_filter}")
             if assets_filter == "comments":
                 continue
+            if progress_cb is not None:
+                progress_cb(
+                    filter_names.index(assets_filter) + 1,
+                    len(filter_names),
+                    assets_filter,
+                )
             folder_name = re.sub("[^a-zA-Zа-яА-я_ 0-9-]", "_", assets_filter)
             out_folder = self.settings.out_folder / folder_name
             if out_folder.exists():
@@ -240,8 +279,11 @@ class MaxPatrolEventsMonitor:
                 self.logger.error(
                     f"{assets_filters[assets_filter]['PDQL']} not a list and string, check."
                 )
-                self.logger.error("Exiting")
-                exit(1)
+                # N2: кривой PDQL — пропуск фильтра, а не смерть прогона
+                self.statistic["|Asset_filters|"][assets_filter] = {
+                    "FAILED": "PDQL не строка и не список строк"
+                }
+                continue
             all_search_values = {}
             if (
                 "all_search_values" in assets_filters[assets_filter].keys()
@@ -256,7 +298,22 @@ class MaxPatrolEventsMonitor:
                 assets_filter,
                 assets_filters[assets_filter],
             )
-            aw.assets_take_info(out_folder, True, all_search_values)
+            if self.settings.dump_queries:
+                # Отладка: что именно будет спрошено по этому фильтру
+                plan_asset_worker(aw, self.logger)
+            try:
+                aw.assets_take_info(out_folder, True, all_search_values)
+                if filter_done_cb is not None:
+                    filter_done_cb(assets_filter)
+            except FilterExecutionError as err:
+                # N2: один сломанный фильтр не должен убивать прогон.
+                self.logger.error(f"Фильтр пропущен: {err}")
+                self.statistic["|Asset_filters|"][assets_filter] = {
+                    "FAILED": err.reason
+                }
+                if filter_done_cb is not None:
+                    filter_done_cb(assets_filter)
+                continue
 
             self.statistic["|Asset_filters|"][assets_filter] = aw.statistic
             self.statistic["|Asset_filters|"][assets_filter]["PDQL"] = assets_filters[
@@ -266,48 +323,17 @@ class MaxPatrolEventsMonitor:
 
     def unified_report(self, assets_filters, bad_assets={}):
         self.logger.info("try to make unified-report")
-        all_assets = {}
-        e_hosts_checker = {}
-        all_no_asset = []
-        for assets_filter in assets_filters:
-            if assets_filter == "comments":
-                continue
-            folder_name = re.sub("[^a-zA-Zа-яА-я_ 0-9-]", "_", assets_filter)
-            out_folder = self.settings.out_folder / folder_name
-            asset_dict_path = out_folder / "!asset_dict.json"
-            asset_dict = {}
-            try:
-                with asset_dict_path.open("r", encoding="utf-8") as asset_dict_file:
-                    asset_dict = json.load(asset_dict_file)
-            except Exception:
-                self.logger.warning(f"Can't open {asset_dict_path.absolute()}")
-            if asset_dict:
-                for asset_id, asset_info in asset_dict.items():
-                    if asset_info.get("statistic") and asset_info["statistic"].get(
-                        "event_src.host"
-                    ):
-                        asset_collision_detected = False
-                        e_hosts = asset_info["statistic"]["event_src.host"].split(" / ")
-                        for e_host in e_hosts:
-                            if e_host not in e_hosts_checker.keys():
-                                e_hosts_checker[e_host] = [asset_id]
-                            elif asset_id not in e_hosts_checker[e_host]:
-                                e_hosts_checker[e_host].append(asset_id)
-                                asset_collision_detected = True
-                    self.asset_analyzer(
-                        all_assets, asset_id, asset_info["statistic"], assets_filter
-                    )
-            no_asset_path = out_folder / "!take_no_asset_ids.json"
-            no_asset_list = []
-            try:
-                with no_asset_path.open("r", encoding="utf-8") as no_asset_file:
-                    no_asset_list = json.load(no_asset_file)
-            except Exception:
-                self.logger.warning(f"Can't open {no_asset_path.absolute()}")
-            if no_asset_list:
-                for no_asset in no_asset_list:
-                    new_no_asset = {"report": assets_filter, **no_asset}
-                    all_no_asset.append(new_no_asset)
+        # Этап 2: сборка вынесена в nomos.service.collect.collect_unified —
+        # тот же код строит промежуточные срезы по мере выполнения фильтров.
+        all_assets, all_no_asset, unified = collect_unified(
+            out_folder=self.settings.out_folder,
+            assets_filters=list(assets_filters),
+            bad_assets=bad_assets,
+            filters_statistic=self.statistic.get("|Asset_filters|"),
+            host=self.settings.mpx_host,
+            time_delta_hours=self.settings.time_delta_hours,
+            run_id=self.run_id,
+        )
         self.united_xlsx = XlsxUnited(
             self.settings.out_folder,
             self.settings.mpx_host,
@@ -323,129 +349,108 @@ class MaxPatrolEventsMonitor:
         self.statistic["unified statistic"] = self.united_xlsx.statistics.model_dump()
         self.united_xlsx.workbook.close()
 
-        # print(json.dumps(e_hosts_checker, indent=4, ensure_ascii=False))
+        # Этап 1/2: типизированный отчёт собран в collect_unified выше.
+        self.last_unified_report = unified
+        dump_unified_report(unified, self.settings.out_folder)
 
     def asset_analyzer(self, all_assets, asset_id, asset_stat, assets_filter):
-        if asset_id not in all_assets.keys():
-            all_assets[asset_id] = {
-                "STATUS": asset_stat["STATUS"],
-                "reports": [assets_filter],
-            }
-            all_assets[asset_id].update(asset_stat)
-        else:
-            for stat_field, stat_value in all_assets[asset_id].items():
-                if stat_field == "STATUS":
-                    if stat_value != asset_stat["STATUS"]:
-                        if stat_value == "ok":
-                            all_assets[asset_id][stat_field] = asset_stat["STATUS"]
-                        elif (
-                            stat_value == "no audit"
-                            and asset_stat["STATUS"] == "no os events"
-                        ):
-                            all_assets[asset_id][stat_field] = "no audit, no os events"
-                        elif (
-                            stat_value == "no os events"
-                            and asset_stat["STATUS"] == "no audit"
-                        ):
-                            all_assets[asset_id][stat_field] = "no audit, no os events"
-                elif type(stat_value) is not list:
-                    if (
-                        stat_value is None
-                        and stat_field in asset_stat.keys()
-                        and asset_stat[stat_field]
-                    ):
-                        all_assets[asset_id][stat_field] = asset_stat[stat_field]
-                elif stat_field == "reports":
-                    all_assets[asset_id][stat_field].append(assets_filter)
-                elif type(stat_value) is list and asset_stat.get(stat_field):
-                    # я намеренно не делаю обработки что в одном случае политика лежит в другом поле
-                    # (на одном запросе выполнилась, на другом нет или частично,
-                    # потому что технически такого быть не должно)
-                    for policy in asset_stat[stat_field]:
-                        if policy not in stat_value:
-                            all_assets[asset_id][stat_field].append(policy)
+        """Этап 1: логика слияния перенесена в
+        nomos.domain.analysis.merge_asset_statistics."""
+        merge_asset_statistics(all_assets, asset_id, asset_stat, assets_filter)
 
 
 if __name__ == "__main__":
-    mem = MaxPatrolEventsMonitor()
-    if not (mem.settings.out_folder / "bad_assets.json").exists():
-        processor = MaxPatrolPDQL(mem.settings, mem.logger, mem.auth)
-        processor.process_bad_assets(processor.asset_filters())
-    if (mem.settings.out_folder / "bad_assets.json").exists():
-        mem.logger.info("Load bad_assets.json")
-        with (mem.settings.out_folder / "bad_assets.json").open(
-            "r", encoding="utf-8"
-        ) as f:
-            bad_assets = json.load(f)
-    global_assets_filters = []
-    if mem.settings.kb_check_mode:
-        if not (
-            (mem.settings.out_folder / "KB_struct_uninstalled.json").exists()
-            and (mem.settings.out_folder / "KB_struct.json").exists()
-        ):
-            kb_check_a = KB_Checker(mem.settings, mem.logger, mem.auth)
-            kb_check_a.work()
-        if (mem.settings.out_folder / "license_info.json").exists():
-            with (mem.settings.out_folder / "license_info.json").open(
+    _run_failed = False
+    try:
+        mem = MaxPatrolEventsMonitor()
+        if not (mem.settings.out_folder / "bad_assets.json").exists():
+            processor = MaxPatrolPDQL(mem.settings, mem.logger, mem.auth)
+            processor.process_bad_assets(processor.asset_filters())
+        if (mem.settings.out_folder / "bad_assets.json").exists():
+            mem.logger.info("Load bad_assets.json")
+            with (mem.settings.out_folder / "bad_assets.json").open(
                 "r", encoding="utf-8"
             ) as f:
-                mem.statistic["lic_info"] = json.load(f)
-        if (mem.settings.out_folder / "KB_struct_uninstalled.json").exists():
-            with (mem.settings.out_folder / "KB_struct_uninstalled.json").open(
+                bad_assets = json.load(f)
+        global_assets_filters = []
+        if mem.settings.kb_check_mode:
+            if not (
+                (mem.settings.out_folder / "KB_struct_uninstalled.json").exists()
+                and (mem.settings.out_folder / "KB_struct.json").exists()
+            ):
+                kb_check_a = KB_Checker(mem.settings, mem.logger, mem.auth)
+                kb_check_a.work()
+            if (mem.settings.out_folder / "license_info.json").exists():
+                with (mem.settings.out_folder / "license_info.json").open(
+                    "r", encoding="utf-8"
+                ) as f:
+                    mem.statistic["lic_info"] = json.load(f)
+            if (mem.settings.out_folder / "KB_struct_uninstalled.json").exists():
+                with (mem.settings.out_folder / "KB_struct_uninstalled.json").open(
+                    "r", encoding="utf-8"
+                ) as f:
+                    mem.statistic["not_installed"] = json.load(f)
+        if mem.settings.mode == "ALL_events":
+            mem.all_events_worker()
+        elif mem.settings.mode == "Asset_IDs":
+            mem.asset_ids_worker()
+        elif mem.settings.mode == "ALL_assets":
+            mem.all_assets_worker()
+        elif mem.settings.mode in ["Dynamic_Groups_assets", "Dynamic_Groups_events"]:
+            mem.dynamic_modes()
+        elif mem.settings.mode == "Assets_filters":
+            global_assets_filters = mem.asset_filters()
+            mem.unified_report(global_assets_filters, bad_assets)
+        # elif mem.settings.mode == "Only_KB":
+        #     mem.kb_check()
+        if (mem.settings.out_folder / "empty_tables.json").exists():
+            mem.logger.info("Load empty_tables.json")
+            with (mem.settings.out_folder / "empty_tables.json").open(
                 "r", encoding="utf-8"
             ) as f:
-                mem.statistic["not_installed"] = json.load(f)
-    if mem.settings.mode == "ALL_events":
-        mem.all_events_worker()
-    elif mem.settings.mode == "Asset_IDs":
-        mem.asset_ids_worker()
-    elif mem.settings.mode == "ALL_assets":
-        mem.all_assets_worker()
-    elif mem.settings.mode in ["Dynamic_Groups_assets", "Dynamic_Groups_events"]:
-        mem.dynamic_modes()
-    elif mem.settings.mode == "Assets_filters":
-        global_assets_filters = mem.asset_filters()
-        mem.unified_report(global_assets_filters, bad_assets)
-    # elif mem.settings.mode == "Only_KB":
-    #     mem.kb_check()
-    if (mem.settings.out_folder / "empty_tables.json").exists():
-        mem.logger.info("Load empty_tables.json")
-        with (mem.settings.out_folder / "empty_tables.json").open(
-            "r", encoding="utf-8"
-        ) as f:
-            mem.statistic["empty_table_lists_to_fill"] = json.load(f)
+                mem.statistic["empty_table_lists_to_fill"] = json.load(f)
 
-    mem.statistic = dict(sorted(mem.statistic.items()))
-    stat_time = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H%m")
-    stat_file_path = (
-        mem.settings.out_folder / f"{stat_time}-{mem.settings.mpx_host}_stat.json"
-    )
-    with stat_file_path.open("w", encoding="utf-8") as stat:
-        mem.logger.info(f"Dump telemetry file in {stat_file_path.absolute()}")
-        json.dump(mem.statistic, stat, ensure_ascii=False, indent=4)
+        mem.statistic = dict(sorted(mem.statistic.items()))
+        stat_time = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H%m")
+        stat_file_path = (
+            mem.settings.out_folder / f"{stat_time}-{mem.settings.mpx_host}_stat.json"
+        )
+        with stat_file_path.open("w", encoding="utf-8") as stat:
+            mem.logger.info(f"Dump telemetry file in {stat_file_path.absolute()}")
+            json.dump(mem.statistic, stat, ensure_ascii=False, indent=4)
 
-    if mem.settings.telemetry != "no":
-        archive_upload(stat_file_path)
-        mem.logger.info(
-            f"File {stat_file_path.absolute()} was sent to storage.ptsecurity.com"
-        )
-    if mem.settings.telemetry == "all":
-        archive_upload(mem.settings.out_folder, stat_file_path)
-        mem.logger.info(
-            f"Folder {mem.settings.out_folder.absolute()} was sent to storage.ptsecurity.com"
-        )
-    if mem.settings.telemetry == "no":
-        user_choice = (
-            input("Upload archive to storage.ptsecurity.com? (Y/N): ").strip().upper()
-        )
-        if user_choice == "Y":
-            report_type = (
-                input("Short or full report? (F - full / other - simplified): ")
-                .strip()
-                .upper()
+        if mem.settings.telemetry != "no":
+            archive_upload(stat_file_path)
+            mem.logger.info(
+                f"File {stat_file_path.absolute()} was sent to storage.ptsecurity.com"
             )
+        if mem.settings.telemetry == "all":
+            archive_upload(mem.settings.out_folder, stat_file_path)
+            mem.logger.info(
+                f"Folder {mem.settings.out_folder.absolute()} was sent to storage.ptsecurity.com"
+            )
+        if mem.settings.telemetry == "no":
+            user_choice = (
+                input("Upload archive to storage.ptsecurity.com? (Y/N): ").strip().upper()
+            )
+            if user_choice == "Y":
+                report_type = (
+                    input("Short or full report? (F - full / other - simplified): ")
+                    .strip()
+                    .upper()
+                )
 
-            if report_type == "F":
-                archive_upload(mem.settings.out_folder, stat_file_path)
-            else:
-                archive_upload(stat_file_path)
+                if report_type == "F":
+                    archive_upload(mem.settings.out_folder, stat_file_path)
+                else:
+                    archive_upload(stat_file_path)
+    except SystemExit:
+        _run_failed = True
+        raise
+    except BaseException:
+        _run_failed = True
+        logging.getLogger("Nomos").exception("Прогон завершился ошибкой")
+        raise
+    finally:
+        # Автозавершение: эталон/сверка + диагностический бандл (см. nomos.autofinish)
+        finalize_last_run(failed=_run_failed)
