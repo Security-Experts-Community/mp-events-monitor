@@ -1,0 +1,79 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nomos"
+version = "0.1.0"
+description = "Nomos — аудит покрытия SIEM MaxPatrol 10 (веб-приложение, в процессе рефакторинга из CLI-прототипа)"
+readme = "README_SHORT.txt"
+# Nomos запускают тем Python, который уже стоит у заказчика, поэтому
+# нижняя граница опущена до 3.10 (проверено vermin), а верхней нет.
+# Проверены 3.10, 3.12 и 3.14; на более новых возможен разрыв в колёсах
+# pydantic-core — envcheck.py предупредит об этом на запуске.
+requires-python = ">=3.10"
+dependencies = [
+    # HTTP к MaxPatrol
+    "requests>=2.32,<3",
+    "aiohttp>=3.12,<4",
+    "urllib3>=2.4",
+    "backoff>=2.2",
+    # Конфигурация
+    "pydantic>=2.11,<3",
+    "pydantic-settings>=2.11,<3",
+    "PyYAML>=6.0",
+    # Вывод/прогресс (legacy, уходит на этапах 1–5)
+    "xlsxwriter>=3.2,<4",
+    "tqdm>=4.67",
+]
+
+[project.optional-dependencies]
+# Режим DataLake (events_dl.py). В прототипе pandas отсутствовал в requirements — реальный баг.
+# Кроме pandas модуль тянет loguru, sqlalchemy и datalake_client; последний —
+# внутренний пакет PT, в публичном PyPI его нет, ставится из внутреннего индекса.
+dl = [
+    "pandas>=2.2",
+    "loguru>=0.7",
+    "sqlalchemy>=2.0",
+    "datalake-client",
+]
+# Телеметрия на storage.ptsecurity.com (test_bot.py); выключена по умолчанию.
+telemetry = ["pyminizip>=0.2"]
+dev = [
+    "pytest>=8.3",
+    "pytest-asyncio>=0.24",
+    # цветной вывод tools/kb_config_generator.py (есть заглушка, если не стоит)
+    "colorama>=0.4",
+    "ruff>=0.6",
+    "vermin>=1.6",  # сторож совместимости с Python 3.10
+    "httpx>=0.27",  # TestClient для тестов API
+]
+
+[tool.setuptools]
+py-modules = ["Nomos"]
+
+[tool.setuptools.packages.find]
+include = ["nomos*", "lib*"]
+
+[tool.ruff]
+line-length = 100
+# py310: минимальная поддерживаемая версия, иначе линтер советует
+# API вроде datetime.UTC, которых там ещё нет
+target-version = "py310"
+# Legacy-код (lib/, Nomos.py) на этапе 0 не переформатируем, чтобы diff-ы
+# этапов 1–2 показывали смысловые изменения, а не стиль.
+include = ["nomos/**/*.py", "tools/*.py", "tests/**/*.py"]
+# tools/kb_config_generator.py приведён в порядок на шаге 2.5 и линтуется
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.ruff.lint.isort]
+# Задаём явно: в CLI-срезе папки nomos/web нет, и без этого линтер считал
+# nomos.web сторонним пакетом, требуя другой порядок импортов, чем в полной
+# версии, — один и тот же файл не мог устроить обе сборки
+known-first-party = ["nomos", "lib"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"

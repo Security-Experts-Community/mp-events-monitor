@@ -3,6 +3,7 @@ import json
 import logging
 import unicodedata
 from collections import defaultdict
+from pathlib import Path
 
 import xlsxwriter
 from aiohttp import ClientSession
@@ -23,6 +24,8 @@ except:
 
 import difflib
 from datetime import datetime
+
+from nomos.kb_presence import ABSENT_TABLE, LABELS, build_absence_report
 
 
 class KB_Checker:
@@ -168,7 +171,7 @@ class KB_Checker:
         diffs_dir.mkdir(parents=True, exist_ok=True)
 
         try:
-            with (diffs_dir / output_file).open("w") as f:
+            with (diffs_dir / output_file).open("w", encoding="utf-8") as f:
                 f.write(result)
         except IOError as e:
             self.logger.error(f"Ошибка записи в файл: {e}")
@@ -503,7 +506,52 @@ class KB_Checker:
         await async_session.close()
         return results
 
+    def write_absence_report(self, kb_installed, known_tables) -> dict:
+        """Пишет KB_struct_absent.json: чего из конфига нет в БЗ клиента.
+
+        Отличается от KB_struct_uninstalled.json: там контент, который
+        есть в базе, но не развёрнут; здесь — которого нет вовсе.
+        """
+        configs_dir = Path(self.settings.event_policies_file).parent
+        try:
+            with Path(self.settings.event_policies_file).open(
+                "r", encoding="utf-8"
+            ) as f:
+                event_policies = json.load(f)
+            with (configs_dir / "table_filters.json").open("r", encoding="utf-8") as f:
+                table_filters = json.load(f)
+        except (OSError, json.JSONDecodeError) as err:
+            self.logger.warning(f"Сводка отсутствующего в БЗ не построена: {err}")
+            return {}
+
+        required_tables = [
+            name
+            for group, names in table_filters.items()
+            if group != "comment"
+            for name in names
+        ]
+        report = build_absence_report(
+            kb_installed, event_policies, required_tables, known_tables
+        )
+        totals = report["totals"]
+        if any(totals.values()):
+            self.logger.warning(
+                "В базе знаний клиента ОТСУТСТВУЮТ: пакетов экспертизы "
+                f"{totals['packages']}, правил корреляции {totals['rules']}, "
+                f"табличных списков {totals['table_lists']}. Это не «не "
+                "установлено» — контента нет вовсе, требуется поставка"
+            )
+            for pack in report["packages"]:
+                self.logger.warning(f"  нет пакета: {pack}")
+        else:
+            self.logger.info("Вся требуемая экспертиза присутствует в базе знаний")
+        path = Path(self.settings.out_folder) / "KB_struct_absent.json"
+        with path.open("w", encoding="utf-8") as f:
+            json.dump(report, f, indent=4, ensure_ascii=False)
+        return report
+
     def work(self):
+        configs_dir = Path(self.settings.event_policies_file).parent
         tables_to_assets = {
             "List_Servers": "AssetGrid_Servers",
             "Sensitive_Users": "AssetGrid_Critical_Domain_Accounts",
@@ -541,8 +589,8 @@ class KB_Checker:
                             ]["name"],
                         }
 
-            with open(
-                f"{self.settings.out_folder}\\license_info.json", "w", encoding="utf-8"
+            with (Path(self.settings.out_folder) / "license_info.json").open(
+                "w", encoding="utf-8"
             ) as f:
                 f.write(json.dumps(self.lic_info, indent=4, ensure_ascii=False))
 
@@ -583,10 +631,13 @@ class KB_Checker:
         for key in keys_to_delete:
             del combined_dict[key]
 
-        with open(
-            f"{self.settings.out_folder}\\KB_struct.json", "w", encoding="utf-8"
+        with (Path(self.settings.out_folder) / "KB_struct.json").open(
+            "w", encoding="utf-8"
         ) as f:
             f.write(json.dumps(combined_dict, indent=4, ensure_ascii=False))
+
+        # Чего из нашего конфига нет в БЗ клиента вообще
+        self.write_absence_report(combined_dict, all_tables_list)
 
         uninstalled_content = {}
         for expert_pack in combined_dict.keys():
@@ -600,17 +651,17 @@ class KB_Checker:
             if temp_list != []:
                 uninstalled_content[expert_pack] = temp_list
 
-        with open(
-            f"{self.settings.out_folder}\\KB_struct_uninstalled.json",
-            "w",
-            encoding="utf-8",
+        with (Path(self.settings.out_folder) / "KB_struct_uninstalled.json").open(
+            "w", encoding="utf-8"
         ) as f:
             json.dump(uninstalled_content, f, indent=4, ensure_ascii=False)
 
-        with open("configs\\packages_names.json", "r", encoding="utf-8") as f_packs:
+        with (configs_dir / "packages_names.json").open(
+            "r", encoding="utf-8"
+        ) as f_packs:
             packs_names = json.load(f_packs)
 
-        with open("configs\\table_filters.json", "r") as f:
+        with (configs_dir / "table_filters.json").open("r", encoding="utf-8") as f:
             table_filters = json.load(f)
 
         file_name = (
@@ -620,7 +671,7 @@ class KB_Checker:
             + ".xlsx"
         )
 
-        report_file = f"{self.settings.out_folder}\\{file_name}"
+        report_file = str(Path(self.settings.out_folder) / file_name)
 
         changed = asyncio.run(self.get_changed(all_tables_list))
 
@@ -657,6 +708,8 @@ class KB_Checker:
         red_format = workbook.add_format({"bg_color": "#dc1319"})
         asset_format = workbook.add_format({"bg_color": "#23A455"})
         yellow_format = workbook.add_format({"bg_color": "#F0E40C"})
+        # Отдельный цвет: элемента нет в БЗ, установить его нечем
+        orange_format = workbook.add_format({"bg_color": "#F79646"})
 
         header_format = workbook.add_format(
             {"bold": True, "font_color": "white", "bg_color": "#4F81BD", "border": 1}
@@ -709,21 +762,32 @@ class KB_Checker:
         for row_idx, tbl_name in enumerate(
             [item for _, tables in categories.items() for item in tables], start=2
         ):
+            # Списка может не быть в БЗ клиента вовсе — раньше здесь падал
+            # KeyError и отчёт не создавался совсем
+            statuses = table_statuses.get(tbl_name)
+            if statuses is None:
+                for i in range(len(current_conveyors)):
+                    worksheet.write(
+                        row_idx, 2 + i, LABELS[ABSENT_TABLE], orange_format
+                    )
+                continue
             for i in range(len(current_conveyors)):
-                if current_conveyors[i] in table_statuses[tbl_name].keys():
-                    if table_statuses[tbl_name][current_conveyors[i]] == "Installed":
+                if current_conveyors[i] in statuses.keys():
+                    if statuses[current_conveyors[i]] == "Installed":
                         worksheet.write(row_idx, 2 + i, "Installed", green_format)
                 else:
                     worksheet.write(row_idx, 2 + i, "Not installed", red_format)
 
-                if table_statuses[tbl_name] == {}:
+                if statuses == {}:
                     worksheet.write(
                         row_idx, 2 + len(current_conveyors), "-----", yellow_format
                     )
 
         current_conveyors = self.get_real_names_pipeline(current_conveyors)
 
-        with open("configs/table_mapping.json", "r", encoding="utf-8") as table_file:
+        with (configs_dir / "table_mapping.json").open(
+            "r", encoding="utf-8"
+        ) as table_file:
             rules_to_tables = json.load(table_file)
 
         for row_idx, tbl_name in enumerate(
@@ -789,7 +853,7 @@ class KB_Checker:
             worksheet.write(
                 0,
                 7 + len(current_conveyors),
-                "Отсутствуют в установочной БД",
+                "Отсутствуют в базе знаний (поставить нечем)",
                 header_format,
             )
             index = 2

@@ -208,11 +208,22 @@ class EventsWorker:
             param = {"groupId": group_id}
         else:
             param = {"groupIds": group_id}
-        if self.settings.logging_level == "DEBUG":
+        # Тело запроса на диск: при DEBUG или при явном dump_queries —
+        # иначе сообщения ниже ссылались на файл, которого нет (репорт 10.09)
+        dump_request = self.settings.logging_level == "DEBUG" or getattr(
+            self.settings, "dump_queries", False
+        )
+        if dump_request:
             with file_path.open("w", encoding="utf-8") as out_file:
                 temp_data_with_params = {"data": data, "params": param}
                 json.dump(temp_data_with_params, out_file, ensure_ascii=False, indent=4)
                 del temp_data_with_params
+        # В сообщениях об ошибках — что именно спрашивали, а не путь к файлу:
+        # файл пишется не всегда, а политика/под-фильтр/пачка нужны всегда
+        query_label = (
+            f"'{temp_policy['name']}' #{temp_policy['number'] + 1} "
+            f"[{out_dir.name}]"
+        )
 
         try_number = 0
         all_ok = False
@@ -247,7 +258,7 @@ class EventsWorker:
                                     int(time.time()) - modified_delta * 60 * 60
                                 )
                                 self.logger.warning(
-                                    f"Errors in take_events response for {file_path} (try {try_number}): "
+                                    f"Errors in take_events response for {query_label} (try {try_number}): "
                                     f"{response}. New timeFrom: {data['timeFrom']}. Retrying in 5s..."
                                 )
                         elif status >= 500:
@@ -260,13 +271,13 @@ class EventsWorker:
                                 int(time.time()) - modified_delta * 60 * 60
                             )
                             self.logger.warning(
-                                f"Server error {status} for {file_path}. Try {try_number}/{self.settings.reconnect_times}. "
+                                f"Server error {status} for {query_label}. Try {try_number}/{self.settings.reconnect_times}. "
                                 f"New timeFrom: {data['timeFrom']}. Retrying in 5s..."
                             )
                         elif status == 400:
                             response = await response_temp.json()
                             self.logger.error(
-                                f"Bad request (400) for {file_path}. Error: {response.get('message', 'unknown')}."
+                                f"Bad request (400) for {query_label}. Error: {response.get('message', 'unknown')}."
                             )
                             self.logger.error(
                                 f"Full response: {json.dumps(response, indent=4)}"
@@ -275,7 +286,7 @@ class EventsWorker:
                         else:
                             response = await response_temp.json()
                             self.logger.error(
-                                f"Unexpected status {status} for {file_path}. Break. Response: {response}"
+                                f"Unexpected status {status} for {query_label}. Break. Response: {response}"
                             )
                             break  # не retryable
 
@@ -298,6 +309,26 @@ class EventsWorker:
                     await asyncio.sleep(5)
 
         # Обработка результата
+        # N6: если ретраи сжимали окно (modified_delta), фиксируем фактическое
+        # окно в статистике — COUNT за усечённый период иначе неотличим от
+        # полного. Пишем минимальное (худшее) окно по политике.
+        if modified_delta:
+            degraded = self.statistic.setdefault("degraded_windows_hours", {})
+            prev = degraded.get(all_policy["name"])
+            if prev is None or modified_delta < prev:
+                degraded[all_policy["name"]] = modified_delta
+            self.logger.warning(
+                f"Политика '{all_policy['name']}': окно анализа сжато до "
+                f"{modified_delta} ч (исходное {self.settings.time_delta_hours} ч)"
+            )
+        if not all_ok:
+            # Молчаливый провал искажает результат: политика без событий
+            # неотличима от политики, которую не удалось спросить
+            self.logger.error(
+                f"Запрос {query_label} не выполнен за "
+                f"{self.settings.reconnect_times} попыток — событий по нему нет "
+                f"в отчёте (возможен ложный 'no os events')"
+            )
         if all_ok and response.get("rows"):
             for row in response["rows"]:
                 event_info = {
@@ -330,7 +361,7 @@ class EventsWorker:
                     )
 
         # Сохранение в файл (только если нужно)
-        if self.settings.logging_level == "DEBUG":
+        if dump_request:
             with (out_dir / file_name).open("w", encoding="utf-8") as out_file:
                 json.dump(temp_policy, out_file, ensure_ascii=False, indent=4)
 
@@ -374,7 +405,21 @@ class EventsWorker:
             out_path,
             self.policies.mandatory_policies,
         )
+        degraded_windows = self.statistic.get("degraded_windows_hours")  # N6
         self.statistic = excel_file.statistics.model_dump()
+        if degraded_windows:
+            self.statistic["degraded_windows_hours"] = degraded_windows
+        # Мета проверенных политик — для карточки актива в веб-версии:
+        # сколько под-фильтров у политики и какие пакеты экспертизы она кроет.
+        self.statistic["checked_policies"] = {
+            name: {
+                "filters_total": len(filters),
+                "packages": sorted(
+                    {pkg for flt in filters.values() for pkg in flt}
+                ),
+            }
+            for name, filters in self.policies.small_policies.items()
+        }
         if "exp_coverage_percent_array" in self.statistic.keys():
             self.statistic.pop("exp_coverage_percent_array")
         with (out_path / "!asset_dict.json").open("w", encoding="utf-8") as out_assets:

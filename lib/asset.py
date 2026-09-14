@@ -12,6 +12,8 @@ import requests
 
 from lib.events import EventsWorker
 from lib.get_token import MPXAuthenticator
+from nomos.errors import FilterExecutionError, MPXAuthError
+from nomos.queryplan import record_filter_assets
 from lib.policies_checker import EventPolicies
 from lib.settings_checker import Settings
 
@@ -114,10 +116,16 @@ class AssetWorker:
             if type(self.comment) is str:
                 self.comment = [self.comment]
         asset_dict, asset_fields, no_assets = self.work(out_folder)
+        # Для плана запросов (dump_queries): какие активы вернул PDQL
+        self._asset_ids = list(asset_dict.keys())
+        self._no_asset_rows = len(no_assets or [])
         num_assets = len(asset_dict.keys())
         self.logger.info(f"find {num_assets} assets")
         if no_assets:
             self.logger.info(f"and {len(no_assets)} lines with asset_id null")
+        if getattr(self.settings, "dump_queries", False):
+            # Выборка видна в плане сразу, а не после многочасового опроса
+            record_filter_assets(self, self.logger)
         counter = self.settings.max_uuids_in_siem_query
         if num_assets > 0:
             ev = EventsWorker(
@@ -187,6 +195,7 @@ class AssetWorker:
                 self.comment,
             )
             self.statistic.update(ev.statistic)
+            self._last_small_policies = ev.policies.small_policies
         elif no_assets:
             ev = EventsWorker(
                 self.settings,
@@ -210,8 +219,24 @@ class AssetWorker:
                 self.comment,
             )
             self.statistic.update(ev.statistic)
+            self._last_small_policies = ev.policies.small_policies
         with (out_folder / "AssetWorker_stat.json").open("w", encoding="utf-8") as stat:
             json.dump(self.statistic, stat, ensure_ascii=False, indent=4)
+        # Мета политик фильтра для веб-отчётов «как в Excel»: тексты
+        # под-фильтров (порядок = № фильтра) и пакеты экспертизы -> правила.
+        policies_meta = {
+            name: {
+                "filters": list(filters.keys()),
+                "packages": {
+                    pkg: sorted({rule for flt in filters.values()
+                                 for rule in flt.get(pkg, [])})
+                    for pkg in sorted({p for flt in filters.values() for p in flt})
+                },
+            }
+            for name, filters in getattr(self, "_last_small_policies", {}).items()
+        }
+        with (out_folder / "!policies_meta.json").open("w", encoding="utf-8") as meta:
+            json.dump(policies_meta, meta, ensure_ascii=False, indent=4)
 
     def work(self, out_folder):
         response, fields, asset_id_field, all_search_values = self.create_pdql_token(
@@ -350,7 +375,7 @@ class AssetWorker:
                     self.logger.warning("503 Service Unavailable")
                 elif response_temp.status_code == 401:
                     self.logger.error("Error with AuthHeader, stop script")
-                    exit(1)
+                    raise MPXAuthError("401 на create_pdql_token: токен недействителен")
             except requests.exceptions.HTTPError as Err:
                 self.logger.warning(
                     f"{retry_num - 1} attempt was unsuccessful while create_pdql_token: {self.pdql} Err: {Err}"
@@ -430,10 +455,24 @@ class AssetWorker:
                             )
                             param["offset"] += limit
                 elif response_temp.status_code in [400, 403, 404]:
+                    # N2: раньше здесь был exit(1), убивавший весь прогон
+                    # из-за одного фильтра. Теперь — исключение уровня фильтра.
                     self.logger.error(
                         f"problem take_assets {response_temp.status_code}"
                     )
-                    exit(1)
+                    raise FilterExecutionError(
+                        self.filter_name,
+                        f"take_assets вернул {response_temp.status_code}",
+                    )
+                else:
+                    # N1: раньше статусы вне (200, 400, 403, 404) — в т.ч. все
+                    # 5xx при деградации стенда — не попадали ни в одну ветку:
+                    # без sleep и счётчика ретраев цикл молотил API бесконечно.
+                    self.logger.warning(
+                        f"take_assets: неожиданный статус "
+                        f"{response_temp.status_code}, ретрай"
+                    )
+                    unsuccessful = True
             except requests.exceptions.HTTPError as Err:
                 self.logger.warning(
                     f"{retry_num} attempt was unsuccessful while take_assets: {token}. pdql: {self.pdql}. Err: {Err}"

@@ -1,15 +1,23 @@
-# base
-.*
-!.gitignore
-!.gitattributes
-*~
-*.pyc
-*.log
-build
-dist
-*.spec
+# Секреты — никогда не коммитить
+configs/.config.env
 
-# pycharm
-*.idea
+# Результаты запусков и отладка
+nomos.db
+nomos.db-*
+out/
+logs/
+debug/
+fixtures/
+golden/
+web_inputs/
 
-/out/*
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+build/
+dist/

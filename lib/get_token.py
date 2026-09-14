@@ -1,3 +1,4 @@
+import sys
 import logging
 import re
 import time
@@ -156,7 +157,7 @@ class MPXAuthenticator:
                     break
                 elif scopes.status_code == 401:
                     self.logger.error("Personal Token expired or no rights to PT MC.")
-                    exit(1)
+                    sys.exit(1)
                 else:
                     raise requests.exceptions.ConnectionError(
                         f"Code {scopes.status_code}, Content: {scopes.content}"
@@ -275,7 +276,7 @@ class MPXAuthenticator:
             response = self.session.get(url, verify=False, json=body)
         if response.status_code == 400:
             self.logger.error("400 Client Error. Check creds.")
-            exit(1)
+            sys.exit(1)
         response.raise_for_status()
         return response
 

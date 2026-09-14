@@ -6,6 +6,16 @@ from pathlib import Path
 from typing import Literal, Optional
 
 import xlsxwriter
+
+from nomos.domain.analysis import (
+    accumulate_policy_hits,
+    check_edr as _domain_check_edr,
+    classify_policy_events,
+    status_counter_field,
+    status_master as _domain_status_master,
+)
+from nomos.kb_presence import INSTALLED, LABELS, is_absent, rule_presence
+from nomos.tablelists import needs_manual_fill
 from pydantic import BaseModel
 
 
@@ -461,17 +471,12 @@ class MonitorXlsxWriter:
                         self.kb_check[policy_name][pack] = {}
                     for rule in policy[event_filter][pack]:
                         if rule not in self.kb_check[policy_name][pack].keys():
-                            install_status = False
-                            if pack in self.kb_installed:
-                                for kb_rule in self.kb_installed[pack]:
-                                    if (
-                                        rule == kb_rule["SystemName"]
-                                        and len(kb_rule["DeploymentStatuses"]) > 0
-                                    ):
-                                        install_status = True
-                                        break
+                            # Различаем «не установлено» и «нет в БЗ вовсе»:
+                            # раньше оба давали install_status=False
+                            presence = rule_presence(self.kb_installed, pack, rule)
                             self.kb_check[policy_name][pack][rule] = {
-                                "install_status": install_status,
+                                "install_status": presence == INSTALLED,
+                                "presence": presence,
                                 "event_filter_indexes": {},
                                 # {номер, общий статус, где 0 - событий нет, 1 - частично, 2 во всех активах}
                             }
@@ -480,13 +485,15 @@ class MonitorXlsxWriter:
                         ].update({str(index): False})
 
     def create_asset_dict(self, policies, small_policies, asset_dict):
+        """Этап 1: накопление статистики перенесено в
+        nomos.domain.analysis.accumulate_policy_hits; здесь остался только
+        рендер строк листов по политикам (порядок записи сохранён)."""
         index = 0
         old_name = ""
         pol_num = 0
         for policy in policies:
             if policy["name"] == "Audit Events Hack":
                 continue
-            # one_policy = True if small_policies[policy["name"]]["count"] == 1 else False
             if policy["name"] != old_name:
                 index = 0
                 old_name = policy["name"]
@@ -506,56 +513,7 @@ class MonitorXlsxWriter:
                     out_list_attrs,
                     self.formats.white,
                 )
-                value = {
-                    "full_info": {
-                        str(policy["number"]): policy["host_ids"][host]["count"]
-                    },
-                    "sum_count": policy["host_ids"][host]["count"],
-                    "satisfaction": "PART",
-                }
-                if host not in asset_dict:
-                    asset_dict.update(
-                        {
-                            host: {
-                                "policies": {policy["name"]: value},
-                                "names": policy["host_ids"][host]["event_src.host"],
-                            }
-                        }
-                    )
-                elif "policies" not in asset_dict[host].keys():
-                    asset_dict[host].update(
-                        {
-                            "policies": {policy["name"]: value},
-                            "names": policy["host_ids"][host]["event_src.host"],
-                        }
-                    )
-                else:
-                    if policy["name"] not in asset_dict[host]["policies"]:
-                        asset_dict[host]["policies"].update({policy["name"]: value})
-                        for host_name in policy["host_ids"][host]["event_src.host"]:
-                            if host_name not in asset_dict[host]["names"]:
-                                asset_dict[host]["names"].append(host_name)
-                    else:
-                        asset_dict[host]["policies"][policy["name"]][
-                            "full_info"
-                        ].update(
-                            {str(policy["number"]): policy["host_ids"][host]["count"]}
-                        )
-                        asset_dict[host]["policies"][policy["name"]][
-                            "sum_count"
-                        ] += policy["host_ids"][host]["count"]
-                if len(
-                    asset_dict[host]["policies"][policy["name"]]["full_info"].keys()
-                ) == len(small_policies[policy["name"]].keys()):
-                    asset_dict[host]["policies"][policy["name"]]["satisfaction"] = "YES"
-                for host_name in policy["host_ids"][host]["event_src.host"]:
-                    if host_name not in asset_dict[host]["names"]:
-                        asset_dict[host]["names"].append(host_name)
-        if policies[-1]["name"] == "Audit Events Hack":
-            for host in policies[-1]["host_ids"].keys():
-                asset_dict[host].update(
-                    {"audit_info": policies[-1]["host_ids"][host]["event_src.host"]}
-                )
+        accumulate_policy_hits(policies, small_policies, asset_dict)
         return asset_dict
 
     def polycolor_one_policy(self, policies_statistic, small_policies):
@@ -604,7 +562,15 @@ class MonitorXlsxWriter:
                         total_rules += 1
                         rule_color = "green"
                         rule_in_list = [rule]
-                        if not self.kb_check[policy][pack][rule]["install_status"]:
+                        presence = self.kb_check[policy][pack][rule].get(
+                            "presence", INSTALLED
+                        )
+                        if is_absent(presence):
+                            # Установить нечего: контента нет в базе знаний
+                            rule_color = "orange"
+                            pack_color = self.formats.orange
+                            rule_in_list.append(LABELS[presence])
+                        elif not self.kb_check[policy][pack][rule]["install_status"]:
                             rule_color = "red"
                             pack_color = self.formats.red
                         else:
@@ -623,12 +589,11 @@ class MonitorXlsxWriter:
                         if rule in self.table_mapping.keys():
                             if self.table_mapping[rule] != []:
                                 for smthing in self.table_mapping[rule]:
-                                    if (
-                                        smthing[list(smthing.keys())[0]]
-                                        == "No_manual_changes"
-                                    ) and list(smthing.keys())[
-                                        0
-                                    ] not in tables_to_assets.keys():
+                                    if smthing[
+                                        list(smthing.keys())[0]
+                                    ] == "No_manual_changes" and needs_manual_fill(
+                                        list(smthing.keys())[0], tables_to_assets
+                                    ):
                                         rule_color = "yellow"
                                         empty_table_lists.append(
                                             list(smthing.keys())[0]
@@ -698,16 +663,10 @@ class MonitorXlsxWriter:
                 self.pol_stat_mat(policies_statistic, policy)
 
     def pol_stat_mat(self, policies_statistic, policy):
-        pol_stat = "no"
-        all_pol = True
-        for index_filter, filter_query in enumerate(policies_statistic[policy]):
-            if policies_statistic[policy][filter_query]:
-                pol_stat = "all"
-            else:
-                all_pol = False
-        if pol_stat == "all" and not all_pol:
-            pol_stat = "not all"
-        if pol_stat == "all" and all_pol:
+        """Этап 1: классификация перенесена в
+        nomos.domain.analysis.classify_policy_events."""
+        pol_stat = classify_policy_events(policies_statistic[policy])
+        if pol_stat == "all":
             self.statistics.policies_with_all_events.append(policy)
         elif pol_stat == "not all":
             self.statistics.policies_with_missing_events.append(policy)
@@ -969,14 +928,10 @@ class MonitorXlsxWriter:
             simple_status, empty_policies_list = _status_master(
                 full_simple_attrs, list(small_policies.keys()), mandatory_policies
             )
-            if simple_status == "ok":
-                self.statistics.ok += 1
-            elif simple_status == "os events":
-                self.statistics.no_os_events += 1
-            elif simple_status == "audit":
-                self.statistics.no_audit += 1
-            else:
-                self.statistics.no_audit_no_os_event += 1
+            # N25 (исправлено): ветки сравнивали с 'os events'/'audit' и были
+            # мёртвыми — критерии C10/C11 листа simple считали только ok.
+            field = status_counter_field(simple_status)
+            setattr(self.statistics, field, getattr(self.statistics, field) + 1)
             asset_dict[asset]["statistic"]["empty policies"] = empty_policies_list
             asset_dict[asset]["statistic"]["STATUS"] = simple_status
             temp_quality += len(empty_policies_list)
@@ -1171,96 +1126,10 @@ class MonitorXlsxWriter:
 
 
 def _status_master(full_simple_attrs, small_attrs, mandatory_policies=None):
-    simple_pol_st_os = False
-    simple_audit_st = False
-    empty_policies = []
-
-    if small_attrs and "Audit Events Hack" in small_attrs:
-        small_attrs.remove("Audit Events Hack")
-    if len(full_simple_attrs) < 9:
-        return "not 8"
-    if not full_simple_attrs[0]:
-        simple_audit_st = True
-    elif full_simple_attrs[4] == "UpToDate":
-        simple_audit_st = True
-    elif (
-        full_simple_attrs[4] == "NotDefined" or full_simple_attrs[4] is None
-    ) and full_simple_attrs[3]:
-        audit_date = datetime.strptime(full_simple_attrs[3], "%Y-%m-%dT%H:%M:%S%z")
-        if (datetime.now(timezone.utc) - audit_date).days < 28:
-            simple_audit_st = True
-    if small_attrs:
-        if full_simple_attrs[7]:
-            if (
-                small_attrs[0].find("w os Win") != -1
-                and full_simple_attrs[7][0].find("w os Win") != -1
-            ):
-                simple_pol_st_os = True
-                for pol in small_attrs:
-                    if pol.find("w os Win") != -1:
-                        if pol not in full_simple_attrs[7]:
-                            simple_pol_st_os = False
-                            empty = True
-                            for not_all_with_msgid in full_simple_attrs[8]:
-                                if not_all_with_msgid.find(pol) != -1:
-                                    empty = False
-                            if empty:
-                                empty_policies.append(pol)
-                    else:
-                        break
-            elif small_attrs[0].find(" os ") == 1:
-                for pol in full_simple_attrs[7]:
-                    if pol.find(" os ") == 1:
-                        simple_pol_st_os = True
-                        break
-        if mandatory_policies:
-            mandatory_policies_copy = mandatory_policies.copy()
-            if (
-                "sa pt edr win" in mandatory_policies_copy
-                and "sa pt edr unix" in mandatory_policies_copy
-            ):
-                if "sa pt edr win" in full_simple_attrs[7]:
-                    mandatory_policies_copy.remove("sa pt edr unix")
-                elif "sa pt edr unix" in full_simple_attrs[7]:
-                    mandatory_policies_copy.remove("sa pt edr win")
-            for mandatory in mandatory_policies_copy:
-                if mandatory not in full_simple_attrs[7]:
-                    empty = True
-                    for not_all_with_msgid in full_simple_attrs[8]:
-                        if not_all_with_msgid.find(mandatory) != -1:
-                            empty = False
-                    if empty:
-                        simple_pol_st_os = False
-                        empty_policies.append(mandatory)
-
-        if full_simple_attrs[8]:
-            simple_pol_st_os = False
-    else:
-        simple_pol_st_os = True
-
-    list_to_return = []
-    if simple_pol_st_os and simple_audit_st:
-        list_to_return.append("ok")
-    else:
-        if not simple_audit_st:
-            list_to_return.append("no audit")
-        if not simple_pol_st_os:
-            list_to_return.append("no os events")
-    return ", ".join(list_to_return), empty_policies
+    """Этап 1: логика перенесена в nomos.domain.analysis.status_master."""
+    return _domain_status_master(full_simple_attrs, small_attrs, mandatory_policies)
 
 
 def check_edr(asset, small_policies):
-    """edr_statuses: Literal["No policies", "Good EDR events", "No EDR events"]"""
-    if (
-        "sa pt edr win" in small_policies.keys()
-        or "sa pt edr unix" in small_policies.keys()
-    ):
-        if "policies" in asset.keys() and (
-            "sa pt edr win" in asset["policies"]
-            or "sa pt edr unix" in asset["policies"]
-        ):
-            return "Good EDR events"
-        else:
-            return "No EDR events"
-    else:
-        return "No policies"
+    """Этап 1: логика перенесена в nomos.domain.analysis.check_edr."""
+    return _domain_check_edr(asset, small_policies)

@@ -7,9 +7,9 @@ import time
 import warnings
 from concurrent.futures import ThreadPoolExecutor
 from copy import deepcopy
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Optional  # type: ignore[attr-defined]
+from typing import Any  # type: ignore[attr-defined]
 
 import backoff
 import pandas as pd
@@ -20,6 +20,7 @@ from sqlalchemy.exc import DBAPIError
 from tqdm.asyncio import tqdm
 
 from lib.events import EventsWorker
+from nomos.compat import UTC
 
 warnings.filterwarnings("ignore")
 global_reconnect_times = 5
