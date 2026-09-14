@@ -41,6 +41,15 @@ WEB_ONLY_PATHS = [
     ".gitlab-ci.yml",
 ]
 
+# Рабочие документы: в поставку не идут (они же в .gitignore)
+INTERNAL_DOCS = [
+    "AGENT.md",
+    "DEVELOPMENT.md",
+    "Nomos_Анализ_и_документация.md",
+    "Nomos_Код-ревью.md",
+    "Nomos_План_рефакторинга.md",
+]
+
 WEB_ONLY_TESTS = [
     "tests/test_frontend_static.py",
     "tests/test_filter_reports.py",
@@ -244,6 +253,8 @@ def build(target: Path, keep_fixtures: bool = False) -> Path:
         if not keep_fixtures and relative.parts[0] == "fixtures":
             continue
         if any(str(relative).startswith(web) for web in WEB_ONLY_PATHS):
+            continue
+        if relative.name in INTERNAL_DOCS:
             continue
         if str(relative).replace("\\", "/") in WEB_ONLY_TESTS:
             continue
