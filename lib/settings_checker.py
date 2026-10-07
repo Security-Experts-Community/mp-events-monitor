@@ -59,6 +59,14 @@ class Settings(BaseSettings, **base_params):
         le=9999,
         validation_alias=AliasChoices("u", "max_uuids", "max_uuids_in_siem_query"),
     )
+    siem_request_timeout: int = Field(
+        default=600,
+        validation_alias=AliasChoices("siem_request_timeout", "siem_timeout"),
+        description="Сколько секунд ждать ответа SIEM на один запрос агрегации "
+        "событий. По истечении окно запроса сужается вдвое и запрос повторяется",
+        ge=30,
+        le=7200,
+    )
     max_threads_for_siem_api: int = Field(
         default=11,
         validation_alias=AliasChoices("t", "max_threads_for_siem_api", "max_threads"),

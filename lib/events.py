@@ -228,6 +228,22 @@ class EventsWorker:
         try_number = 0
         all_ok = False
         response = {}
+        request_timeout = getattr(self.settings, "siem_request_timeout", 600)
+
+        def shrink_window():
+            """Сужает окно запроса вдвое: 168 ч -> 84 -> 42 ...
+
+            Тяжёлый запрос (5xx, ошибки в ответе, таймаут) повторять с тем же
+            окном бессмысленно — SIEM снова не успеет. Фактическое окно потом
+            попадает в degraded_windows_hours (N6).
+            """
+            nonlocal modified_delta
+            if not modified_delta:
+                modified_delta = self.settings.time_delta_hours // 2
+            else:
+                modified_delta = modified_delta // 2
+            modified_delta = max(modified_delta, 1)
+            data["timeFrom"] = int(time.time()) - modified_delta * 60 * 60
 
         # ⚠️ ВАЖНО: семафор захватываем только на отправку запроса, НЕ на retry + sleep!
         while try_number < self.settings.reconnect_times:
@@ -240,7 +256,7 @@ class EventsWorker:
                         json=data,
                         params=param,
                         ssl=False,
-                        timeout=ClientTimeout(total=600),  # явный таймаут 100 сек
+                        timeout=ClientTimeout(total=request_timeout),
                     ) as response_temp:
                         status = response_temp.status
                         if status == 200:
@@ -250,26 +266,14 @@ class EventsWorker:
                                 break  # успех — выходим из retry-цикла
                             else:
                                 # Ошибка в ответе — уменьшаем timeFrom
-                                if not modified_delta:
-                                    modified_delta = self.settings.time_delta_hours // 2
-                                else:
-                                    modified_delta = modified_delta // 2
-                                data["timeFrom"] = (
-                                    int(time.time()) - modified_delta * 60 * 60
-                                )
+                                shrink_window()
                                 self.logger.warning(
                                     f"Errors in take_events response for {query_label} (try {try_number}): "
                                     f"{response}. New timeFrom: {data['timeFrom']}. Retrying in 5s..."
                                 )
                         elif status >= 500:
                             # Серверная ошибка — retry
-                            if not modified_delta:
-                                modified_delta = self.settings.time_delta_hours // 2
-                            else:
-                                modified_delta = modified_delta // 2
-                            data["timeFrom"] = (
-                                int(time.time()) - modified_delta * 60 * 60
-                            )
+                            shrink_window()
                             self.logger.warning(
                                 f"Server error {status} for {query_label}. Try {try_number}/{self.settings.reconnect_times}. "
                                 f"New timeFrom: {data['timeFrom']}. Retrying in 5s..."
@@ -294,16 +298,42 @@ class EventsWorker:
                 if not all_ok and try_number < self.settings.reconnect_times:
                     await asyncio.sleep(5)
 
-            except (ClientError, ClientResponseError, ContentTypeError) as Err:
+            except (asyncio.TimeoutError, TimeoutError):
+                # SIEM не ответил за request_timeout. Это не «неожиданная
+                # ошибка»: таймаут aiohttp — голый TimeoutError, он не
+                # ClientError и раньше падал в except Exception с трейсбеком
+                # посреди прогресс-бара, а повтор шёл с тем же окном и снова
+                # висел request_timeout. Обычно запрос просто тяжёлый
+                # (много активов x широкое окно) или SIEM перегружен
+                # параллельными запросами — сужаем окно, как при 5xx.
+                retrying = try_number < self.settings.reconnect_times
+                if retrying:
+                    shrink_window()
                 self.logger.warning(
-                    f"HTTP error (try {try_number}): {Err}. Retrying in 5s..."
+                    f"SIEM не ответил за {request_timeout} с на {query_label} "
+                    f"(попытка {try_number}/{self.settings.reconnect_times})."
+                    + (
+                        f" Окно сужено до {modified_delta} ч, повтор через 5 с"
+                        if retrying
+                        else ""
+                    )
+                )
+                if retrying:
+                    await asyncio.sleep(5)
+            except (ClientError, ClientResponseError, ContentTypeError) as Err:
+                # str() у ServerDisconnectedError и др. бывает пустым — тип нужен
+                self.logger.warning(
+                    f"HTTP error {type(Err).__name__} for {query_label} "
+                    f"(try {try_number}/{self.settings.reconnect_times}): {Err}. "
+                    "Retrying in 5s..."
                 )
                 # sleep вне семафора — уже сделано выше, но для надёжности:
                 if try_number < self.settings.reconnect_times:
                     await asyncio.sleep(5)
             except Exception as Err:
                 self.logger.exception(
-                    f"Unexpected error in take_events (try {try_number}): {Err}"
+                    f"Unexpected error in take_events for {query_label} "
+                    f"(try {try_number}): {Err}"
                 )
                 if try_number < self.settings.reconnect_times:
                     await asyncio.sleep(5)
